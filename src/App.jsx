@@ -1,0 +1,1158 @@
+import "./App.css";
+import React, { useState, useEffect } from "react";
+import WLogo from "./assets/images/whiteLogo.png";
+import Blogo from "./assets/images/blackLogo.png";
+
+import {
+  Sun,
+  Moon,
+  Menu,
+  X,
+  ArrowDown,
+  Phone,
+  Mail,
+  MapPin,
+  Star,
+  Award,
+  Users,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Facebook,
+  Instagram,
+  Linkedin,
+  Camera,
+  Wrench,
+  Palette,
+  Target,
+} from "lucide-react";
+
+function App() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentTeamSlide, setCurrentTeamSlide] = useState(0);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  // Gallery images
+  const galleryImages = [
+    {
+      id: 1,
+      title: "Modern Kitchen Design",
+      description: "Sleek contemporary kitchen with custom cabinetry",
+    },
+    {
+      id: 2,
+      title: "Classic Wood Finish",
+      description: "Traditional oak kitchen with modern appliances",
+    },
+    {
+      id: 3,
+      title: "Luxury Kitchen Island",
+      description: "Spacious island with granite countertops",
+    },
+    {
+      id: 4,
+      title: "Minimalist Design",
+      description: "Clean lines with premium materials",
+    },
+    {
+      id: 5,
+      title: "Custom Storage Solutions",
+      description: "Optimized storage with elegant design",
+    },
+  ];
+
+  // Team members
+  const teamMembers = [
+    {
+      id: 1,
+      name: "David Zhang",
+      role: "Founder & Master Carpenter",
+      bio: "With over 20 years of experience, David brings precision and artistry to every project.",
+    },
+    {
+      id: 2,
+      name: "Sarah Johnson",
+      role: "Design Consultant",
+      bio: "Sarah transforms ideas into beautiful, functional kitchen designs that clients love.",
+    },
+    {
+      id: 3,
+      name: "Michael Chen",
+      role: "Project Manager",
+      bio: "Michael ensures every project runs smoothly from start to finish with meticulous attention to detail.",
+    },
+    {
+      id: 4,
+      name: "Emily Rodriguez",
+      role: "Customer Relations",
+      bio: "Emily is your dedicated point of contact, ensuring your experience with us is exceptional.",
+    },
+  ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+
+      // Animation trigger
+      const elements = document.querySelectorAll("[data-animate]");
+      elements.forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+        if (isVisible && !element.classList.contains("animated")) {
+          element.classList.add("animated");
+        }
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Carousel auto-advance
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % galleryImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [galleryImages.length]);
+
+  // Team carousel auto-advance
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTeamSlide((prev) => (prev + 1) % teamMembers.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [teamMembers.length]);
+
+  const toggleMode = () => setIsDarkMode(!isDarkMode);
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const nextSlide = () =>
+    setCurrentSlide((prev) => (prev + 1) % galleryImages.length);
+  const prevSlide = () =>
+    setCurrentSlide(
+      (prev) => (prev - 1 + galleryImages.length) % galleryImages.length
+    );
+  const nextTeamSlide = () =>
+    setCurrentTeamSlide((prev) => (prev + 1) % teamMembers.length);
+  const prevTeamSlide = () =>
+    setCurrentTeamSlide(
+      (prev) => (prev - 1 + teamMembers.length) % teamMembers.length
+    );
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Here you would typically send the form data to your backend
+    console.log("Form submitted:", formData);
+    alert("Thank you for your message! We'll get back to you soon.");
+    setFormData({ name: "", email: "", message: "" });
+  };
+
+  return (
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-black text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      {/* Header */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? `${
+                isDarkMode ? "bg-black" : "bg-white/95"
+              } backdrop-blur-md shadow-lg`
+            : "bg-transparent"
+        }`}
+      >
+        <div className="container mx-auto px-2 py-1 md:px-8 md:py-6 ">
+          <nav className="flex items-center justify-between">
+            <div className="flex items-center">
+              <img
+                src={isDarkMode ? WLogo : Blogo}
+                alt="the logo"
+                className="w-[140px]"
+              />
+            </div>
+
+            <div className="hidden lg:flex items-center space-x-6 md:space-x-8">
+              {["Home", "About", "Mission", "Gallery", "Team", "Contact"].map(
+                (item) => (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="hover:text-yellow-500 transition-colors duration-200 font-medium relative group"
+                  >
+                    {item}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
+                  </a>
+                )
+              )}
+              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg">
+                Get Quote
+              </button>
+              <button
+                onClick={toggleMode}
+                className={`p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                  isDarkMode
+                    ? "bg-gray-800 text-white"
+                    : "bg-gray-50 text-gray-900"
+                } hover:text-yellow-500`}
+              >
+                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+            </div>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="lg:hidden p-2 text-current"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </nav>
+
+          {/* Mobile Menu */}
+          <div
+            className={`lg:hidden transition-all duration-300 overflow-hidden ${
+              isMobileMenuOpen
+                ? "max-h-screen opacity-100"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <div
+              className={`py-4 rounded-lg mt-2 shadow-xl ${
+                isDarkMode ? "bg-gray-800" : "bg-gray-50"
+              }`}
+            >
+              {["Home", "About", "Mission", "Gallery", "Team", "Contact"].map(
+                (item) => (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase()}`}
+                    className="block px-4 py-2 hover:text-yellow-500 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item}
+                  </a>
+                )
+              )}
+              <div className="px-4 py-3 flex space-x-3">
+                <button className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors">
+                  Get Quote
+                </button>
+                <button
+                  onClick={toggleMode}
+                  className={`p-2 rounded-lg transition-colors ${
+                    isDarkMode
+                      ? "bg-gray-700 text-white"
+                      : "bg-gray-100 text-gray-900"
+                  } hover:text-yellow-500`}
+                >
+                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section
+        id="home"
+        className="relative w-full h-screen pt-20 overflow-hidden"
+      >
+        <div
+          className={`absolute inset-0 ${
+            isDarkMode
+              ? "bg-gradient-to-br from-gray-900 to-black"
+              : "bg-gradient-to-br from-gray-100 to-white"
+          }`}
+        >
+          <div
+            className="absolute inset-0 opacity-50"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fbbf24' fill-opacity='0.05'%3E%3Cpath d='m0 40l40-40h-40z'/%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          ></div>
+        </div>
+
+        <div className="mt-4 relative z-10 flex h-full items-center">
+          <div div className="pt-6 container mx-auto px-4 py-8 md:px-8">
+            <div className="max-w-4xl">
+              <div className="flex items-center mb-8 md:mb-12">
+                <div>
+                  <div className="text-yellow-500 text-base md:text-lg font-medium">
+                    Crafting Excellence
+                  </div>
+                </div>
+              </div>
+
+              <h1
+                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 md:mb-8"
+                data-animate
+              >
+                Modern Kitchens,
+                <br />
+                <span className="text-yellow-500">Made for You</span>
+              </h1>
+
+              <p
+                className={`text-lg md:text-xl mb-8 md:mb-12 max-w-3xl leading-relaxed ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+                data-animate
+              >
+                DZ Wood Kitchen crafts elegant, made-to-measure kitchens that
+                combine durability, precision, and timeless style for the modern
+                home.
+              </p>
+
+              <div
+                className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-12 md:mb-16"
+                data-animate
+              >
+                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl">
+                  Explore Our Work
+                </button>
+                <button
+                  className={`border-2 px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl ${
+                    isDarkMode
+                      ? "border-white text-white hover:bg-white hover:text-black"
+                      : "border-black text-black hover:bg-black hover:text-white"
+                  }`}
+                >
+                  Get Free Quote
+                </button>
+              </div>
+
+              <div
+                className="w-[100vw] grid grid-cols-3 gap-6 md:gap-8 max-w-2xl"
+                data-animate
+              >
+                {[
+                  { value: "500+", label: "Projects Done" },
+                  { value: "15+", label: "Years Experience" },
+                  { value: "100%", label: "Satisfaction" },
+                ].map((stat, index) => (
+                  <div key={index} className="text-center">
+                    <div className="text-3xl md:text-4xl font-bold mb-1 hover:text-yellow-500 transition-colors">
+                      {stat.value}
+                    </div>
+                    <div
+                      className={`text-sm md:text-base ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className=" absolute bottom-8 left-1/2 transform -translate-y-10  animate-bounce">
+          <ArrowDown
+            size={24}
+            className="opacity-70 hover:opacity-100 transition-opacity"
+          />
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section
+        id="about"
+        className={`py-16 md:py-24 ${isDarkMode ? "bg-black" : "bg-gray-50"}`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="text-center mb-12 md:mb-20" data-animate>
+            <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
+              About Us
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold">About Us</h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
+            <div className="relative" data-animate>
+              <div
+                className={`w-full h-64 md:h-96 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
+                  isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                }`}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Camera size={24} className="text-black" />
+                  </div>
+                  <p
+                    className={`text-base ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    Workshop Image Placeholder
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6" data-animate>
+              <div className="text-yellow-500 text-xs md:text-sm font-semibold uppercase tracking-wider">
+                Our Story
+              </div>
+              <h3 className="text-2xl md:text-4xl font-bold leading-tight">
+                We Always Make
+                <br />
+                <span className="text-yellow-500">The Best</span>
+              </h3>
+
+              <div className="space-y-4 text-base md:text-lg">
+                <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
+                  At DZ Wood Kitchen, we are passionate about creating
+                  exceptional kitchens that blend traditional craftsmanship with
+                  modern design.
+                </p>
+                <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                  From custom cabinetry to complete kitchen renovations, we use
+                  only the finest materials and time-tested techniques to
+                  deliver results that exceed expectations.
+                </p>
+                <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                  With over 15 years of experience in the industry, we have
+                  built our reputation on reliability, innovation, and customer
+                  satisfaction.
+                </p>
+              </div>
+
+              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-colors">
+                Contact Us
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <section
+        id="gallery"
+        className={`py-16 md:py-24 ${isDarkMode ? "bg-black" : "bg-gray-50"}`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="text-center mb-12 md:mb-20" data-animate>
+            <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
+              Our Work
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold">Gallery</h2>
+          </div>
+
+          <div className="relative max-w-4xl mx-auto" data-animate>
+            <div className="overflow-hidden rounded-xl shadow-xl">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {galleryImages.map((image) => (
+                  <div key={image.id} className="w-full flex-shrink-0">
+                    <div
+                      className={`w-full h-64 md:h-96 flex items-center justify-center ${
+                        isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Palette size={24} className="text-black" />
+                        </div>
+                        <h3 className="text-xl font-bold mb-2">
+                          {image.title}
+                        </h3>
+                        <p
+                          className={
+                            isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }
+                        >
+                          {image.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={prevSlide}
+              className={`absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
+                isDarkMode
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-50 text-gray-900"
+              }`}
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              onClick={nextSlide}
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
+                isDarkMode
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-50 text-gray-900"
+              }`}
+            >
+              <ChevronRight size={20} />
+            </button>
+
+            <div className="flex justify-center mt-6 space-x-2">
+              {galleryImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentSlide ? "bg-yellow-500" : "bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission Section */}
+      <section
+        id="mission"
+        className={`py-16 md:py-24 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
+            {/* Mission Content Column */}
+            <div className="space-y-8" data-animate>
+              <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
+                Our Mission
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold">Our Mission</h2>
+
+              <div className="space-y-4 text-base md:text-lg">
+                <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
+                  Our mission is to transform houses into homes by creating
+                  beautiful, functional kitchens that serve as the heart of
+                  family life.
+                </p>
+                <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
+                  We are committed to sustainable practices, using responsibly
+                  sourced materials and implementing eco-friendly processes.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                {[
+                  {
+                    icon: Award,
+                    title: "Quality",
+                    desc: "Finest materials & craftsmanship",
+                  },
+                  {
+                    icon: Target,
+                    title: "Innovation",
+                    desc: "Modern design trends",
+                  },
+                  {
+                    icon: Users,
+                    title: "Service",
+                    desc: "Exceptional service",
+                  },
+                ].map((value, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow ${
+                      isDarkMode ? "bg-gray-800" : "bg-gray-50"
+                    }`}
+                  >
+                    <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <value.icon size={18} className="text-black" />
+                    </div>
+                    <h3 className="text-lg font-bold mb-1 text-center">
+                      {value.title}
+                    </h3>
+                    <p
+                      className={`text-sm text-center ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      {value.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Image Gallery Column */}
+            <div className="space-y-4" data-animate>
+              {/* Large top image */}
+              <div
+                className={`w-full h-64 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
+                  isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                }`}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Camera size={24} className="text-black" />
+                  </div>
+                  <p
+                    className={`text-base ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    Craftsmanship in Action
+                  </p>
+                </div>
+              </div>
+
+              {/* Two smaller bottom images */}
+              <div className="grid grid-cols-2 gap-4">
+                <div
+                  className={`h-48 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Wrench size={20} className="text-black" />
+                    </div>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      Precision Work
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className={`h-48 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                  }`}
+                >
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Palette size={20} className="text-black" />
+                    </div>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      Design Excellence
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section
+        className={`py-[12px] md:py-24 ${isDarkMode ? "bg-black" : "bg-white"}`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
+            data-animate
+          >
+            {[
+              { icon: Calendar, value: "15+", label: "Years Experience" },
+              { icon: Wrench, value: "500+", label: "Projects Done" },
+              { icon: Star, value: "300+", label: "Satisfied Clients" },
+              { icon: Users, value: "50+", label: "Expert Team" },
+            ].map((stat, index) => (
+              <div key={index} className="text-center p-4">
+                <div className="flex justify-center mb-4">
+                  <stat.icon size={32} className="text-yellow-500" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold text-yellow-500 mb-2">
+                  {stat.value}
+                </div>
+                <div
+                  className={`text-sm md:text-base ${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section
+        id="team"
+        className={`py-16 md:py-24 ${
+          isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        }`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="text-center mb-12 md:mb-20" data-animate>
+            <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
+              Our Experts
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold">Meet Our Team</h2>
+          </div>
+
+          <div className="relative max-w-6xl mx-auto" data-animate>
+            <div className="overflow-hidden rounded-xl">
+              <div
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentTeamSlide * 100}%)` }}
+              >
+                {teamMembers.map((member) => (
+                  <div key={member.id} className="w-full flex-shrink-0 px-4">
+                    <div
+                      className={`p-8 rounded-xl shadow-lg ${
+                        isDarkMode ? "bg-gray-800" : "bg-white"
+                      }`}
+                    >
+                      <div className="flex flex-col md:flex-row items-center gap-8">
+                        <div className="w-full md:w-1/3">
+                          <div
+                            className={`w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto flex items-center justify-center ${
+                              isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                            }`}
+                          >
+                            <Users size={48} className="text-yellow-500" />
+                          </div>
+                        </div>
+                        <div className="w-full md:w-2/3 text-center md:text-left">
+                          <h3 className="text-2xl font-bold mb-2">
+                            {member.name}
+                          </h3>
+                          <div className="text-yellow-500 font-medium mb-4">
+                            {member.role}
+                          </div>
+                          <p
+                            className={`mb-6 ${
+                              isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
+                          >
+                            {member.bio}
+                          </p>
+                          <div className="flex justify-center md:justify-start space-x-4"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={prevTeamSlide}
+              className={`absolute left-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
+                isDarkMode
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-50 text-gray-900"
+              }`}
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button
+              onClick={nextTeamSlide}
+              className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
+                isDarkMode
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-50 text-gray-900"
+              }`}
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            <div className="flex justify-center mt-8 space-x-2">
+              {teamMembers.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTeamSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    index === currentTeamSlide ? "bg-yellow-500" : "bg-gray-400"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section
+        id="contact"
+        className={`py-16 md:py-24 ${isDarkMode ? "bg-black" : "bg-white"}`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="text-center mb-12 md:mb-20" data-animate>
+            <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
+              Get In Touch
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold">Contact Us</h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-start">
+            <div className="space-y-8" data-animate>
+              <h3 className="text-2xl md:text-3xl font-bold">
+                Let's Discuss Your Project
+              </h3>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label
+                    htmlFor="name"
+                    className={`block mb-2 font-medium ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="email"
+                    className={`block mb-2 font-medium ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="message"
+                    className={`block mb-2 font-medium ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    Your Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows="5"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700 text-white"
+                        : "bg-white border-gray-300 text-gray-900"
+                    }`}
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors w-full"
+                >
+                  Send Message
+                </button>
+              </form>
+            </div>
+
+            <div className="space-y-8" data-animate>
+              <h3 className="text-2xl md:text-3xl font-bold">
+                Contact Information
+              </h3>
+
+              <div
+                className={`space-y-6 p-6 rounded-xl shadow-lg ${
+                  isDarkMode ? "bg-gray-800" : "bg-gray-50"
+                }`}
+              >
+                <div className="flex items-start">
+                  <div className="bg-yellow-500 p-3 rounded-full mr-4 flex-shrink-0">
+                    <MapPin size={20} className="text-black" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-1">Our Location</h4>
+                    <p
+                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
+                    >
+                      2458 Oak Ridge Omaha, NE 68105
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="bg-yellow-500 p-3 rounded-full mr-4 flex-shrink-0">
+                    <Phone size={20} className="text-black" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-1">Phone Number</h4>
+                    <p
+                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
+                    >
+                      +1 (402) 979-9718
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="bg-yellow-500 p-3 rounded-full mr-4 flex-shrink-0">
+                    <Mail size={20} className="text-black" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold mb-1">Email Address</h4>
+                    <p
+                      className={isDarkMode ? "text-gray-400" : "text-gray-600"}
+                    >
+                      info@dzwoodkitchen.com
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`p-6 rounded-xl shadow-lg ${
+                  isDarkMode ? "bg-gray-800" : "bg-gray-50"
+                }`}
+              >
+                <h4 className="font-bold mb-4">Business Hours</h4>
+                <ul className="space-y-3">
+                  {[
+                    { day: "Monday - Friday", hours: "9:00 AM - 6:00 PM" },
+                    { day: "Saturday", hours: "10:00 AM - 4:00 PM" },
+                    { day: "Sunday", hours: "Closed" },
+                  ].map((item, index) => (
+                    <li key={index} className="flex justify-between">
+                      <span
+                        className={
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }
+                      >
+                        {item.day}
+                      </span>
+                      <span
+                        className={
+                          isDarkMode
+                            ? "text-gray-300 font-medium"
+                            : "text-gray-800 font-medium"
+                        }
+                      >
+                        {item.hours}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section
+        className={`py-16 md:py-24 ${
+          isDarkMode ? "bg-gray-800" : "bg-gray-50"
+        }`}
+      >
+        <div className="container mx-auto px-4 md:px-8 text-center">
+          <div className="max-w-3xl mx-auto" data-animate>
+            <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
+              Ready to Start?
+            </div>
+            <h2 className="text-2xl md:text-4xl font-bold mb-6">
+              We Are Always Ready To
+              <br />
+              <span className="text-yellow-500">Create Your Dream Kitchen</span>
+            </h2>
+            <p
+              className={`text-base md:text-lg mb-8 ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Get in touch with us today and let's start building the kitchen of
+              your dreams together.
+            </p>
+            <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors">
+              Get Started Today
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer
+        className={`py-12 border-t ${
+          isDarkMode
+            ? "bg-gray-800 border-gray-700"
+            : "bg-gray-100 border-gray-200"
+        }`}
+      >
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
+                  <span className="text-black font-bold text-lg">DZ</span>
+                </div>
+                <div className="text-xl font-bold">Wood Kitchen</div>
+              </div>
+              <p
+                className={`mb-4 text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Crafting beautiful kitchens with precision and style for over 15
+                years.
+              </p>
+              <div className="flex space-x-3">
+                {[Facebook, Instagram, Linkedin].map((Icon, index) => (
+                  <div
+                    key={index}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center shadow-md hover:bg-yellow-500 hover:text-black transition-colors ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-gray-200 text-gray-900"
+                    }`}
+                  >
+                    <Icon size={18} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-4 text-yellow-500">Quick Links</h4>
+              <ul
+                className={`space-y-2 text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {["Home", "About", "Mission", "Gallery", "Contact"].map(
+                  (link) => (
+                    <li key={link}>
+                      <a
+                        href={`#${link.toLowerCase()}`}
+                        className="hover:text-yellow-500 transition-colors"
+                      >
+                        {link}
+                      </a>
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold mb-4 text-yellow-500">Contact Info</h4>
+              <div
+                className={`space-y-3 text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                <div className="flex items-start">
+                  <MapPin size={16} className="mr-2 mt-0.5 text-yellow-500" />
+                  <span>2458 Oak Ridge Omaha, NE 68105</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone size={16} className="mr-2 text-yellow-500" />
+                  <span>402-979-9718</span>
+                </div>
+                <div className="flex items-center">
+                  <Mail size={16} className="mr-2 text-yellow-500" />
+                  <span>info@dzwoodkitchen.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`border-t pt-6 text-center text-xs ${
+              isDarkMode
+                ? "border-gray-700 text-gray-400"
+                : "border-gray-200 text-gray-600"
+            }`}
+          >
+            <p>
+              Copyright © {new Date().getFullYear()} DZ Wood Kitchen | Crafted
+              with Excellence
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        html {
+          scroll-behavior: smooth;
+        }
+
+        [data-animate] {
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        [data-animate].animated {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        @keyframes bounce {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        .animate-bounce {
+          animation: bounce 2s infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default App;
