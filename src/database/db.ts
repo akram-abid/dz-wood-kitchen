@@ -1,6 +1,7 @@
 import { Pool, PoolClient, PoolConfig, QueryResult, QueryResultRow } from "pg";
 import { loadConfig } from "../utils/conf";
-
+import { logger } from "../utils/logger";
+import * as Prisma from "@prisma/client";
 // Load app config
 const config = loadConfig();
 
@@ -22,7 +23,7 @@ const pool = new Pool(poolConfig);
 
 // Log errors
 pool.on("error", (err) => {
-  console.error("Database pool error:", err);
+  logger.error("Database pool error:", err);
 });
 
 // Exported db helper
@@ -35,7 +36,7 @@ export const db = {
     const res = await pool.query<T>(text, params);
     const duration = Date.now() - start;
 
-    console.log("Executed query", {
+    logger.info("Executed query", {
       query: text.length > 100 ? text.substring(0, 100) + "..." : text,
       duration: `${duration}ms`,
       rows: res.rowCount,
@@ -53,7 +54,7 @@ export const db = {
       return result;
     } catch (err) {
       await client.query("ROLLBACK");
-      console.error("Transaction error:", err);
+      logger.error("Transaction error:", err);
       throw err;
     } finally {
       client.release();
@@ -65,7 +66,7 @@ export const db = {
       const result = await pool.query("SELECT 1");
       return result.rowCount === 1;
     } catch (error) {
-      console.error("Health check failed:", error);
+      logger.error("Health check failed:", error);
       return false;
     }
   },
@@ -73,9 +74,9 @@ export const db = {
   async close(): Promise<void> {
     try {
       await pool.end();
-      console.log("Database pool closed.");
+      logger.info("Database pool closed.");
     } catch (error) {
-      console.error("Failed to close pool:", error);
+      logger.error("Failed to close pool:", error);
     }
   },
 
@@ -91,6 +92,8 @@ export const db = {
     return pool.connect();
   },
 };
+
+export const prisma = new Prisma.PrismaClient();
 
 // Export types
 export type { PoolClient };
