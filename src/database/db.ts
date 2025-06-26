@@ -1,7 +1,9 @@
 import { Pool, PoolClient, PoolConfig, QueryResult, QueryResultRow } from "pg";
 import { loadConfig } from "../utils/conf";
 import { logger } from "../utils/logger";
-import * as Prisma from "@prisma/client";
+import { drizzle } from "drizzle-orm/node-postgres";
+import * as schema from "./schema";
+
 // Load app config
 const config = loadConfig();
 
@@ -93,7 +95,6 @@ export const db = {
   },
 };
 
-export const prisma = new Prisma.PrismaClient();
-
+export const dbDrizzle = drizzle(pool, { schema });
 // Export types
 export type { PoolClient };
