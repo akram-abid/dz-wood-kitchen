@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import WLogo from "./assets/images/whiteLogo.png";
 import Blogo from "./assets/images/blackLogo.png";
 import "./utils/i18n/i18next";
-import Cookies from "js-cookie";
 
 import {
   Globe,
@@ -35,6 +34,24 @@ import i18next from "i18next";
 
 function App() {
   const { t } = useTranslation();
+  const title1 = useTypingEffect(t("title1"), 80, 500);
+  const title2 = useTypingEffect(t("title2"), 80, title1.isComplete ? 500 : 0);
+
+  const projectsCount = useCountAnimation(
+    "500+",
+    2000,
+    title2.isComplete ? 1000 : 0
+  );
+  const yearsCount = useCountAnimation(
+    "15+",
+    2000,
+    title2.isComplete ? 1200 : 0
+  );
+  const satisfactionCount = useCountAnimation(
+    "100%",
+    2000,
+    title2.isComplete ? 1400 : 0
+  );
 
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -104,20 +121,19 @@ function App() {
     },
   ];
 
-  
   useEffect(() => {
-  const updateDirection = () => {
-    document.documentElement.dir = i18next.dir();
-  };
+    const updateDirection = () => {
+      document.documentElement.dir = i18next.dir();
+    };
 
-  updateDirection();
+    updateDirection();
 
-  i18next.on('languageChanged', updateDirection);
+    i18next.on("languageChanged", updateDirection);
 
-  return () => {
-    i18next.off('languageChanged', updateDirection);
-  };
-}, []);
+    return () => {
+      i18next.off("languageChanged", updateDirection);
+    };
+  }, []);
 
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
 
@@ -127,7 +143,7 @@ function App() {
 
   const handleLanguageChange = (languageCode) => {
     console.log("Selected language:", languageCode);
-    i18next.changeLanguage(languageCode)
+    i18next.changeLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
   };
 
@@ -229,18 +245,23 @@ function App() {
             </div>
 
             <div className="hidden lg:flex items-center space-x-6 md:space-x-8">
-              {[{tag: t("home"), link :"home"}, {tag: t("about"), link :"about"}, {tag: t("mission"), link :"mission"}, {tag: t("gallery"), link :"gallery"}, {tag: t("team"), link :"team"}, {tag: t("contact"), link :"contact"}].map(
-                ({tag, link}) => (
-                  <a
-                    key={link}
-                    href={`#${link}`}
-                    className="hover:text-yellow-500 transition-colors duration-200 font-medium relative group"
-                  >
-                    {tag}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
-                  </a>
-                )
-              )}
+              {[
+                { tag: t("home"), link: "home" },
+                { tag: t("about"), link: "about" },
+                { tag: t("mission"), link: "mission" },
+                { tag: t("gallery"), link: "gallery" },
+                { tag: t("team"), link: "team" },
+                { tag: t("contact"), link: "contact" },
+              ].map(({ tag, link }) => (
+                <a
+                  key={link}
+                  href={`#${link}`}
+                  className="hover:text-yellow-500 transition-colors duration-200 font-medium relative group"
+                >
+                  {tag}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              ))}
 
               {/* Language Dropdown */}
               <div className="relative">
@@ -335,18 +356,23 @@ function App() {
                 isDarkMode ? "bg-gray-800" : "bg-gray-50"
               }`}
             >
-              {[{tag: t("home"), link :"home"}, {tag: t("about"), link :"about"}, {tag: t("mission"), link :"mission"}, {tag: t("gallery"), link :"gallery"}, {tag: t("team"), link :"team"}, {tag: t("contact"), link :"contact"}].map(
-                ({tag, link}) => (
-                  <a
-                    key={link}
-                    href={`#${link}`}
-                    className="block px-4 py-2 hover:text-yellow-500 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {tag}
-                  </a>
-                )
-              )}
+              {[
+                { tag: t("home"), link: "home" },
+                { tag: t("about"), link: "about" },
+                { tag: t("mission"), link: "mission" },
+                { tag: t("gallery"), link: "gallery" },
+                { tag: t("team"), link: "team" },
+                { tag: t("contact"), link: "contact" },
+              ].map(({ tag, link }) => (
+                <a
+                  key={link}
+                  href={`#${link}`}
+                  className="block px-4 py-2 hover:text-yellow-500 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {tag}
+                </a>
+              ))}
 
               {/* Mobile Language Selection */}
               <div className="px-4 py-2">
@@ -432,12 +458,20 @@ function App() {
               </div>
 
               <h1
-                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 md:mb-8"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[150px] md:min-h-[180px]"
                 data-animate
               >
-                {t("title1")}
+                {title1.displayText}
+                {title1.displayText && !title1.isComplete && (
+                  <span className="animate-pulse">|</span>
+                )}
                 <br />
-                <span className="text-yellow-500">{t("title2")}</span>
+                <span className="text-yellow-500">
+                  {title2.displayText}
+                  {title2.displayText && !title2.isComplete && (
+                    <span className="animate-pulse">|</span>
+                  )}
+                </span>
               </h1>
 
               <p
@@ -471,24 +505,40 @@ function App() {
                 className="w-[100vw] grid grid-cols-3 gap-6 md:gap-8 max-w-2xl"
                 data-animate
               >
-                {[
-                  { value: "500+", label: t("projectsDone")},
-                  { value: "15+", label: t("yearsExperience") },
-                  { value: "100%", label: t("satisfaction") },
-                ].map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-3xl md:text-4xl font-bold mb-1 hover:text-yellow-500 transition-colors">
-                      {stat.value}
+                {title2.isComplete &&
+                  [
+                    {
+                      value: "500+",
+                      label: t("projectsDone"),
+                      count: projectsCount,
+                      suffix: "+",
+                    },
+                    {
+                      value: "15+",
+                      label: t("yearsExperience"),
+                      count: yearsCount,
+                      suffix: "+",
+                    },
+                    {
+                      value: "100%",
+                      label: t("satisfaction"),
+                      count: satisfactionCount,
+                      suffix: "%",
+                    },
+                  ].map((stat, index) => (
+                    <div key={index} className="text-center">
+                      <div className="text-3xl md:text-4xl font-bold mb-1 hover:text-yellow-500 transition-colors">
+                        {stat.count}
+                      </div>
+                      <div
+                        className={`text-sm md:text-base ${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {stat.label}
+                      </div>
                     </div>
-                    <div
-                      className={`text-sm md:text-base ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>
@@ -568,7 +618,7 @@ function App() {
       </section>
 
       {/* Gallery Section */}
-<section
+      <section
         id="gallery"
         className={`py-16 md:py-24 ${isDarkMode ? "bg-black" : "bg-gray-50"}`}
       >
@@ -584,12 +634,12 @@ function App() {
             <div className="overflow-hidden rounded-xl shadow-xl">
               <div
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ 
+                style={{
                   transform: `translateX(${
-                    document.documentElement.dir === 'rtl' 
-                      ? currentSlide * 100 
+                    document.documentElement.dir === "rtl"
+                      ? currentSlide * 100
                       : -currentSlide * 100
-                  }%)` 
+                  }%)`,
                 }}
               >
                 {galleryImages.map((image) => (
@@ -623,32 +673,34 @@ function App() {
             <button
               onClick={prevSlide}
               className={`absolute ${
-                document.documentElement.dir === 'rtl' ? 'right-2' : 'left-2'
+                document.documentElement.dir === "rtl" ? "right-2" : "left-2"
               } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              {document.documentElement.dir === 'rtl' ? 
-                <ChevronRight size={20} /> : 
+              {document.documentElement.dir === "rtl" ? (
+                <ChevronRight size={20} />
+              ) : (
                 <ChevronLeft size={20} />
-              }
+              )}
             </button>
             <button
               onClick={nextSlide}
               className={`absolute ${
-                document.documentElement.dir === 'rtl' ? 'left-2' : 'right-2'
+                document.documentElement.dir === "rtl" ? "left-2" : "right-2"
               } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              {document.documentElement.dir === 'rtl' ? 
-                <ChevronLeft size={20} /> : 
+              {document.documentElement.dir === "rtl" ? (
+                <ChevronLeft size={20} />
+              ) : (
                 <ChevronRight size={20} />
-              }
+              )}
             </button>
 
             <div className="flex justify-center mt-6 space-x-2">
@@ -678,7 +730,9 @@ function App() {
               <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
                 {t("ourMission")}
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold">{t("ourMissionTitle")}</h2>
+              <h2 className="text-3xl md:text-5xl font-bold">
+                {t("ourMissionTitle")}
+              </h2>
 
               <div className="space-y-4 text-base md:text-lg">
                 <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
@@ -833,7 +887,7 @@ function App() {
       </section>
 
       {/* Team Section */}
-<section
+      <section
         id="team"
         className={`py-16 md:py-24 ${
           isDarkMode ? "bg-gray-900" : "bg-gray-50"
@@ -844,19 +898,21 @@ function App() {
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
               {t("ourExperts")}
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">{t("meetOurTeam")}</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">
+              {t("meetOurTeam")}
+            </h2>
           </div>
 
           <div className="relative max-w-6xl mx-auto" data-animate>
             <div className="overflow-hidden rounded-xl">
               <div
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ 
+                style={{
                   transform: `translateX(${
-                    document.documentElement.dir === 'rtl' 
-                      ? currentTeamSlide * 100 
+                    document.documentElement.dir === "rtl"
+                      ? currentTeamSlide * 100
                       : -currentTeamSlide * 100
-                  }%)` 
+                  }%)`,
                 }}
               >
                 {teamMembers.map((member) => (
@@ -876,11 +932,13 @@ function App() {
                             <Users size={48} className="text-yellow-500" />
                           </div>
                         </div>
-                        <div className={`w-full md:w-2/3 text-center ${
-                          document.documentElement.dir === 'rtl' 
-                            ? 'md:text-right' 
-                            : 'md:text-left'
-                        }`}>
+                        <div
+                          className={`w-full md:w-2/3 text-center ${
+                            document.documentElement.dir === "rtl"
+                              ? "md:text-right"
+                              : "md:text-left"
+                          }`}
+                        >
                           <h3 className="text-2xl font-bold mb-2">
                             {member.name}
                           </h3>
@@ -894,11 +952,13 @@ function App() {
                           >
                             {member.bio}
                           </p>
-                          <div className={`flex space-x-4 ${
-                            document.documentElement.dir === 'rtl' 
-                              ? 'justify-center md:justify-end' 
-                              : 'justify-center md:justify-start'
-                          }`}></div>
+                          <div
+                            className={`flex space-x-4 ${
+                              document.documentElement.dir === "rtl"
+                                ? "justify-center md:justify-end"
+                                : "justify-center md:justify-start"
+                            }`}
+                          ></div>
                         </div>
                       </div>
                     </div>
@@ -910,32 +970,34 @@ function App() {
             <button
               onClick={prevTeamSlide}
               className={`absolute ${
-                document.documentElement.dir === 'rtl' ? 'right-0' : 'left-0'
+                document.documentElement.dir === "rtl" ? "right-0" : "left-0"
               } top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              {document.documentElement.dir === 'rtl' ? 
-                <ChevronRight size={24} /> : 
+              {document.documentElement.dir === "rtl" ? (
+                <ChevronRight size={24} />
+              ) : (
                 <ChevronLeft size={24} />
-              }
+              )}
             </button>
             <button
               onClick={nextTeamSlide}
               className={`absolute ${
-                document.documentElement.dir === 'rtl' ? 'left-0' : 'right-0'
+                document.documentElement.dir === "rtl" ? "left-0" : "right-0"
               } top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              {document.documentElement.dir === 'rtl' ? 
-                <ChevronLeft size={24} /> : 
+              {document.documentElement.dir === "rtl" ? (
+                <ChevronLeft size={24} />
+              ) : (
                 <ChevronRight size={24} />
-              }
+              )}
             </button>
 
             <div className="flex justify-center mt-8 space-x-2">
@@ -1159,15 +1221,17 @@ function App() {
             <h2 className="text-2xl md:text-4xl font-bold mb-6">
               {t("alwaysReady")}
               <br />
-              <span className="text-yellow-500">{t("createYourDreamKitchen")}</span>
+              <span className="text-yellow-500">
+                {t("createYourDreamKitchen")}
+              </span>
             </h2>
             <p
               className={`text-base md:text-lg mb-8 ${
                 isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
             >
-              {(t("getInTouchToday"))} 
-            </p>  
+              {t("getInTouchToday")}
+            </p>
             <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors">
               {t("getStartedToday")}
             </button>
@@ -1188,10 +1252,10 @@ function App() {
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
                 <img
-                src={isDarkMode ? WLogo : Blogo}
-                alt="the logo"
-                className="w-[280px]"
-              />
+                  src={isDarkMode ? WLogo : Blogo}
+                  alt="the logo"
+                  className="w-[280px]"
+                />
               </div>
               <p
                 className={`mb-4 text-sm ${
@@ -1217,29 +1281,38 @@ function App() {
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-yellow-500">{t("quickLinks")}</h4>
+              <h4 className="font-bold mb-4 text-yellow-500">
+                {t("quickLinks")}
+              </h4>
               <ul
                 className={`space-y-2 text-sm ${
                   isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                {[{tag: t("home"), link :"home"}, {tag: t("about"), link :"about"}, {tag: t("mission"), link :"mission"}, {tag: t("gallery"), link :"gallery"}, {tag: t("team"), link :"team"}, {tag: t("contact"), link :"contact"}].map(
-                  ({tag, link}) => (
-                    <li key={link}>
-                      <a
-                        href={`#${link}`}
-                        className="hover:text-yellow-500 transition-colors"
-                      >
-                        {tag}
-                      </a>
-                    </li>
-                  )
-                )}
+                {[
+                  { tag: t("home"), link: "home" },
+                  { tag: t("about"), link: "about" },
+                  { tag: t("mission"), link: "mission" },
+                  { tag: t("gallery"), link: "gallery" },
+                  { tag: t("team"), link: "team" },
+                  { tag: t("contact"), link: "contact" },
+                ].map(({ tag, link }) => (
+                  <li key={link}>
+                    <a
+                      href={`#${link}`}
+                      className="hover:text-yellow-500 transition-colors"
+                    >
+                      {tag}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-yellow-500">{t("contactInfo")}</h4>
+              <h4 className="font-bold mb-4 text-yellow-500">
+                {t("contactInfo")}
+              </h4>
               <div
                 className={`space-y-3 text-sm ${
                   isDarkMode ? "text-gray-400" : "text-gray-600"
@@ -1278,5 +1351,82 @@ function App() {
     </div>
   );
 }
+
+// Typing animation hook
+const useTypingEffect = (text, speed = 50, delay = 0) => {
+  const [displayText, setDisplayText] = useState("");
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    if (!text || delay === 0) return;
+
+    setDisplayText("");
+    setIsComplete(false);
+
+    const timer = setTimeout(() => {
+      let i = 0;
+      const typingInterval = setInterval(() => {
+        if (i < text.length) {
+          setDisplayText(text.slice(0, i + 1));
+          i++;
+        } else {
+          setIsComplete(true);
+          clearInterval(typingInterval);
+        }
+      }, speed);
+
+      return () => clearInterval(typingInterval);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [text, speed, delay]);
+
+  return { displayText, isComplete };
+};
+
+const useCountAnimation = (target, duration = 2000, delay = 0) => {
+  const [displayValue, setDisplayValue] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Reset states
+    setIsVisible(false);
+    setDisplayValue("");
+    
+    if (delay === 0) {
+      return;
+    }
+    
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      const startTime = Date.now();
+      const startValue = 0;
+      const targetValue = parseInt(target.replace(/[^\d]/g, "")) || 0;
+      const suffix = target.replace(/\d/g, "");
+
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+        const currentValue = Math.floor(
+          startValue + (targetValue - startValue) * easeOutQuart
+        );
+
+        setDisplayValue(currentValue + suffix);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        }
+      };
+
+      animate();
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [target, duration, delay]);
+
+  return displayValue;
+};
 
 export default App;
