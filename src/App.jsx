@@ -2,8 +2,12 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import WLogo from "./assets/images/whiteLogo.png";
 import Blogo from "./assets/images/blackLogo.png";
+import "./utils/i18n/i18next";
+import Cookies from "js-cookie";
 
 import {
+  Globe,
+  ChevronDown,
   Sun,
   Moon,
   Menu,
@@ -26,8 +30,12 @@ import {
   Palette,
   Target,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 function App() {
+  const { t } = useTranslation();
+
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -95,6 +103,35 @@ function App() {
       bio: "Emily is your dedicated point of contact, ensuring your experience with us is exceptional.",
     },
   ];
+
+  
+  useEffect(() => {
+  const updateDirection = () => {
+    document.documentElement.dir = i18next.dir();
+  };
+
+  updateDirection();
+
+  i18next.on('languageChanged', updateDirection);
+
+  return () => {
+    i18next.off('languageChanged', updateDirection);
+  };
+}, []);
+
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+
+  const toggleLanguageDropdown = () => {
+    setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
+  };
+
+  const handleLanguageChange = (languageCode) => {
+    console.log("Selected language:", languageCode);
+    i18next.changeLanguage(languageCode)
+    setIsLanguageDropdownOpen(false);
+  };
+
+  //change page direction
 
   useEffect(() => {
     const handleScroll = () => {
@@ -204,9 +241,66 @@ function App() {
                   </a>
                 )
               )}
+
+              {/* Language Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={toggleLanguageDropdown}
+                  className={`flex items-center space-x-2 p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                    isDarkMode
+                      ? "bg-gray-800 text-white"
+                      : "bg-gray-50 text-gray-900"
+                  } hover:text-yellow-500`}
+                >
+                  <Globe size={20} />
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform duration-200 ${
+                      isLanguageDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Language Dropdown Menu */}
+                <div
+                  className={`absolute right-0 mt-2 w-40 transition-all duration-200 ${
+                    isLanguageDropdownOpen
+                      ? "opacity-100 visible translate-y-0"
+                      : "opacity-0 invisible -translate-y-2"
+                  }`}
+                >
+                  <div
+                    className={`rounded-lg shadow-xl border ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    {[
+                      { code: "en", name: "English", flag: "🇺🇸" },
+                      { code: "ar", name: "العربية", flag: "🇸🇦" },
+                    ].map((language) => (
+                      <button
+                        key={language.code}
+                        onClick={() => handleLanguageChange(language.code)}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
+                          isDarkMode
+                            ? "hover:bg-gray-700 text-white"
+                            : "hover:bg-gray-50 text-gray-900"
+                        } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
+                      >
+                        <span className="text-lg">{language.flag}</span>
+                        <span className="font-medium">{language.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg">
                 Get Quote
               </button>
+
               <button
                 onClick={toggleMode}
                 className={`p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
@@ -253,6 +347,39 @@ function App() {
                   </a>
                 )
               )}
+
+              {/* Mobile Language Selection */}
+              <div className="px-4 py-2">
+                <div className="mb-3">
+                  <p
+                    className={`text-sm font-medium mb-2 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
+                    Language
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { code: "en", name: "English", flag: "🇺🇸" },
+                      { code: "ar", name: "العربية", flag: "🇸🇦" },
+                    ].map((language) => (
+                      <button
+                        key={language.code}
+                        onClick={() => handleLanguageChange(language.code)}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${
+                          isDarkMode
+                            ? "bg-gray-700 hover:bg-gray-600 text-white"
+                            : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                        } hover:text-yellow-500`}
+                      >
+                        <span>{language.flag}</span>
+                        <span>{language.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <div className="px-4 py-3 flex space-x-3">
                 <button className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors">
                   Get Quote
@@ -299,7 +426,7 @@ function App() {
               <div className="flex items-center mb-8 md:mb-12">
                 <div>
                   <div className="text-yellow-500 text-base md:text-lg font-medium">
-                    Crafting Excellence
+                    {t("craftingExcellence")}
                   </div>
                 </div>
               </div>
@@ -308,9 +435,9 @@ function App() {
                 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 md:mb-8"
                 data-animate
               >
-                Modern Kitchens,
+                {t("title1")}
                 <br />
-                <span className="text-yellow-500">Made for You</span>
+                <span className="text-yellow-500">{t("title2")}</span>
               </h1>
 
               <p
