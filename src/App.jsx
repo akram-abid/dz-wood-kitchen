@@ -576,7 +576,7 @@ function App() {
       </section>
 
       {/* Gallery Section */}
-      <section
+<section
         id="gallery"
         className={`py-16 md:py-24 ${isDarkMode ? "bg-black" : "bg-gray-50"}`}
       >
@@ -592,7 +592,13 @@ function App() {
             <div className="overflow-hidden rounded-xl shadow-xl">
               <div
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                style={{ 
+                  transform: `translateX(${
+                    document.documentElement.dir === 'rtl' 
+                      ? currentSlide * 100 
+                      : -currentSlide * 100
+                  }%)` 
+                }}
               >
                 {galleryImages.map((image) => (
                   <div key={image.id} className="w-full flex-shrink-0">
@@ -624,23 +630,33 @@ function App() {
 
             <button
               onClick={prevSlide}
-              className={`absolute left-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
+              className={`absolute ${
+                document.documentElement.dir === 'rtl' ? 'right-2' : 'left-2'
+              } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              <ChevronLeft size={20} />
+              {document.documentElement.dir === 'rtl' ? 
+                <ChevronRight size={20} /> : 
+                <ChevronLeft size={20} />
+              }
             </button>
             <button
               onClick={nextSlide}
-              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
+              className={`absolute ${
+                document.documentElement.dir === 'rtl' ? 'left-2' : 'right-2'
+              } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              <ChevronRight size={20} />
+              {document.documentElement.dir === 'rtl' ? 
+                <ChevronLeft size={20} /> : 
+                <ChevronRight size={20} />
+              }
             </button>
 
             <div className="flex justify-center mt-6 space-x-2">
@@ -828,7 +844,7 @@ function App() {
       </section>
 
       {/* Team Section */}
-      <section
+<section
         id="team"
         className={`py-16 md:py-24 ${
           isDarkMode ? "bg-gray-900" : "bg-gray-50"
@@ -846,7 +862,13 @@ function App() {
             <div className="overflow-hidden rounded-xl">
               <div
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentTeamSlide * 100}%)` }}
+                style={{ 
+                  transform: `translateX(${
+                    document.documentElement.dir === 'rtl' 
+                      ? currentTeamSlide * 100 
+                      : -currentTeamSlide * 100
+                  }%)` 
+                }}
               >
                 {teamMembers.map((member) => (
                   <div key={member.id} className="w-full flex-shrink-0 px-4">
@@ -865,7 +887,11 @@ function App() {
                             <Users size={48} className="text-yellow-500" />
                           </div>
                         </div>
-                        <div className="w-full md:w-2/3 text-center md:text-left">
+                        <div className={`w-full md:w-2/3 text-center ${
+                          document.documentElement.dir === 'rtl' 
+                            ? 'md:text-right' 
+                            : 'md:text-left'
+                        }`}>
                           <h3 className="text-2xl font-bold mb-2">
                             {member.name}
                           </h3>
@@ -879,7 +905,11 @@ function App() {
                           >
                             {member.bio}
                           </p>
-                          <div className="flex justify-center md:justify-start space-x-4"></div>
+                          <div className={`flex space-x-4 ${
+                            document.documentElement.dir === 'rtl' 
+                              ? 'justify-center md:justify-end' 
+                              : 'justify-center md:justify-start'
+                          }`}></div>
                         </div>
                       </div>
                     </div>
@@ -890,23 +920,33 @@ function App() {
 
             <button
               onClick={prevTeamSlide}
-              className={`absolute left-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
+              className={`absolute ${
+                document.documentElement.dir === 'rtl' ? 'right-0' : 'left-0'
+              } top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              <ChevronLeft size={24} />
+              {document.documentElement.dir === 'rtl' ? 
+                <ChevronRight size={24} /> : 
+                <ChevronLeft size={24} />
+              }
             </button>
             <button
               onClick={nextTeamSlide}
-              className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
+              className={`absolute ${
+                document.documentElement.dir === 'rtl' ? 'left-0' : 'right-0'
+              } top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white"
                   : "bg-gray-50 text-gray-900"
               }`}
             >
-              <ChevronRight size={24} />
+              {document.documentElement.dir === 'rtl' ? 
+                <ChevronLeft size={24} /> : 
+                <ChevronRight size={24} />
+              }
             </button>
 
             <div className="flex justify-center mt-8 space-x-2">
