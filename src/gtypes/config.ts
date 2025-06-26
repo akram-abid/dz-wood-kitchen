@@ -2,6 +2,7 @@
 export interface ServerConfig {
   NODE_ENV: "development" | "production" | "test";
   PORT: number;
+  APP_URL: string;
   HOST: string;
   JWT_SECRET: string;
   JWT_REFRESH_SECRET: string;
@@ -13,4 +14,8 @@ export interface ServerConfig {
   LOG_LEVEL: "trace" | "debug" | "info" | "warn" | "error" | "fatal";
   BODY_LIMIT: number;
   FILE_SIZE_LIMIT: number;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  FACEBOOK_CLIENT_SECRET: string;
+  FACEBOOK_CLIENT_ID: string;
 }
