@@ -123,14 +123,12 @@ export async function facebookCallback(
   reply: FastifyReply,
 ) {
   try {
-    // Grant stores OAuth data in req.session.grant
     const grantData = (req.session as any).grant as GrantSessionData;
 
     if (!grantData?.response) {
       return reply.status(401).send({ error: "Authentication failed" });
     }
 
-    // For Facebook, the user data is in the raw response
     let raw;
     try {
       raw = JSON.parse(grantData.response.raw || "{}");
