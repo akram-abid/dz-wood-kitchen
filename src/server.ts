@@ -19,6 +19,8 @@ import { initLogger, logger as sLog } from "./utils/logger";
 import { db } from "./database/db";
 import { authRoutes } from "./routes/auth.routes";
 import { grantPlugin } from "./plugins/grant.plugin";
+import { postRoutes } from "./routes/services.routes";
+import { setupStaticFiles } from "./utils/static";
 
 dotenv.config();
 const config = loadConfig();
@@ -32,6 +34,16 @@ interface RequestContext {
 declare module "fastify" {
   interface FastifyRequest {
     ctx: RequestContext;
+  }
+
+  interface FastifyInstance {
+    authenticate: (
+      request: FastifyRequest,
+      reply: FastifyReply,
+    ) => Promise<void>;
+    authorize: (
+      roles: string[],
+    ) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
 }
 
@@ -70,6 +82,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
   initLogger(server.log);
 
   await grantPlugin(server);
+  await setupStaticFiles(server);
 
   // Security headers
   await server.register(helmet, {
@@ -146,12 +159,13 @@ const buildServer = async (): Promise<FastifyInstance> => {
         const payload = server.jwt.verify(token) as JwtPayload;
         request.ctx.user = payload;
       } catch (error) {
-        reply.send(server.httpErrors.unauthorized("Invalid or expired token"));
+        throw server.httpErrors.unauthorized("Invalid or expired token");
       }
     },
   );
 
   // Role-based authorization decorator
+
   server.decorate("authorize", (roles: string[]) => {
     return async (request: FastifyRequest, reply: FastifyReply) => {
       if (!request.ctx.user) {
@@ -257,6 +271,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
   server.register(
     async (api) => {
       await api.register(authRoutes, { prefix: "/auth" });
+      await api.register(postRoutes, { prefix: "/services" });
     },
     { prefix: "/api/v1" },
   );

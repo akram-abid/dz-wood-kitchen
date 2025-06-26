@@ -21,7 +21,7 @@ export async function grantPlugin(app: FastifyInstance): Promise<void> {
   await app.register(fastifySession, {
     secret: config.JWT_SECRET,
     cookie: {
-      secure: config.NODE_ENV === "production",
+      secure: false,
       httpOnly: true,
       sameSite: "strict" as const,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
