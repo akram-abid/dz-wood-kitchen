@@ -6,7 +6,6 @@ import Fastify, {
 import helmet from "@fastify/helmet";
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
-import cookie from "@fastify/cookie";
 import multipart from "@fastify/multipart";
 import compress from "@fastify/compress";
 import sensible from "@fastify/sensible";
@@ -18,6 +17,8 @@ import { loadConfig } from "./utils/conf";
 import type { JwtPayload } from "./gtypes/jwt";
 import { initLogger, logger as sLog } from "./utils/logger";
 import { db } from "./database/db";
+import { authRoutes } from "./routes/auth.routes";
+import { grantPlugin } from "./plugins/grant.plugin";
 
 dotenv.config();
 const config = loadConfig();
@@ -68,6 +69,8 @@ const buildServer = async (): Promise<FastifyInstance> => {
   // server logger
   initLogger(server.log);
 
+  await grantPlugin(server);
+
   // Security headers
   await server.register(helmet, {
     contentSecurityPolicy: {
@@ -99,17 +102,6 @@ const buildServer = async (): Promise<FastifyInstance> => {
     cookie: {
       cookieName: "token",
       signed: false,
-    },
-  });
-
-  // Cookie support
-  await server.register(cookie, {
-    secret: config.JWT_SECRET,
-    parseOptions: {
-      httpOnly: true,
-      secure: config.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
   });
 
@@ -262,6 +254,13 @@ const buildServer = async (): Promise<FastifyInstance> => {
     }
   };
 
+  server.register(
+    async (api) => {
+      await api.register(authRoutes, { prefix: "/auth" });
+    },
+    { prefix: "/api/v1" },
+  );
+
   process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
   process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
@@ -276,6 +275,8 @@ const start = async (): Promise<void> => {
 
     console.log("Database is connected and healthy");
     const server = await buildServer();
+
+    console.log(server.printRoutes());
 
     await server.listen({
       port: config.PORT,
