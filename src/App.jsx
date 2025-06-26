@@ -229,14 +229,14 @@ function App() {
             </div>
 
             <div className="hidden lg:flex items-center space-x-6 md:space-x-8">
-              {["Home", "About", "Mission", "Gallery", "Team", "Contact"].map(
-                (item) => (
+              {[{tag: t("home"), link :"home"}, {tag: t("about"), link :"about"}, {tag: t("mission"), link :"mission"}, {tag: t("gallery"), link :"gallery"}, {tag: t("team"), link :"team"}, {tag: t("contact"), link :"contact"}].map(
+                ({tag, link}) => (
                   <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
+                    key={link}
+                    href={`#${link}`}
                     className="hover:text-yellow-500 transition-colors duration-200 font-medium relative group"
                   >
-                    {item}
+                    {tag}
                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
                   </a>
                 )
@@ -298,7 +298,7 @@ function App() {
               </div>
 
               <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg">
-                Get Quote
+                {t("orderNow")}
               </button>
 
               <button
@@ -335,15 +335,15 @@ function App() {
                 isDarkMode ? "bg-gray-800" : "bg-gray-50"
               }`}
             >
-              {["Home", "About", "Mission", "Gallery", "Team", "Contact"].map(
-                (item) => (
+              {[{tag: t("home"), link :"home"}, {tag: t("about"), link :"about"}, {tag: t("mission"), link :"mission"}, {tag: t("gallery"), link :"gallery"}, {tag: t("team"), link :"team"}, {tag: t("contact"), link :"contact"}].map(
+                ({tag, link}) => (
                   <a
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
+                    key={link}
+                    href={`#${link}`}
                     className="block px-4 py-2 hover:text-yellow-500 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    {item}
+                    {tag}
                   </a>
                 )
               )}
@@ -446,9 +446,7 @@ function App() {
                 }`}
                 data-animate
               >
-                DZ Wood Kitchen crafts elegant, made-to-measure kitchens that
-                combine durability, precision, and timeless style for the modern
-                home.
+                {t("subTitle")}
               </p>
 
               <div
@@ -456,7 +454,7 @@ function App() {
                 data-animate
               >
                 <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl">
-                  Explore Our Work
+                  {t("exploreOurWork")}
                 </button>
                 <button
                   className={`border-2 px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl ${
@@ -465,7 +463,7 @@ function App() {
                       : "border-black text-black hover:bg-black hover:text-white"
                   }`}
                 >
-                  Get Free Quote
+                  {t("orderNow")}
                 </button>
               </div>
 
@@ -474,9 +472,9 @@ function App() {
                 data-animate
               >
                 {[
-                  { value: "500+", label: "Projects Done" },
-                  { value: "15+", label: "Years Experience" },
-                  { value: "100%", label: "Satisfaction" },
+                  { value: "500+", label: t("projectsDone")},
+                  { value: "15+", label: t("yearsExperience") },
+                  { value: "100%", label: t("satisfaction") },
                 ].map((stat, index) => (
                   <div key={index} className="text-center">
                     <div className="text-3xl md:text-4xl font-bold mb-1 hover:text-yellow-500 transition-colors">
@@ -512,9 +510,9 @@ function App() {
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center mb-12 md:mb-20" data-animate>
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
-              About Us
+              {t("aboutUsTitle")}
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">About Us</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">{t("aboutUs")}</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
@@ -541,34 +539,28 @@ function App() {
 
             <div className="space-y-6" data-animate>
               <div className="text-yellow-500 text-xs md:text-sm font-semibold uppercase tracking-wider">
-                Our Story
+                {t("ourStory")}
               </div>
               <h3 className="text-2xl md:text-4xl font-bold leading-tight">
-                We Always Make
+                {t("weAlwaysMake")}
                 <br />
-                <span className="text-yellow-500">The Best</span>
+                <span className="text-yellow-500">{t("theBest")}</span>
               </h3>
 
               <div className="space-y-4 text-base md:text-lg">
                 <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                  At DZ Wood Kitchen, we are passionate about creating
-                  exceptional kitchens that blend traditional craftsmanship with
-                  modern design.
+                  {t("aboutUsDescription1")}
                 </p>
                 <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
-                  From custom cabinetry to complete kitchen renovations, we use
-                  only the finest materials and time-tested techniques to
-                  deliver results that exceed expectations.
+                  {t("aboutUsDescription2")}
                 </p>
                 <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
-                  With over 15 years of experience in the industry, we have
-                  built our reputation on reliability, innovation, and customer
-                  satisfaction.
+                  {t("aboutUsDescription3")}
                 </p>
               </div>
 
               <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-colors">
-                Contact Us
+                {t("contactUs")}
               </button>
             </div>
           </div>
@@ -583,9 +575,9 @@ function App() {
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center mb-12 md:mb-20" data-animate>
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
-              Our Work
+              {t("ourWork")}
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">Gallery</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">{t("gallery")}</h2>
           </div>
 
           <div className="relative max-w-4xl mx-auto" data-animate>
@@ -684,19 +676,16 @@ function App() {
             {/* Mission Content Column */}
             <div className="space-y-8" data-animate>
               <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
-                Our Mission
+                {t("ourMission")}
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold">Our Mission</h2>
+              <h2 className="text-3xl md:text-5xl font-bold">{t("ourMissionTitle")}</h2>
 
               <div className="space-y-4 text-base md:text-lg">
                 <p className={isDarkMode ? "text-gray-300" : "text-gray-700"}>
-                  Our mission is to transform houses into homes by creating
-                  beautiful, functional kitchens that serve as the heart of
-                  family life.
+                  {t("ourMissionDescription1")}
                 </p>
                 <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
-                  We are committed to sustainable practices, using responsibly
-                  sourced materials and implementing eco-friendly processes.
+                  {t("ourMissionDescription2")}
                 </p>
               </div>
 
@@ -704,18 +693,18 @@ function App() {
                 {[
                   {
                     icon: Award,
-                    title: "Quality",
-                    desc: "Finest materials & craftsmanship",
+                    title: t("quality"),
+                    desc: t("qualityDescription"),
                   },
                   {
                     icon: Target,
-                    title: "Innovation",
-                    desc: "Modern design trends",
+                    title: t("innovation"),
+                    desc: t("innovationDescription"),
                   },
                   {
                     icon: Users,
-                    title: "Service",
-                    desc: "Exceptional service",
+                    title: t("service"),
+                    desc: t("serviceDescription"),
                   },
                 ].map((value, index) => (
                   <div
@@ -818,10 +807,10 @@ function App() {
             data-animate
           >
             {[
-              { icon: Calendar, value: "15+", label: "Years Experience" },
-              { icon: Wrench, value: "500+", label: "Projects Done" },
-              { icon: Star, value: "300+", label: "Satisfied Clients" },
-              { icon: Users, value: "50+", label: "Expert Team" },
+              { icon: Calendar, value: "15+", label: t("yearsExperience") },
+              { icon: Wrench, value: "500+", label: t("projectsDone") },
+              { icon: Star, value: "300+", label: t("satisfaction") },
+              { icon: Users, value: "50+", label: t("expertTeam") },
             ].map((stat, index) => (
               <div key={index} className="text-center p-4">
                 <div className="flex justify-center mb-4">
@@ -853,9 +842,9 @@ function App() {
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center mb-12 md:mb-20" data-animate>
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
-              Our Experts
+              {t("ourExperts")}
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">Meet Our Team</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">{t("meetOurTeam")}</h2>
           </div>
 
           <div className="relative max-w-6xl mx-auto" data-animate>
@@ -972,15 +961,15 @@ function App() {
         <div className="container mx-auto px-4 md:px-8">
           <div className="text-center mb-12 md:mb-20" data-animate>
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
-              Get In Touch
+              {t("getInTouch")}
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold">Contact Us</h2>
+            <h2 className="text-3xl md:text-5xl font-bold">{t("contactUs")}</h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-start">
             <div className="space-y-8" data-animate>
               <h3 className="text-2xl md:text-3xl font-bold">
-                Let's Discuss Your Project
+                {t("tellUsMore")}
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -991,7 +980,7 @@ function App() {
                       isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
-                    Your Name
+                    {t("yourName")}
                   </label>
                   <input
                     type="text"
@@ -1015,7 +1004,7 @@ function App() {
                       isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
-                    Email Address
+                    {t("emailAddress")}
                   </label>
                   <input
                     type="email"
@@ -1039,7 +1028,7 @@ function App() {
                       isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
-                    Your Message
+                    {t("yourMessage")}
                   </label>
                   <textarea
                     id="message"
@@ -1060,14 +1049,14 @@ function App() {
                   type="submit"
                   className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors w-full"
                 >
-                  Send Message
+                  {t("sendMessage")}
                 </button>
               </form>
             </div>
 
             <div className="space-y-8" data-animate>
               <h3 className="text-2xl md:text-3xl font-bold">
-                Contact Information
+                {t("contactInformation")}
               </h3>
 
               <div
@@ -1080,11 +1069,11 @@ function App() {
                     <MapPin size={20} className="text-black" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Our Location</h4>
+                    <h4 className="font-bold mb-1">{t("ourLocation")}</h4>
                     <p
                       className={isDarkMode ? "text-gray-400" : "text-gray-600"}
                     >
-                      2458 Oak Ridge Omaha, NE 68105
+                      {t("address")}
                     </p>
                   </div>
                 </div>
@@ -1094,11 +1083,11 @@ function App() {
                     <Phone size={20} className="text-black" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Phone Number</h4>
+                    <h4 className="font-bold mb-1">{t("phoneNumber")}</h4>
                     <p
                       className={isDarkMode ? "text-gray-400" : "text-gray-600"}
                     >
-                      +1 (402) 979-9718
+                      {t("phone")}
                     </p>
                   </div>
                 </div>
@@ -1108,11 +1097,11 @@ function App() {
                     <Mail size={20} className="text-black" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Email Address</h4>
+                    <h4 className="font-bold mb-1">{t("email")}</h4>
                     <p
                       className={isDarkMode ? "text-gray-400" : "text-gray-600"}
                     >
-                      info@dzwoodkitchen.com
+                      {t("emailValue")}
                     </p>
                   </div>
                 </div>
@@ -1123,12 +1112,12 @@ function App() {
                   isDarkMode ? "bg-gray-800" : "bg-gray-50"
                 }`}
               >
-                <h4 className="font-bold mb-4">Business Hours</h4>
+                <h4 className="font-bold mb-4">{t("businessHours")}</h4>
                 <ul className="space-y-3">
                   {[
-                    { day: "Monday - Friday", hours: "9:00 AM - 6:00 PM" },
-                    { day: "Saturday", hours: "10:00 AM - 4:00 PM" },
-                    { day: "Sunday", hours: "Closed" },
+                    { day: t("mondayFriday"), hours: t("hours1") },
+                    { day: t("saturday"), hours: t("hours2") },
+                    { day: t("sunday"), hours: t("closed") },
                   ].map((item, index) => (
                     <li key={index} className="flex justify-between">
                       <span
@@ -1165,23 +1154,22 @@ function App() {
         <div className="container mx-auto px-4 md:px-8 text-center">
           <div className="max-w-3xl mx-auto" data-animate>
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
-              Ready to Start?
+              {t("readyToStart")}
             </div>
             <h2 className="text-2xl md:text-4xl font-bold mb-6">
-              We Are Always Ready To
+              {t("alwaysReady")}
               <br />
-              <span className="text-yellow-500">Create Your Dream Kitchen</span>
+              <span className="text-yellow-500">{t("createYourDreamKitchen")}</span>
             </h2>
             <p
               className={`text-base md:text-lg mb-8 ${
                 isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
             >
-              Get in touch with us today and let's start building the kitchen of
-              your dreams together.
-            </p>
+              {(t("getInTouchToday"))} 
+            </p>  
             <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors">
-              Get Started Today
+              {t("getStartedToday")}
             </button>
           </div>
         </div>
@@ -1199,18 +1187,18 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
-                <div className="w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-black font-bold text-lg">DZ</span>
-                </div>
-                <div className="text-xl font-bold">Wood Kitchen</div>
+                <img
+                src={isDarkMode ? WLogo : Blogo}
+                alt="the logo"
+                className="w-[280px]"
+              />
               </div>
               <p
                 className={`mb-4 text-sm ${
                   isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                Crafting beautiful kitchens with precision and style for over 15
-                years.
+                {t("experienceTagline")}
               </p>
               <div className="flex space-x-3">
                 {[Facebook, Instagram, Linkedin].map((Icon, index) => (
@@ -1229,20 +1217,20 @@ function App() {
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-yellow-500">Quick Links</h4>
+              <h4 className="font-bold mb-4 text-yellow-500">{t("quickLinks")}</h4>
               <ul
                 className={`space-y-2 text-sm ${
                   isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                {["Home", "About", "Mission", "Gallery", "Contact"].map(
-                  (link) => (
+                {[{tag: t("home"), link :"home"}, {tag: t("about"), link :"about"}, {tag: t("mission"), link :"mission"}, {tag: t("gallery"), link :"gallery"}, {tag: t("team"), link :"team"}, {tag: t("contact"), link :"contact"}].map(
+                  ({tag, link}) => (
                     <li key={link}>
                       <a
-                        href={`#${link.toLowerCase()}`}
+                        href={`#${link}`}
                         className="hover:text-yellow-500 transition-colors"
                       >
-                        {link}
+                        {tag}
                       </a>
                     </li>
                   )
@@ -1251,7 +1239,7 @@ function App() {
             </div>
 
             <div>
-              <h4 className="font-bold mb-4 text-yellow-500">Contact Info</h4>
+              <h4 className="font-bold mb-4 text-yellow-500">{t("contactInfo")}</h4>
               <div
                 className={`space-y-3 text-sm ${
                   isDarkMode ? "text-gray-400" : "text-gray-600"
