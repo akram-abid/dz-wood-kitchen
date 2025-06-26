@@ -1,0 +1,172 @@
+import { FastifyRequest, FastifyReply } from "fastify";
+import { authService } from "../services/auth.service";
+import type { SignupData, LoginData } from "../dtos/auth.dtos";
+
+type SignupRequest = FastifyRequest<{ Body: SignupData }>;
+type LoginRequest = FastifyRequest<{ Body: LoginData }>;
+
+interface GrantSessionData {
+  response?: {
+    access_token: string;
+    refresh_token?: string;
+    raw: string;
+  };
+}
+
+export async function signupController(
+  req: SignupRequest,
+  reply: FastifyReply,
+) {
+  try {
+    const data = req.body;
+    const result = await authService.signup(data);
+
+    req.log.info("Signup controller: user registered", {
+      userId: result.user.id,
+    });
+
+    return reply.code(201).send({
+      message: "Signup successful",
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+  } catch (err: any) {
+    req.log.error("Signup controller error", { error: err.message });
+
+    const statusCode = err.message.includes("already exists") ? 409 : 500;
+
+    return reply.code(statusCode).send({
+      message: err.message || "Internal server error",
+    });
+  }
+}
+
+export async function loginController(req: LoginRequest, reply: FastifyReply) {
+  try {
+    const data = req.body;
+    const result = await authService.login(data);
+
+    req.log.info("Login controller: user logged in", {
+      userId: result.user.id,
+    });
+
+    return reply.code(200).send({
+      message: "Login successful",
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+  } catch (err: any) {
+    req.log.error("Login controller error", { error: err.message });
+
+    const statusCode = err.message.includes("Invalid credentials") ? 401 : 500;
+
+    return reply.code(statusCode).send({
+      message: err.message || "Internal server error",
+    });
+  }
+}
+
+export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    // Grant stores OAuth data in req.session.grant
+    const grantData = (req.session as any).grant as GrantSessionData;
+
+    if (!grantData?.response) {
+      return reply.status(401).send({ error: "Authentication failed" });
+    }
+
+    // For Google, the user data is in the raw response
+    let raw;
+    try {
+      raw = JSON.parse(grantData.response.raw || "{}");
+    } catch (parseError) {
+      return reply.status(400).send({ error: "Invalid OAuth response format" });
+    }
+
+    // Validate required fields
+    if (!raw.sub || !raw.email) {
+      return reply.status(400).send({
+        error: "Missing required profile data",
+        message: "Google profile must include ID and email",
+      });
+    }
+
+    const profile = {
+      id: raw.sub,
+      email: raw.email,
+      firstName: raw.given_name || "",
+      lastName: raw.family_name || "",
+      provider: "google" as const,
+    };
+
+    const result = await authService.oauthLogin(profile);
+
+    // Clear grant data from session
+    delete (req.session as any).grant;
+
+    return reply.send({
+      success: true,
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+  } catch (error) {
+    console.error("Google OAuth error:", error);
+    return reply.status(500).send({ error: "OAuth login failed" });
+  }
+}
+
+export async function facebookCallback(
+  req: FastifyRequest,
+  reply: FastifyReply,
+) {
+  try {
+    // Grant stores OAuth data in req.session.grant
+    const grantData = (req.session as any).grant as GrantSessionData;
+
+    if (!grantData?.response) {
+      return reply.status(401).send({ error: "Authentication failed" });
+    }
+
+    // For Facebook, the user data is in the raw response
+    let raw;
+    try {
+      raw = JSON.parse(grantData.response.raw || "{}");
+    } catch (parseError) {
+      return reply.status(400).send({ error: "Invalid OAuth response format" });
+    }
+
+    // Validate required fields
+    if (!raw.id || !raw.email) {
+      return reply.status(400).send({
+        error: "Missing required profile data",
+        message: "Facebook profile must include ID and email",
+      });
+    }
+
+    const profile = {
+      id: raw.id,
+      email: raw.email,
+      firstName: raw.first_name || "",
+      lastName: raw.last_name || "",
+      provider: "facebook" as const,
+    };
+
+    const result = await authService.oauthLogin(profile);
+
+    // Clear grant data from session
+    delete (req.session as any).grant;
+
+    return reply.send({
+      success: true,
+      user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+  } catch (error) {
+    console.error("Facebook OAuth error:", error);
+    return reply.status(500).send({ error: "OAuth login failed" });
+  }
+}
