@@ -5,6 +5,9 @@ import App from "./App";
 import KitchenGallery from "./pages/projects";
 import KitchenDetails from "./pages/Kitchen";
 import KitchenOrderPage from "./pages/kitchenOrderPage";
+import ProfilePage from "./pages/profile";
+import SignupPage from "./pages/signup";
+import LoginPage from "./pages/login";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +26,18 @@ const router = createBrowserRouter([
     path: "/order",
     element: <KitchenOrderPage />,
   },
+  {
+    path: "/profile",
+    element: <ProfilePage />
+  },
+  {
+    path: "/signup",
+    element: <SignupPage />
+  },
+  {
+    path: "/login",
+    element: <LoginPage />
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
