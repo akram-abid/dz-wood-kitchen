@@ -321,8 +321,9 @@ function App() {
                 </div>
               </div>
 
-              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
-              onClick={() => navigate("/order")}  
+              <button
+                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                onClick={() => navigate("/order")}
               >
                 {t("orderNow")}
               </button>
@@ -412,8 +413,11 @@ function App() {
               </div>
 
               <div className="px-4 py-3 flex space-x-3">
-                <button className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors">
-                  Get Quote
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                  onClick={() => navigate("/order")}
+                >
+                  {t("orderNow")}
                 </button>
                 <button
                   onClick={toggleMode}
