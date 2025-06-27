@@ -71,6 +71,39 @@ export const posts = pgTable("posts", {
     .references(() => admins.id, { onDelete: "cascade" }),
 });
 
+export const orders = pgTable("orders", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+
+  title: text("title"),
+
+  description: text("description").notNull(),
+
+  woodType: text("wood_type"),
+
+  daira: text("daira").notNull(),
+  street: text("street").notNull(),
+  wilaya: text("wilaya").notNull(),
+  phoneNumber: text("phone_number").notNull(),
+
+  mediaUrls: json("media_urls"),
+
+  postId: text("post_id").references(() => posts.id, { onDelete: "set null" }),
+
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 // Relations
 export const adminsRelations = relations(admins, ({ many }) => ({
   posts: many(posts),
@@ -83,6 +116,17 @@ export const postsRelations = relations(posts, ({ one }) => ({
   }),
 }));
 
+export const ordersRelations = relations(orders, ({ one }) => ({
+  user: one(users, {
+    fields: [orders.userId],
+    references: [users.id],
+  }),
+  post: one(posts, {
+    fields: [orders.postId],
+    references: [posts.id],
+  }),
+}));
+
 // Type exports for TypeScript
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -92,3 +136,6 @@ export type NewAdmin = typeof admins.$inferInsert;
 
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
+
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
