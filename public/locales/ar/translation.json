@@ -64,5 +64,22 @@
   "team": "الفريق",
   "contact": "اتصل",
   "experienceTagline": "نصنع مطابخ جميلة بدقة وأناقة لأكثر من 15 عامًا.",
-  "contactInfo": "معلومات الاتصال"
+  "contactInfo": "معلومات الاتصال",
+  "seeAllProjects": "عرض جميع المشاريع",
+  "masterpieces": "أعمال مميزة",
+  "ourKitchen": "مطابخنا",
+  "ourWorkDescription": "اكتشف مجموعتنا من المطابخ المصنوعة يدويًا، كل واحدة مصممة ومبنية بدقة وشغف.",
+  "filterByWoodType": " حسب نوع الخشب:",
+  "all": "الكل",
+  "oak": "بلوط",
+  "pine": "صنوبر",
+  "walnut": "جوز",
+  "cherry": "كرز",
+  "reclaimedOak": "بلوط معاد تدويره",
+  "maple": "قيقب",
+  "kitchensDisplayed": "مطبخ معروض",
+  "viewDetails": "عرض التفاصيل",
+  "readyForYourDreamKitchen": "هل أنت مستعد لمطبخ أحلامك؟",
+  "customKitchenDescription": "دعنا نصنع لك مطبخًا مخصصًا يناسب أسلوبك واحتياجاتك تمامًا. كل قطعة مصنوعة يدويًا بعناية فائقة ومصممة لتدوم مدى الحياة.",
+  "startYourProject": "ابدأ مشروعك"
 }

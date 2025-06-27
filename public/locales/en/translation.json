@@ -64,5 +64,22 @@
   "contact": "Contact",
   "team": "Team",
   "experienceTagline": "Crafting beautiful kitchens with precision and style for over 15 years.",
-  "contactInfo": "Contact Info"
+  "contactInfo": "Contact Info",
+  "seeAllProjects": "See All Projects",
+  "masterpieces": "Masterpieces",
+  "ourKitchen": "Our Kitchen",
+  "ourWorkDescription": "Discover our collection of handcrafted kitchens, each uniquely designed and built with precision and passion.",
+  "filterByWoodType": "Filter by Wood Type:",
+  "all": "All",
+  "oak": "Oak",
+  "pine": "Pine",
+  "walnut": "Walnut",
+  "cherry": "Cherry",
+  "reclaimedOak": "Reclaimed Oak",
+  "maple": "Maple",
+  "kitchensDisplayed": "Kitchens Displayed",
+  "viewDetails": "View Details",
+  "readyForYourDreamKitchen": "Ready for Your Dream Kitchen?",
+  "customKitchenDescription": "Let us create a custom kitchen that perfectly fits your style and needs. Each piece is handcrafted with attention to detail and built to last a lifetime.",
+  "startYourProject": "Start Your Project"
 }

@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const { t } = useTranslation();
@@ -63,6 +64,8 @@ function App() {
     email: "",
     message: "",
   });
+
+  const navigate = useNavigate();
 
   // Gallery images
   const galleryImages = [
@@ -447,7 +450,7 @@ function App() {
         </div>
 
         <div className="mt-4 relative z-10 flex h-full items-center">
-          <div div className="pt-6 container mx-auto px-4 py-8 md:px-8">
+          <div div className="pt-2 container mx-auto px-4 py-4 md:px-8">
             <div className="max-w-4xl">
               <div className="flex items-center mb-8 md:mb-12">
                 <div>
@@ -458,7 +461,7 @@ function App() {
               </div>
 
               <h1
-                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[150px] md:min-h-[180px]"
+                className="font-bold text-4xl md:text-5xl lg:text-6xl font-bold leading-tight min-h-[16 0px] md:min-h-[180px]"
                 data-animate
               >
                 {title1.displayText}
@@ -643,7 +646,10 @@ function App() {
                 }}
               >
                 {galleryImages.map((image) => (
-                  <div key={image.id} className="w-full flex-shrink-0">
+                  <div
+                    key={image.id}
+                    className="w-full flex-shrink-0 relative group"
+                  >
                     <div
                       className={`w-full h-64 md:h-96 flex items-center justify-center ${
                         isDarkMode ? "bg-gray-700" : "bg-gray-200"
@@ -665,20 +671,27 @@ function App() {
                         </p>
                       </div>
                     </div>
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                        {t("viewProject")}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* Navigation arrows */}
             <button
               onClick={prevSlide}
               className={`absolute ${
                 document.documentElement.dir === "rtl" ? "right-2" : "left-2"
               } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
-                  ? "bg-gray-800 text-white"
-                  : "bg-gray-50 text-gray-900"
-              }`}
+                  ? "bg-gray-800 text-white hover:bg-gray-700"
+                  : "bg-gray-50 text-gray-900 hover:bg-gray-100"
+              } transition-colors`}
             >
               {document.documentElement.dir === "rtl" ? (
                 <ChevronRight size={20} />
@@ -692,9 +705,9 @@ function App() {
                 document.documentElement.dir === "rtl" ? "left-2" : "right-2"
               } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
-                  ? "bg-gray-800 text-white"
-                  : "bg-gray-50 text-gray-900"
-              }`}
+                  ? "bg-gray-800 text-white hover:bg-gray-700"
+                  : "bg-gray-50 text-gray-900 hover:bg-gray-100"
+              } transition-colors`}
             >
               {document.documentElement.dir === "rtl" ? (
                 <ChevronLeft size={20} />
@@ -703,17 +716,40 @@ function App() {
               )}
             </button>
 
+            {/* Slide indicators */}
             <div className="flex justify-center mt-6 space-x-2">
               {galleryImages.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentSlide ? "bg-yellow-500" : "bg-gray-400"
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentSlide
+                      ? "bg-yellow-500 w-6"
+                      : "bg-gray-400 hover:bg-gray-500"
                   }`}
                 />
               ))}
             </div>
+          </div>
+
+          {/* See All Button */}
+          <div className="text-center mt-12" data-animate>
+            <button
+              onClick={() => navigate("/gallery")}
+              className={`inline-flex items-center px-8 py-4 border-2 rounded-xl font-semibold text-lg md:text-xl transition-all duration-300 group ${
+                isDarkMode
+                  ? "border-white text-white hover:bg-white hover:text-black"
+                  : "border-black text-black hover:bg-black hover:text-white"
+              }`}
+            >
+              {t("seeAllProjects")}
+              <ChevronRight
+                size={20}
+                className={`ml-2 transition-transform duration-300 ${
+                  document.documentElement.dir === "rtl" ? "rotate-180" : ""
+                } group-hover:translate-x-1`}
+              />
+            </button>
           </div>
         </div>
       </section>
@@ -1392,11 +1428,11 @@ const useCountAnimation = (target, duration = 2000, delay = 0) => {
     // Reset states
     setIsVisible(false);
     setDisplayValue("");
-    
+
     if (delay === 0) {
       return;
     }
-    
+
     const timer = setTimeout(() => {
       setIsVisible(true);
       const startTime = Date.now();
