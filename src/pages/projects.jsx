@@ -163,13 +163,13 @@ const KitchenGallery = () => {
   };
 
   const woodTypes = [
-    {filter: "all", tag: t("all")},
-    {filter: "oak", tag: t("oak")},
-    {filter: "pine", tag: t("pine")},
-    {filter: "walnut", tag: t("walnut")},
-    {filter: "cherry", tag: t("cherry")},
-    {filter: "reclaimedOak", tag: t("reclaimedOak")},
-    {filter: "maple", tag: t("maple")},
+    { filter: "all", tag: t("all") },
+    { filter: "oak", tag: t("oak") },
+    { filter: "pine", tag: t("pine") },
+    { filter: "walnut", tag: t("walnut") },
+    { filter: "cherry", tag: t("cherry") },
+    { filter: "reclaimedOak", tag: t("reclaimedOak") },
+    { filter: "maple", tag: t("maple") },
   ];
 
   const KitchenCarousel = ({ images }) => {
@@ -267,22 +267,23 @@ const KitchenGallery = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-
             <div className="relative">
-            <button
-              onClick={toggleLanguageDropdown}
-              className={`flex items-center space-x-2 p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
-                darkMode ? "bg-gray-800 text-white" : "bg-gray-50 text-gray-900"
-              } hover:text-yellow-500`}
-            >
-              <Globe size={20} />
-              <ChevronDown
-                size={16}
-                className={`transition-transform duration-200 ${
-                  isLanguageDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
+              <button
+                onClick={toggleLanguageDropdown}
+                className={`flex items-center space-x-2 p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                  darkMode
+                    ? "bg-gray-800 text-white"
+                    : "bg-gray-50 text-gray-900"
+                } hover:text-yellow-500`}
+              >
+                <Globe size={20} />
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform duration-200 ${
+                    isLanguageDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
               <div
                 className={`absolute right-0 mt-2 w-40 transition-all duration-200 ${
                   isLanguageDropdownOpen
@@ -345,27 +346,26 @@ const KitchenGallery = () => {
       {/* Filter Section */}
       <div className="bg-gray-50 dark:bg-gray-900 pt-8 py-4 sticky top-16 z-40">
         <div className="container mx-auto px-4">
-          <div className="flex md:flex-row items-center justify-between">
-            <div className="flex space-x-5 items-center mb-4 md:mb-0">
-              <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 w-full md:w-auto">
+              <h3 className="text-lg font-semibold text-black dark:text-white whitespace-nowrap">
                 {t("filterByWoodType")}
               </h3>
               <select
                 value={selectedWoodType}
                 onChange={(e) => setSelectedWoodType(e.target.value)}
-                className="px-4 py-2 border-2 border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white dark:bg-gray-800 text-black dark:text-white"
+                className="px-4 py-2 border-2 border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-white dark:bg-gray-800 text-black dark:text-white w-full sm:w-auto min-w-[200px]"
               >
-                {woodTypes.map(({filter, tag}) => (
+                {woodTypes.map(({ filter, tag }) => (
                   <option key={filter} value={filter}>
                     {tag}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="text-black dark:text-white">
-              <span className="text-lg font-semibold">
-                {filteredKitchens.length}{" "}
-                {t("kitchensDisplayed")}
+            <div className="text-black dark:text-white self-start md:self-auto">
+              <span className="text-lg font-semibold whitespace-nowrap">
+                {filteredKitchens.length} {t("kitchensDisplayed")}
               </span>
             </div>
           </div>
@@ -392,7 +392,6 @@ const KitchenGallery = () => {
                 </p>
 
                 <div className="flex items-center justify-between">
-                  
                   <button
                     onClick={() => navigate(`/gallery/${kitchen.id}`)}
                     className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
