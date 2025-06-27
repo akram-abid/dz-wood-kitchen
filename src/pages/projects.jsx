@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import WLogo from "../assets/images/whiteLogo.png";
+import Blogo from "../assets/images/blackLogo.png";
 import {
   Globe,
   Calendar,
@@ -9,14 +11,12 @@ import {
   ChevronRight,
   Tag,
 } from "lucide-react";
-import WLogo from "../assets/images/whiteLogo.png";
-import Blogo from "../assets/images/blackLogo.png";
-import i18next from "i18next";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 
 const KitchenGallery = () => {
-  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [kitchens, setKitchens] = useState([]);
   const [filteredKitchens, setFilteredKitchens] = useState([]);
   const [selectedWoodType, setSelectedWoodType] = useState("all");
@@ -24,11 +24,14 @@ const KitchenGallery = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [currentLanguage, setCurrentLanguage] = useState("en");
   const loaderRef = useRef(null);
-  const navigate = useNavigate();
 
   // Check if current language is RTL
-  const isRTL = i18next.language === "ar";
+  const isRTL = currentLanguage === "ar";
+
+  // Translation function
+  const { t } = useTranslation();
 
   // Fake data generator
   const generateFakeKitchens = (count) => {
@@ -62,10 +65,10 @@ const KitchenGallery = () => {
         woodTypes[i % woodTypes.length]
       } Kitchen`,
       images: [
-        `https://source.unsplash.com/random/400x300/?kitchen,${i + 1}`,
-        `https://source.unsplash.com/random/400x300/?kitchen,${i + 2}`,
-        `https://source.unsplash.com/random/400x300/?kitchen,${i + 3}`,
-        `https://source.unsplash.com/random/400x300/?kitchen,${i + 4}`,
+        `https://picsum.photos/400/300?random=${Date.now() + i + 1}`,
+        `https://picsum.photos/400/300?random=${Date.now() + i + 2}`,
+        `https://picsum.photos/400/300?random=${Date.now() + i + 3}`,
+        `https://picsum.photos/400/300?random=${Date.now() + i + 4}`,
       ],
       description: `A beautiful ${styles[
         i % styles.length
@@ -110,21 +113,11 @@ const KitchenGallery = () => {
     }
   }, [selectedWoodType, kitchens]);
 
-  // FIXED: Better RTL direction handling
+  // RTL direction handling
   useEffect(() => {
-    const updateDirection = () => {
-      const isRTL = i18next.dir() === "rtl" || i18next.language === "ar";
-      document.documentElement.dir = isRTL ? "rtl" : "ltr";
-      document.documentElement.lang = i18next.language;
-    };
-
-    updateDirection();
-    i18next.on("languageChanged", updateDirection);
-
-    return () => {
-      i18next.off("languageChanged", updateDirection);
-    };
-  }, []);
+    document.documentElement.dir = isRTL ? "rtl" : "ltr";
+    document.documentElement.lang = currentLanguage;
+  }, [currentLanguage, isRTL]);
 
   // Infinite scroll observer
   useEffect(() => {
@@ -163,7 +156,8 @@ const KitchenGallery = () => {
   };
 
   const handleLanguageChange = (languageCode) => {
-    i18n.changeLanguage(languageCode);
+    console.log("Selected language:", languageCode);
+    i18next.changeLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
   };
 
@@ -218,25 +212,25 @@ const KitchenGallery = () => {
           ))}
         </div>
 
-        {/* FIXED: RTL-aware carousel buttons */}
+        {/* Carousel Navigation - Fixed for RTL */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            isRTL ? nextSlide() : prevSlide();
+            prevSlide();
           }}
-          className={`absolute ${isRTL ? 'right-2' : 'left-2'} top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all`}
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all z-10"
         >
-          <ChevronLeft size={20} className={`cursor-pointer ${isRTL ? 'rotate-180' : ''}`} />
+          <ChevronLeft size={20} />
         </button>
 
         <button
           onClick={(e) => {
             e.stopPropagation();
-            isRTL ? prevSlide() : nextSlide();
+            nextSlide();
           }}
-          className={`absolute ${isRTL ? 'left-2' : 'right-2'} top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all`}
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all z-10"
         >
-          <ChevronRight size={20} className={`cursor-pointer ${isRTL ? 'rotate-180' : ''}`} />
+          <ChevronRight size={20} />
         </button>
 
         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
@@ -262,8 +256,8 @@ const KitchenGallery = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300 w-full">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50 w-full">
-        <div className="max-w-full mx-auto flex justify-between items-center">
+      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50">
+        <div className="w-full flex justify-between items-center">
           <div className="flex items-center flex-shrink-0">
             <img
               src={darkMode ? WLogo : Blogo}
@@ -272,16 +266,15 @@ const KitchenGallery = () => {
             />
           </div>
 
-          {/* FIXED: RTL-aware header controls */}
-          <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
             <div className="relative">
               <button
                 onClick={toggleLanguageDropdown}
-                className={`flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                className={`flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
                   darkMode
                     ? "bg-gray-800 text-white"
                     : "bg-gray-50 text-gray-900"
-                } hover:text-yellow-500 ${isRTL ? 'flex-row-reverse' : ''}`}
+                } hover:text-yellow-500`}
               >
                 <Globe size={16} className="sm:w-5 sm:h-5" />
                 <ChevronDown
@@ -291,10 +284,8 @@ const KitchenGallery = () => {
                   }`}
                 />
               </button>
-              
-              {/* FIXED: RTL-aware dropdown position */}
               <div
-                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
+                className={`absolute right-0 mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
                   isLanguageDropdownOpen
                     ? "opacity-100 visible translate-y-0"
                     : "opacity-0 invisible -translate-y-2"
@@ -314,13 +305,11 @@ const KitchenGallery = () => {
                     <button
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
-                      className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 transition-colors duration-200 ${
+                      className={`w-full flex items-center space-x-2 sm:space-x-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left transition-colors duration-200 ${
                         darkMode
                           ? "hover:bg-gray-700 text-white"
                           : "hover:bg-gray-50 text-gray-900"
-                      } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg ${
-                        isRTL ? 'flex-row-reverse text-right' : 'text-left'
-                      }`}
+                      } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
                     >
                       <span className="text-sm sm:text-base md:text-lg">
                         {language.flag}
@@ -362,11 +351,11 @@ const KitchenGallery = () => {
         </div>
       </div>
 
-      {/* FIXED: Filter Section with proper RTL support */}
+      {/* Filter Section - Proper RTL handling */}
       <div className="bg-gray-50 dark:bg-gray-900 pt-8 py-4 sticky top-16 z-40 w-full">
         <div className="max-w-7xl mx-auto px-4">
-          <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
-            <div className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 w-full md:w-auto ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 w-full md:w-auto">
               <h3 className="text-lg font-semibold text-black dark:text-white whitespace-nowrap">
                 {t("filterByWoodType")}
               </h3>
@@ -391,7 +380,7 @@ const KitchenGallery = () => {
         </div>
       </div>
 
-      {/* FIXED: Gallery Grid with proper container */}
+      {/* Gallery Grid */}
       <div className="w-full py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">

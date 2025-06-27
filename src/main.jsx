@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
 import KitchenGallery from "./pages/projects";
 import KitchenDetails from "./pages/Kitchen";
+import KitchenOrderPage from "./pages/kitchenOrderPage";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,11 @@ const router = createBrowserRouter([
   {
     path: "/gallery/:kitchenId",
     element: <KitchenDetails />,
-  }
+  },
+  {
+    path: "/order",
+    element: <KitchenOrderPage />,
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(

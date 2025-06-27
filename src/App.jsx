@@ -321,7 +321,9 @@ function App() {
                 </div>
               </div>
 
-              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg">
+              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+              onClick={() => navigate("/order")}  
+              >
                 {t("orderNow")}
               </button>
 
