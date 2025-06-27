@@ -58,6 +58,7 @@ export const posts = pgTable("posts", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   woodType: text("wood_type").notNull(),
   imageUrls: json("image_urls").notNull(),
+  items: json("items").notNull(),
   estimatedTime: text("estimated_time").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
