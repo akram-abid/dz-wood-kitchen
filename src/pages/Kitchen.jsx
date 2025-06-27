@@ -27,6 +27,9 @@ const KitchenDetails = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
 
+  // RTL detection
+  const isRTL = i18next.language === "ar";
+
   useEffect(() => {
     const fakeKitchen = {
       id,
@@ -101,96 +104,98 @@ const KitchenDetails = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50">
-        <div className="w-full max-w-full mx-auto flex justify-between items-center">
-          <div className="flex items-center flex-shrink-0">
-            <img
-              src={darkMode ? WLogo : Blogo}
-              alt="the logo"
-              className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
-            />
-          </div>
+      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-0 sticky top-0 z-50">
+        <div className="w-full px-3 sm:px-6 md:px-8 lg:px-14">
+          <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className="flex items-center flex-shrink-0">
+              <img
+                src={darkMode ? WLogo : Blogo}
+                alt="the logo"
+                className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
+              />
+            </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
-            <div className="relative">
-              <button
-                onClick={toggleLanguageDropdown}
-                className={`flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
-                  darkMode
-                    ? "bg-gray-800 text-white"
-                    : "bg-gray-50 text-gray-900"
-                } hover:text-yellow-500`}
-              >
-                <Globe size={16} className="sm:w-5 sm:h-5" />
-                <ChevronDown
-                  size={14}
-                  className={`sm:w-4 sm:h-4 transition-transform duration-200 ${
-                    isLanguageDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div
-                className={`absolute right-0 mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
-                  isLanguageDropdownOpen
-                    ? "opacity-100 visible translate-y-0"
-                    : "opacity-0 invisible -translate-y-2"
-                }`}
-              >
-                <div
-                  className={`rounded-lg shadow-xl border ${
+            <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className="relative">
+                <button
+                  onClick={toggleLanguageDropdown}
+                  className={`flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
                     darkMode
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
+                      ? "bg-gray-800 text-white"
+                      : "bg-gray-50 text-gray-900"
+                  } hover:text-yellow-500 ${isRTL ? 'flex-row-reverse' : ''}`}
+                >
+                  <Globe size={16} className="sm:w-5 sm:h-5" />
+                  <ChevronDown
+                    size={14}
+                    className={`sm:w-4 sm:h-4 transition-transform duration-200 ${
+                      isLanguageDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
+                    isLanguageDropdownOpen
+                      ? "opacity-100 visible translate-y-0"
+                      : "opacity-0 invisible -translate-y-2"
                   }`}
                 >
-                  {[
-                    { code: "en", name: "English", flag: "🇺🇸" },
-                    { code: "ar", name: "العربية", flag: "🇸🇦" },
-                  ].map((language) => (
-                    <button
-                      key={language.code}
-                      onClick={() => handleLanguageChange(language.code)}
-                      className={`w-full flex items-center space-x-2 sm:space-x-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left transition-colors duration-200 ${
-                        darkMode
-                          ? "hover:bg-gray-700 text-white"
-                          : "hover:bg-gray-50 text-gray-900"
-                      } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
-                    >
-                      <span className="text-sm sm:text-base md:text-lg">
-                        {language.flag}
-                      </span>
-                      <span className="font-medium text-xs sm:text-sm md:text-base truncate">
-                        {language.name}
-                      </span>
-                    </button>
-                  ))}
+                  <div
+                    className={`rounded-lg shadow-xl border ${
+                      darkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    {[
+                      { code: "en", name: "English", flag: "🇺🇸" },
+                      { code: "ar", name: "العربية", flag: "🇸🇦" },
+                    ].map((language) => (
+                      <button
+                        key={language.code}
+                        onClick={() => handleLanguageChange(language.code)}
+                        className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left transition-colors duration-200 ${
+                          darkMode
+                            ? "hover:bg-gray-700 text-white"
+                            : "hover:bg-gray-50 text-gray-900"
+                        } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg ${isRTL ? 'flex-row-reverse text-right' : ''}`}
+                      >
+                        <span className="text-sm sm:text-base md:text-lg">
+                          {language.flag}
+                        </span>
+                        <span className="font-medium text-xs sm:text-sm md:text-base truncate">
+                          {language.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
+              <button
+                onClick={toggleDarkMode}
+                className="p-1.5 sm:p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex-shrink-0"
+              >
+                {darkMode ? (
+                  <Moon size={16} className="sm:w-5 sm:h-5" />
+                ) : (
+                  <Sun size={16} className="sm:w-5 sm:h-5" />
+                )}
+              </button>
             </div>
-            <button
-              onClick={toggleDarkMode}
-              className="p-1.5 sm:p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex-shrink-0"
-            >
-              {darkMode ? (
-                <Moon size={16} className="sm:w-5 sm:h-5" />
-              ) : (
-                <Sun size={16} className="sm:w-5 sm:h-5" />
-              )}
-            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="w-full max-w-none px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
+      <main className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
         <div className="w-full max-w-7xl mx-auto">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-400 mb-4 sm:mb-6 transition-colors"
+            className={`flex items-center text-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-400 mb-4 sm:mb-6 transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
           >
-            {i18n.dir() === "rtl" ? (
+            {isRTL ? (
               <>
-                <ChevronRight className="ml-1" />
+                <ChevronRight className={`${isRTL ? 'mr-1' : 'ml-1'}`} />
                 {t("backToGallery")}
               </>
             ) : (
@@ -225,16 +230,24 @@ const KitchenDetails = () => {
               </div>
 
               <button
-                onClick={prevImage}
-                className="cursor-pointer absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-1.5 sm:p-2 rounded-full hover:bg-opacity-75 transition-all"
+                onClick={isRTL ? nextImage : prevImage}
+                className={`cursor-pointer absolute ${isRTL ? 'right-2 sm:right-4' : 'left-2 sm:left-4'} top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-1.5 sm:p-2 rounded-full hover:bg-opacity-75 transition-all`}
               >
-                <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+                {isRTL ? (
+                  <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+                ) : (
+                  <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+                )}
               </button>
               <button
-                onClick={nextImage}
-                className="cursor-pointer absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-1.5 sm:p-2 rounded-full hover:bg-opacity-75 transition-all"
+                onClick={isRTL ? prevImage : nextImage}
+                className={`cursor-pointer absolute ${isRTL ? 'left-2 sm:left-4' : 'right-2 sm:right-4'} top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-1.5 sm:p-2 rounded-full hover:bg-opacity-75 transition-all`}
               >
-                <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+                {isRTL ? (
+                  <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+                ) : (
+                  <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+                )}
               </button>
 
               <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 flex justify-center gap-2">
@@ -254,11 +267,11 @@ const KitchenDetails = () => {
 
             {/* Details Section - Scrollable on desktop */}
             <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 lg:overflow-y-auto lg:h-full">
-              <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4">
+              <h1 className={`text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {kitchen.title}
               </h1>
 
-              <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
+              <p className={`text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base ${isRTL ? 'text-right' : 'text-left'}`}>
                 {kitchen.description}
               </p>
 
@@ -267,35 +280,39 @@ const KitchenDetails = () => {
                   icon={<MapPin className="text-yellow-500" />}
                   label={t("location")}
                   value={kitchen.location}
+                  isRTL={isRTL}
                 />
                 <DetailItem
                   icon={<Clock className="text-yellow-500" />}
                   label={t("duration")}
                   value={kitchen.duration}
+                  isRTL={isRTL}
                 />
                 <DetailItem
                   icon={<Calendar className="text-yellow-500" />}
                   label={t("completedDate")}
                   value={kitchen.completedDate}
+                  isRTL={isRTL}
                 />
                 <DetailItem
                   icon={<Tag className="text-yellow-500" />}
                   label={t("woodType")}
                   value={kitchen.woodType}
+                  isRTL={isRTL}
                 />
               </div>
 
               <div className="mb-6 sm:mb-8">
-                <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mb-3 sm:mb-4">
+                <h3 className={`text-lg sm:text-xl font-semibold text-black dark:text-white mb-3 sm:mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t("features")}
                 </h3>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {kitchen.features.map((feature, index) => (
                     <li
                       key={index}
-                      className="flex items-center text-gray-700 dark:text-gray-300 text-sm sm:text-base"
+                      className={`flex items-center text-gray-700 dark:text-gray-300 text-sm sm:text-base ${isRTL ? 'flex-row-reverse text-right' : ''}`}
                     >
-                      <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2 flex-shrink-0"></span>
+                      <span className={`w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 ${isRTL ? 'ml-2' : 'mr-2'}`}></span>
                       {feature}
                     </li>
                   ))}
@@ -309,10 +326,10 @@ const KitchenDetails = () => {
   );
 };
 
-const DetailItem = ({ icon, label, value }) => (
-  <div className="flex items-center">
-    <span className="mr-2 sm:mr-3 flex-shrink-0">{icon}</span>
-    <div className="min-w-0">
+const DetailItem = ({ icon, label, value, isRTL }) => (
+  <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+    <span className={`flex-shrink-0 ${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'}`}>{icon}</span>
+    <div className={`min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{label}</p>
       <p className="font-medium text-black dark:text-white text-sm sm:text-base truncate">{value}</p>
     </div>
