@@ -256,36 +256,36 @@ const KitchenGallery = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-md py-4 px-14 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center">
+          <div className="flex items-center flex-shrink-0">
             <img
               src={darkMode ? WLogo : Blogo}
               alt="the logo"
-              className="w-[140px]"
+              className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
             />
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
             <div className="relative">
               <button
                 onClick={toggleLanguageDropdown}
-                className={`flex items-center space-x-2 p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                className={`flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
                   darkMode
                     ? "bg-gray-800 text-white"
                     : "bg-gray-50 text-gray-900"
                 } hover:text-yellow-500`}
               >
-                <Globe size={20} />
+                <Globe size={16} className="sm:w-5 sm:h-5" />
                 <ChevronDown
-                  size={16}
-                  className={`transition-transform duration-200 ${
+                  size={14}
+                  className={`sm:w-4 sm:h-4 transition-transform duration-200 ${
                     isLanguageDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
               <div
-                className={`absolute right-0 mt-2 w-40 transition-all duration-200 ${
+                className={`absolute right-0 mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
                   isLanguageDropdownOpen
                     ? "opacity-100 visible translate-y-0"
                     : "opacity-0 invisible -translate-y-2"
@@ -305,14 +305,18 @@ const KitchenGallery = () => {
                     <button
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
+                      className={`w-full flex items-center space-x-2 sm:space-x-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left transition-colors duration-200 ${
                         darkMode
                           ? "hover:bg-gray-700 text-white"
                           : "hover:bg-gray-50 text-gray-900"
                       } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
                     >
-                      <span className="text-lg">{language.flag}</span>
-                      <span className="font-medium">{language.name}</span>
+                      <span className="text-sm sm:text-base md:text-lg">
+                        {language.flag}
+                      </span>
+                      <span className="font-medium text-xs sm:text-sm md:text-base truncate">
+                        {language.name}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -320,9 +324,13 @@ const KitchenGallery = () => {
             </div>
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="p-1.5 sm:p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-yellow-400 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors flex-shrink-0"
             >
-              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+              {darkMode ? (
+                <Moon size={16} className="sm:w-5 sm:h-5" />
+              ) : (
+                <Sun size={16} className="sm:w-5 sm:h-5" />
+              )}
             </button>
           </div>
         </div>
