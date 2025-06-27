@@ -27,6 +27,9 @@ const KitchenGallery = () => {
   const loaderRef = useRef(null);
   const navigate = useNavigate();
 
+  // Check if current language is RTL
+  const isRTL = i18next.language === "ar";
+
   // Fake data generator
   const generateFakeKitchens = (count) => {
     const woodTypes = [
@@ -107,20 +110,22 @@ const KitchenGallery = () => {
     }
   }, [selectedWoodType, kitchens]);
 
-  // change page direction
+  // FIXED: Better RTL direction handling
   useEffect(() => {
     const updateDirection = () => {
-      document.documentElement.dir = i18next.dir();
+      const isRTL = i18next.dir() === "rtl" || i18next.language === "ar";
+      document.documentElement.dir = isRTL ? "rtl" : "ltr";
+      document.documentElement.lang = i18next.language;
     };
 
     updateDirection();
-
     i18next.on("languageChanged", updateDirection);
 
     return () => {
       i18next.off("languageChanged", updateDirection);
     };
   }, []);
+
   // Infinite scroll observer
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -164,12 +169,12 @@ const KitchenGallery = () => {
 
   const woodTypes = [
     { filter: "all", tag: t("all") },
-    { filter: "oak", tag: t("oak") },
-    { filter: "pine", tag: t("pine") },
-    { filter: "walnut", tag: t("walnut") },
-    { filter: "cherry", tag: t("cherry") },
-    { filter: "reclaimedOak", tag: t("reclaimedOak") },
-    { filter: "maple", tag: t("maple") },
+    { filter: "Oak", tag: t("oak") },
+    { filter: "Pine", tag: t("pine") },
+    { filter: "Walnut", tag: t("walnut") },
+    { filter: "Cherry", tag: t("cherry") },
+    { filter: "Reclaimed Oak", tag: t("reclaimedOak") },
+    { filter: "Maple", tag: t("maple") },
   ];
 
   const KitchenCarousel = ({ images }) => {
@@ -213,24 +218,25 @@ const KitchenGallery = () => {
           ))}
         </div>
 
+        {/* FIXED: RTL-aware carousel buttons */}
         <button
           onClick={(e) => {
             e.stopPropagation();
-            prevSlide();
+            isRTL ? nextSlide() : prevSlide();
           }}
-          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+          className={`absolute ${isRTL ? 'right-2' : 'left-2'} top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all`}
         >
-          <ChevronLeft size={20} className="cursor-pointer" />
+          <ChevronLeft size={20} className={`cursor-pointer ${isRTL ? 'rotate-180' : ''}`} />
         </button>
 
         <button
           onClick={(e) => {
             e.stopPropagation();
-            nextSlide();
+            isRTL ? prevSlide() : nextSlide();
           }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+          className={`absolute ${isRTL ? 'left-2' : 'right-2'} top-1/2 -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all`}
         >
-          <ChevronRight size={20} className="cursor-pointer" />
+          <ChevronRight size={20} className={`cursor-pointer ${isRTL ? 'rotate-180' : ''}`} />
         </button>
 
         <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
@@ -254,10 +260,10 @@ const KitchenGallery = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300 w-full">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50">
-        <div className="container mx-auto flex justify-between items-center">
+      <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50 w-full">
+        <div className="max-w-full mx-auto flex justify-between items-center">
           <div className="flex items-center flex-shrink-0">
             <img
               src={darkMode ? WLogo : Blogo}
@@ -266,15 +272,16 @@ const KitchenGallery = () => {
             />
           </div>
 
-          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+          {/* FIXED: RTL-aware header controls */}
+          <div className={`flex items-center gap-2 sm:gap-3 md:gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="relative">
               <button
                 onClick={toggleLanguageDropdown}
-                className={`flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                className={`flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
                   darkMode
                     ? "bg-gray-800 text-white"
                     : "bg-gray-50 text-gray-900"
-                } hover:text-yellow-500`}
+                } hover:text-yellow-500 ${isRTL ? 'flex-row-reverse' : ''}`}
               >
                 <Globe size={16} className="sm:w-5 sm:h-5" />
                 <ChevronDown
@@ -284,8 +291,10 @@ const KitchenGallery = () => {
                   }`}
                 />
               </button>
+              
+              {/* FIXED: RTL-aware dropdown position */}
               <div
-                className={`absolute right-0 mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
+                className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-32 sm:w-36 md:w-40 transition-all duration-200 z-10 ${
                   isLanguageDropdownOpen
                     ? "opacity-100 visible translate-y-0"
                     : "opacity-0 invisible -translate-y-2"
@@ -305,11 +314,13 @@ const KitchenGallery = () => {
                     <button
                       key={language.code}
                       onClick={() => handleLanguageChange(language.code)}
-                      className={`w-full flex items-center space-x-2 sm:space-x-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 text-left transition-colors duration-200 ${
+                      className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 transition-colors duration-200 ${
                         darkMode
                           ? "hover:bg-gray-700 text-white"
                           : "hover:bg-gray-50 text-gray-900"
-                      } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
+                      } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg ${
+                        isRTL ? 'flex-row-reverse text-right' : 'text-left'
+                      }`}
                     >
                       <span className="text-sm sm:text-base md:text-lg">
                         {language.flag}
@@ -337,8 +348,8 @@ const KitchenGallery = () => {
       </header>
 
       {/* Hero Section */}
-      <div className="bg-black text-white py-16">
-        <div className="container mx-auto px-4">
+      <div className="bg-black text-white py-16 w-full">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-4">
               {t("ourKitchen")}
@@ -351,11 +362,11 @@ const KitchenGallery = () => {
         </div>
       </div>
 
-      {/* Filter Section */}
-      <div className="bg-gray-50 dark:bg-gray-900 pt-8 py-4 sticky top-16 z-40">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 w-full md:w-auto">
+      {/* FIXED: Filter Section with proper RTL support */}
+      <div className="bg-gray-50 dark:bg-gray-900 pt-8 py-4 sticky top-16 z-40 w-full">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+            <div className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 w-full md:w-auto ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
               <h3 className="text-lg font-semibold text-black dark:text-white whitespace-nowrap">
                 {t("filterByWoodType")}
               </h3>
@@ -380,49 +391,51 @@ const KitchenGallery = () => {
         </div>
       </div>
 
-      {/* Gallery Grid */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredKitchens.map((kitchen) => (
-            <div
-              key={kitchen.id}
-              className="bg-white dark:bg-gray-900 border-yellow-400 rounded-xl shadow-lg overflow-hidden border-2 border-gray-100 dark:border-gray-700 hover:border-yellow-400 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl will-change-transform"
-            >
-              <KitchenCarousel images={kitchen.images} />
+      {/* FIXED: Gallery Grid with proper container */}
+      <div className="w-full py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            {filteredKitchens.map((kitchen) => (
+              <div
+                key={kitchen.id}
+                className="bg-white dark:bg-gray-900 border-yellow-400 rounded-xl shadow-lg overflow-hidden border-2 border-gray-100 dark:border-gray-700 hover:border-yellow-400 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl will-change-transform w-full"
+              >
+                <KitchenCarousel images={kitchen.images} />
 
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-black dark:text-white mb-2 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">
-                  {kitchen.title}
-                </h3>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-black dark:text-white mb-2 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">
+                    {kitchen.title}
+                  </h3>
 
-                <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2">
-                  {kitchen.description}
-                </p>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                    {kitchen.description}
+                  </p>
 
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() => navigate(`/gallery/${kitchen.id}`)}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-                  >
-                    {t("viewDetails")}
-                  </button>
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => navigate(`/gallery/${kitchen.id}`)}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+                    >
+                      {t("viewDetails")}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Infinite scroll loader */}
-        <div ref={loaderRef} className="py-8 flex justify-center">
-          {loading && (
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent"></div>
-          )}
+          {/* Infinite scroll loader */}
+          <div ref={loaderRef} className="py-8 flex justify-center w-full">
+            {loading && (
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent"></div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Call to Action */}
-      <div className="bg-black dark:bg-gray-800 text-white py-16">
-        <div className="container mx-auto px-4 text-center">
+      <div className="bg-black dark:bg-gray-800 text-white py-16 w-full">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">
             {t("readyForYourDreamKitchen")}
           </h2>
