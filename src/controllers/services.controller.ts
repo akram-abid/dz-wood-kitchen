@@ -6,6 +6,7 @@ const addPostSchema = z.object({
   title: z.string(),
   description: z.string(),
   price: z.string(),
+  items: z.array(z.string()).max(20),
   woodType: z.string(),
   estimatedTime: z.string(),
   adminId: z.string().uuid(),
@@ -17,7 +18,8 @@ const deletePostParamsSchema = z.object({
 });
 
 const getByAdminParamsSchema = z.object({
-  adminId: z.string().uuid(),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(25).default(15),
 });
 
 const getPostByIdSchema = z.object({
@@ -64,9 +66,9 @@ export const getPostsByAdminHandler = async (
   reply: FastifyReply,
 ) => {
   try {
-    //const { adminId } = getByAdminParamsSchema.parse(req.params);
+    const { page, limit } = getByAdminParamsSchema.parse(req.query);
 
-    const posts = await servicePostService.getPostsByAdmin();
+    const posts = await servicePostService.getPostsByAdmin(page, limit);
 
     return reply.send({ success: true, posts });
   } catch (error: any) {
@@ -88,5 +90,73 @@ export const getPostsById = async (
   } catch (error: any) {
     req.log.error("Get posts error", error);
     return reply.code(400).send({ success: false, message: error.message });
+  }
+};
+
+export const updatePostHandler = async (
+  req: FastifyRequest<{
+    Params: { postId: string };
+    Body: {
+      title?: string;
+      description?: string;
+      price?: string;
+      woodType?: string;
+      estimatedTime?: string;
+      items?: string[];
+      imageFilenames?: string[];
+      adminId?: string;
+    };
+  }>,
+  reply: FastifyReply,
+) => {
+  try {
+    const { postId } = req.params;
+    const {
+      title,
+      description,
+      price,
+      woodType,
+      estimatedTime,
+      items,
+      imageFilenames,
+      adminId,
+    } = req.body;
+
+    if (!adminId) {
+      return reply.code(401).send({
+        success: false,
+        message: "Unauthorized: adminId missing",
+      });
+    }
+
+    const updateData: any = {
+      ...(title && { title }),
+      ...(description && { description }),
+      ...(price && { price }),
+      ...(woodType && { woodType }),
+      ...(estimatedTime && { estimatedTime }),
+      ...(items && { items }),
+    };
+
+    if (imageFilenames && imageFilenames.length > 0) {
+      const imageUrls = imageFilenames.map(
+        (filename) => `/pictures/services/${filename}`,
+      );
+      updateData.imageUrls = imageUrls;
+    }
+
+    const updatedPost = await servicePostService.updatePost(
+      postId,
+      adminId,
+      updateData,
+    );
+
+    return reply.send({ success: true, post: updatedPost });
+  } catch (error: any) {
+    req.log.error("Error updating post:", error);
+    return reply.code(400).send({
+      success: false,
+      message: error.message || "Failed to update post",
+    });
   }
 };
