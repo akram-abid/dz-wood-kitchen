@@ -102,7 +102,7 @@ const KitchenDetails = () => {
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 shadow-md py-2 sm:py-3 md:py-4 px-3 sm:px-6 md:px-8 lg:px-14 sticky top-0 z-50">
-        <div className="container mx-auto flex justify-between items-center">
+        <div className="w-full max-w-full mx-auto flex justify-between items-center">
           <div className="flex items-center flex-shrink-0">
             <img
               src={darkMode ? WLogo : Blogo}
@@ -182,123 +182,125 @@ const KitchenDetails = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-400 mb-6 transition-colors"
-        >
-          {i18n.dir() === "rtl" ? (
-            <>
-              <ChevronRight className="ml-1" />
-              {t("backToGallery")}
-            </>
-          ) : (
-            <>
-              <ChevronLeft className="mr-1" />
-              {t("backToGallery")}
-            </>
-          )}
-        </button>
+      <main className="w-full max-w-none px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6">
+        <div className="w-full max-w-7xl mx-auto">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-400 mb-4 sm:mb-6 transition-colors"
+          >
+            {i18n.dir() === "rtl" ? (
+              <>
+                <ChevronRight className="ml-1" />
+                {t("backToGallery")}
+              </>
+            ) : (
+              <>
+                <ChevronLeft className="mr-1" />
+                {t("backToGallery")}
+              </>
+            )}
+          </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:h-[calc(100vh-180px)]">
-          {/* Image Gallery - Full height on desktop */}
-          <div className="relative rounded-xl overflow-hidden shadow-lg h-full min-h-[400px] lg:min-h-full">
-            <div className="relative h-full w-full">
-              {kitchen.images.map((image, index) => (
-                <div
-                  key={index}
-                  className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
-                    index === currentImageIndex
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }`}
-                >
-                  <img
-                    src={image}
-                    alt={kitchen.title}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={prevImage}
-              className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={nextImage}
-              className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
-            >
-              <ChevronRight size={24} />
-            </button>
-
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-              {kitchen.images.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentImageIndex
-                      ? "bg-yellow-400 scale-125"
-                      : "bg-gray-300 bg-opacity-50 dark:bg-gray-400"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Details Section - Scrollable on desktop */}
-          <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 lg:overflow-y-auto lg:h-full">
-            <h1 className="text-3xl font-bold text-black dark:text-white mb-4">
-              {kitchen.title}
-            </h1>
-
-            <p className="text-gray-700 dark:text-gray-300 mb-6">
-              {kitchen.description}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-              <DetailItem
-                icon={<MapPin className="text-yellow-500" />}
-                label={t("location")}
-                value={kitchen.location}
-              />
-              <DetailItem
-                icon={<Clock className="text-yellow-500" />}
-                label={t("duration")}
-                value={kitchen.duration}
-              />
-              <DetailItem
-                icon={<Calendar className="text-yellow-500" />}
-                label={t("completedDate")}
-                value={kitchen.completedDate}
-              />
-              <DetailItem
-                icon={<Tag className="text-yellow-500" />}
-                label={t("woodType")}
-                value={kitchen.woodType}
-              />
-            </div>
-
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-black dark:text-white mb-4">
-                {t("features")}
-              </h3>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {kitchen.features.map((feature, index) => (
-                  <li
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 lg:h-[calc(100vh-180px)]">
+            {/* Image Gallery - Full height on desktop */}
+            <div className="relative rounded-xl overflow-hidden shadow-lg h-full min-h-[300px] sm:min-h-[400px] lg:min-h-full">
+              <div className="relative h-full w-full">
+                {kitchen.images.map((image, index) => (
+                  <div
                     key={index}
-                    className="flex items-center text-gray-700 dark:text-gray-300"
+                    className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+                      index === currentImageIndex
+                        ? "opacity-100"
+                        : "opacity-0 pointer-events-none"
+                    }`}
                   >
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>
-                    {feature}
-                  </li>
+                    <img
+                      src={image}
+                      alt={kitchen.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 ))}
-              </ul>
+              </div>
+
+              <button
+                onClick={prevImage}
+                className="cursor-pointer absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-1.5 sm:p-2 rounded-full hover:bg-opacity-75 transition-all"
+              >
+                <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="cursor-pointer absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 dark:bg-[#ffffff52] bg-black bg-opacity-50 text-white p-1.5 sm:p-2 rounded-full hover:bg-opacity-75 transition-all"
+              >
+                <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+              </button>
+
+              <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 flex justify-center gap-2">
+                {kitchen.images.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all ${
+                      index === currentImageIndex
+                        ? "bg-yellow-400 scale-125"
+                        : "bg-gray-300 bg-opacity-50 dark:bg-gray-400"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Details Section - Scrollable on desktop */}
+            <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 lg:overflow-y-auto lg:h-full">
+              <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4">
+                {kitchen.title}
+              </h1>
+
+              <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
+                {kitchen.description}
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <DetailItem
+                  icon={<MapPin className="text-yellow-500" />}
+                  label={t("location")}
+                  value={kitchen.location}
+                />
+                <DetailItem
+                  icon={<Clock className="text-yellow-500" />}
+                  label={t("duration")}
+                  value={kitchen.duration}
+                />
+                <DetailItem
+                  icon={<Calendar className="text-yellow-500" />}
+                  label={t("completedDate")}
+                  value={kitchen.completedDate}
+                />
+                <DetailItem
+                  icon={<Tag className="text-yellow-500" />}
+                  label={t("woodType")}
+                  value={kitchen.woodType}
+                />
+              </div>
+
+              <div className="mb-6 sm:mb-8">
+                <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mb-3 sm:mb-4">
+                  {t("features")}
+                </h3>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {kitchen.features.map((feature, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center text-gray-700 dark:text-gray-300 text-sm sm:text-base"
+                    >
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2 flex-shrink-0"></span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -309,10 +311,10 @@ const KitchenDetails = () => {
 
 const DetailItem = ({ icon, label, value }) => (
   <div className="flex items-center">
-    <span className="mx-3">{icon}</span>
-    <div>
-      <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
-      <p className="font-medium text-black dark:text-white">{value}</p>
+    <span className="mr-2 sm:mr-3 flex-shrink-0">{icon}</span>
+    <div className="min-w-0">
+      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{label}</p>
+      <p className="font-medium text-black dark:text-white text-sm sm:text-base truncate">{value}</p>
     </div>
   </div>
 );
