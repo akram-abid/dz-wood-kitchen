@@ -51,12 +51,26 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
       userId: result.user.id,
     });
 
-    return reply.code(200).send({
-      message: "Login successful",
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    });
+    return reply
+      .setCookie("accessToken", result.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 4,
+      })
+      .setCookie("refreshToken", result.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      })
+      .code(200)
+      .send({
+        message: "Login successful",
+        user: result.user,
+      });
   } catch (err: any) {
     req.log.error("Login controller error", { error: err.message });
 
@@ -106,12 +120,26 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     // Clear grant data from session
     delete (req.session as any).grant;
 
-    return reply.send({
-      success: true,
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    });
+    return reply
+      .setCookie("accessToken", result.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 4,
+      })
+      .setCookie("refreshToken", result.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      })
+      .code(200)
+      .send({
+        message: "Login successful",
+        user: result.user,
+      });
   } catch (error) {
     console.error("Google OAuth error:", error);
     return reply.status(500).send({ error: "OAuth login failed" });
@@ -156,13 +184,26 @@ export async function facebookCallback(
 
     // Clear grant data from session
     delete (req.session as any).grant;
-
-    return reply.send({
-      success: true,
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    });
+    return reply
+      .setCookie("accessToken", result.accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 4,
+      })
+      .setCookie("refreshToken", result.refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      })
+      .code(200)
+      .send({
+        message: "Login successful",
+        user: result.user,
+      });
   } catch (error) {
     console.error("Facebook OAuth error:", error);
     return reply.status(500).send({ error: "OAuth login failed" });
