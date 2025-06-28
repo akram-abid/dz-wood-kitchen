@@ -167,5 +167,15 @@
   "joinThousands": "انضم إلى آلاف العملاء الراضين الذين حولوا منازلهم بحلول مطابخنا الفاخرة.",
   "customDesigns": "تصاميم مخصصة تناسب مساحتك",
   "premiumMaterials": "مواد فاخرة وحرفية عالية",
-  "expertSupport": "دعم خبراء طوال مشروعك"
+  "expertSupport": "دعم خبراء طوال مشروعك",
+  "completeOrder": "إكمال الطلب",
+  "articlesUsed": "العناصر/المواد المستخدمة",
+  "addArticle": "إضافة عنصر/مادة",
+  "completionNotes": "ملاحظات الإكمال",
+  "anySpecialNotes": "هل هناك ملاحظات خاصة حول هذا الإكمال؟",
+  "orderDetails": "تفاصيل الطلب",
+  "clientInformation": "معلومات العميل",
+  "orderInformation": "معلومات الطلب",
+  "completionDetails": "تفاصيل الإكمال",
+  "notes": "ملاحظات"
 }

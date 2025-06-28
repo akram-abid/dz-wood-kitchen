@@ -8,6 +8,7 @@ import KitchenOrderPage from "./pages/kitchenOrderPage";
 import ProfilePage from "./pages/profile";
 import SignupPage from "./pages/signup";
 import LoginPage from "./pages/login";
+import AdminDashboard from "./pages/adminDashboard";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />
+  },
+  {
+    path: "/dashboard",
+    element: <AdminDashboard />,
   }
 ]);
 

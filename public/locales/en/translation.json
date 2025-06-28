@@ -165,5 +165,14 @@
   "joinThousands": "Join thousands of satisfied customers who have transformed their homes with our premium kitchen solutions.",
   "customDesigns": "Custom designs tailored to your space",
   "premiumMaterials": "Premium materials and craftsmanship",
-  "expertSupport": "Expert support throughout your project"
+  "expertSupport": "Expert support throughout your project",
+  "completeOrder": "Complete Order",
+  "articlesUsed": "Articles/Elements Used",
+  "addArticle": "Add article/element",
+  "completionNotes": "Completion Notes",
+  "anySpecialNotes": "Any special notes about this completion?",
+  "clientInformation": "Client Information",
+  "orderInformation": "Order Information",
+  "completionDetails": "Completion Details",
+  "notes": "Notes"
 }
