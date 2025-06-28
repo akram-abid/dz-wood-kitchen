@@ -29,6 +29,13 @@
       "when": 1751123059353,
       "tag": "0003_conscious_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751130315985,
+      "tag": "0004_wealthy_madrox",
+      "breakpoints": true
     }
   ]
 }

@@ -22,14 +22,10 @@ export const users = pgTable("users", {
     .$default(() => "user"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  name: text("name").notNull(),
-  lastname: text("lastname").notNull(),
-  wilaya: text("wilaya").notNull(),
-  phoneNumber: text("phoneNumber").notNull(),
+  fullName: text("fullName").notNull(),
+  phoneNumber: text("phoneNumber"),
   oauthprovider: text("oauthprovider"),
   oauthId: text("oauthId"),
-  daira: text("daira").notNull(),
-  baladia: text("baladia").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

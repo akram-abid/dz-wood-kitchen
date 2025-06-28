@@ -1,11 +1,7 @@
 export interface SignupData {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  wilaya: string;
-  daira: string;
-  baladia: string;
+  fullName: string;
   phoneNumber: string;
 }
 
