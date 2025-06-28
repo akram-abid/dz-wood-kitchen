@@ -21,7 +21,7 @@ import { authRoutes } from "./routes/auth.routes";
 import { grantPlugin } from "./plugins/grant.plugin";
 import { postRoutes } from "./routes/services.routes";
 import { setupStaticFiles } from "./utils/static";
-
+import { orderRoutes } from "./routes/order.routes";
 dotenv.config();
 const config = loadConfig();
 
@@ -270,6 +270,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
     async (api) => {
       await api.register(authRoutes, { prefix: "/auth" });
       await api.register(postRoutes, { prefix: "/services" });
+      await api.register(orderRoutes, { prefix: "/orders" });
     },
     { prefix: "/api/v1" },
   );

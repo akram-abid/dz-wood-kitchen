@@ -5,16 +5,11 @@ import {
   deleteOrderHandler,
   getOrderByIdHandler,
 } from "../controllers/order.controller";
-import {
-  processFileUploads,
-  orderImagesPath,
-  MAX_FILES_LIMIT,
-  ALLOWED_MIME_TYPES,
-} from "../utils/uploader"; // Import the existing function
+import { processFileUploads, orderImagesPath } from "../utils/uploader"; // Import the existing function
 
 export async function orderRoutes(server: FastifyInstance) {
   // Create Order
-  server.post("/orders", {
+  server.post("/", {
     preHandler: [server.authenticate],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -44,7 +39,7 @@ export async function orderRoutes(server: FastifyInstance) {
   });
 
   // Update Order
-  server.patch("/orders/:orderId", {
+  server.patch("/:orderId", {
     preHandler: [server.authenticate],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -81,13 +76,13 @@ export async function orderRoutes(server: FastifyInstance) {
   });
 
   // Delete Order
-  server.delete("/orders/:id", {
+  server.delete("/:id", {
     preHandler: [server.authenticate],
     handler: deleteOrderHandler,
   });
 
   // Get Order by ID
-  server.get("/orders/:id", {
+  server.get("/:id", {
     preHandler: [server.authenticate],
     handler: getOrderByIdHandler,
   });
