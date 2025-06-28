@@ -84,6 +84,7 @@ export const orders = pgTable("orders", {
 
   daira: text("daira").notNull(),
   street: text("street").notNull(),
+  baladia: text("baladia").notNull(),
   wilaya: text("wilaya").notNull(),
   phoneNumber: text("phone_number").notNull(),
 
