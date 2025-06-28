@@ -6,7 +6,7 @@ import { users } from "../database/schema"; // Your schema
 import { loadConfig } from "../utils/conf";
 import { logger } from "../utils/logger";
 import { SignupData, LoginData, OAuthProfile } from "../dtos/auth.dtos";
-
+import { JwtPayload } from "../gtypes/jwt";
 const config = loadConfig();
 
 export class AuthService {
@@ -62,13 +62,14 @@ export class AuthService {
           email: users.email,
           name: users.name,
           lastname: users.lastname,
+          role: users.role,
           phoneNumber: users.phoneNumber,
         });
 
       const user = newUser[0];
 
       // Generate tokens
-      const tokens = this.generateTokens(user.id);
+      const tokens = this.generateTokens(user.id, user.email, user.role);
 
       logger.info("User registered successfully", {
         userId: user.id,
@@ -291,9 +292,9 @@ export class AuthService {
     }
   }*/
 
-  async verifyToken(token: string) {
+  /*async verifyToken(token: string) {
     try {
-      const decoded = jwt.verify(token, config.JWT_SECRET) as any;
+      const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
 
       if (decoded.type !== "access") {
         throw new Error("Invalid token type");
@@ -324,7 +325,7 @@ export class AuthService {
     } catch (error) {
       throw new Error("Invalid token");
     }
-  }
+  }*/
 }
 
 export const authService = new AuthService();
