@@ -37,7 +37,7 @@ export class ServicePostService {
           price: data.price,
           woodType: data.woodType,
           estimatedTime: data.estimatedTime,
-          adminId: data.adminId,
+          createdBy: data.adminId,
           imageUrls,
           items,
           createdAt: new Date(),
@@ -132,7 +132,7 @@ export class ServicePostService {
       const result = await db
         .update(posts)
         .set(updatePayload)
-        .where(and(eq(posts.id, postId), eq(posts.adminId, adminId)))
+        .where(and(eq(posts.id, postId), eq(posts.createdBy, adminId)))
         .returning();
 
       logger.info("Post updated successfully", {
