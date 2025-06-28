@@ -8,72 +8,25 @@ import {
 import fs from "fs";
 import path from "path";
 import { pipeline } from "stream/promises";
-
-const serviceImagesPath = path.join(process.cwd(), "pictures/services");
-if (!fs.existsSync(serviceImagesPath)) {
-  fs.mkdirSync(serviceImagesPath, { recursive: true });
-}
+import { serviceImagesPath, processFileUploads } from "../utils/uploader";
 
 export async function postRoutes(server: FastifyInstance) {
+  // Create Post
   server.post("/posts", {
     preHandler: [server.authenticate, server.authorize(["admin"])],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
-        const parts = req.parts();
-        const fields: Record<string, any> = {};
-        const imageFilenames: string[] = [];
+        const uploadResult = await processFileUploads(
+          req.parts(),
+          reply,
+          serviceImagesPath,
+        );
+        if (!uploadResult) return; // Error already sent by processFileUploads
 
-        for await (const part of parts) {
-          if (part.type === "file") {
-            if (
-              !["image/jpeg", "image/png", "image/jpg", "video/mp4"].includes(
-                part.mimetype || "",
-              )
-            ) {
-              return reply.code(400).send({
-                success: false,
-                message: "Unsupported file type",
-              });
-            }
-
-            const filename = `${Date.now()}-${part.filename}`;
-            const filepath = path.join(serviceImagesPath, filename);
-
-            await pipeline(part.file, fs.createWriteStream(filepath));
-            imageFilenames.push(filename);
-          } else if (part.type === "field") {
-            if (part.fieldname === "items") {
-              try {
-                fields.items = JSON.parse(part.value as string);
-                if (
-                  !Array.isArray(fields.items) ||
-                  !fields.items.every((i) => typeof i === "string")
-                ) {
-                  throw new Error("Invalid format");
-                }
-              } catch {
-                return reply.code(400).send({
-                  success: false,
-                  message:
-                    "Invalid 'items' field: must be JSON array of strings",
-                });
-              }
-            } else {
-              fields[part.fieldname] = part.value;
-            }
-          }
-        }
-
-        if (imageFilenames.length > 15) {
-          return reply.code(400).send({
-            success: false,
-            message: "Max 15 files allowed",
-          });
-        }
-
+        const { fields, mediaFilenames } = uploadResult;
         const body = {
           ...fields,
-          imageFilenames,
+          mediaFilenames,
           adminId: req.ctx.user?.userId,
         };
 
@@ -88,79 +41,24 @@ export async function postRoutes(server: FastifyInstance) {
     },
   });
 
-  // Delete Post
-  server.delete("/posts/:id", {
-    preHandler: [server.authenticate, server.authorize(["admin"])],
-    handler: deletePostHandler,
-  });
-
-  // Get All Posts by Admin
-  server.get("/posts", {
-    preHandler: [server.authenticate, server.authorize(["admin"])],
-    handler: getPostsByAdminHandler,
-  });
-
+  // Update Post
   server.patch("/posts/:postId", {
     preHandler: [server.authenticate, server.authorize(["admin"])],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
         const postId = (req.params as any).postId;
-        const parts = req.parts();
-        const fields: Record<string, any> = {};
-        const imageFilenames: string[] = [];
+        const uploadResult = await processFileUploads(
+          req.parts(),
+          reply,
+          serviceImagesPath,
+        );
+        if (!uploadResult) return; // Error already sent by processFileUploads
 
-        for await (const part of parts) {
-          if (part.type === "file") {
-            if (
-              !["image/jpeg", "image/png", "image/jpg", "video/mp4"].includes(
-                part.mimetype || "",
-              )
-            ) {
-              return reply.code(400).send({
-                success: false,
-                message: "Unsupported file type",
-              });
-            }
-
-            const filename = `${Date.now()}-${part.filename}`;
-            const filepath = path.join(serviceImagesPath, filename);
-
-            await pipeline(part.file, fs.createWriteStream(filepath));
-            imageFilenames.push(filename);
-          } else if (part.type === "field") {
-            if (part.fieldname === "items") {
-              try {
-                fields.items = JSON.parse(part.value as string);
-                if (
-                  !Array.isArray(fields.items) ||
-                  !fields.items.every((i) => typeof i === "string")
-                ) {
-                  throw new Error("Invalid items array");
-                }
-              } catch {
-                return reply.code(400).send({
-                  success: false,
-                  message:
-                    "Invalid 'items' field: must be JSON array of strings",
-                });
-              }
-            } else {
-              fields[part.fieldname] = part.value;
-            }
-          }
-        }
-
-        if (imageFilenames.length > 0 && imageFilenames.length > 15) {
-          return reply.code(400).send({
-            success: false,
-            message: "Max 15 files allowed",
-          });
-        }
-
+        const { fields, mediaFilenames } = uploadResult;
         const updatePayload = {
           ...fields,
           adminId: req.ctx.user?.userId,
-          ...(imageFilenames.length > 0 && { imageFilenames }),
+          ...(mediaFilenames.length > 0 && { mediaFilenames }),
         };
 
         return updatePostHandler(
@@ -179,5 +77,17 @@ export async function postRoutes(server: FastifyInstance) {
         });
       }
     },
+  });
+
+  // Delete Post
+  server.delete("/posts/:id", {
+    preHandler: [server.authenticate, server.authorize(["admin"])],
+    handler: deletePostHandler,
+  });
+
+  // Get All Posts by Admin
+  server.get("/posts", {
+    preHandler: [server.authenticate, server.authorize(["admin"])],
+    handler: getPostsByAdminHandler,
   });
 }
