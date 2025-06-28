@@ -1,12 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
-import { dbDrizzle as db } from "../database/db"; // Your database connection
-import { users } from "../database/schema"; // Your schema
+import { dbDrizzle as db } from "../database/db";
+import { users } from "../database/schema";
 import { loadConfig } from "../utils/conf";
 import { logger } from "../utils/logger";
 import { SignupData, LoginData, OAuthProfile } from "../dtos/auth.dtos";
-import { JwtPayload } from "../gtypes/jwt";
 const config = loadConfig();
 
 export class AuthService {
@@ -48,20 +47,13 @@ export class AuthService {
         .values({
           email: data.email,
           password: hashedPassword,
-          name: data.firstName,
+          fullName: data.fullName,
           role: "user",
-          lastname: data.lastName,
-          wilaya: data.wilaya,
-          daira: data.daira,
-          baladia: data.baladia,
-          phoneNumber: data.phoneNumber,
-          updatedAt: new Date(),
         })
         .returning({
           id: users.id,
           email: users.email,
-          name: users.name,
-          lastname: users.lastname,
+          fullName: users.fullName,
           role: users.role,
           phoneNumber: users.phoneNumber,
         });
@@ -121,13 +113,7 @@ export class AuthService {
         user: {
           id: user.id,
           email: user.email,
-          name: user.name,
-          lastname: user.lastname,
-          wilaya: user.wilaya,
-          daira: user.daira,
-          baladia: user.baladia,
-          phoneNumber: user.phoneNumber,
-          createdAt: user.createdAt,
+          fullName: user.fullName,
         },
         ...tokens,
       };
@@ -154,17 +140,11 @@ export class AuthService {
           .insert(users)
           .values({
             email: profile.email,
-            name: profile.firstName,
-            lastname: profile.lastName,
+            fullName: `${profile.firstName} ${profile.lastName}`,
             password: "",
-            wilaya: "",
-            daira: "",
-            baladia: "",
-            phoneNumber: "",
             role: "user",
             oauthprovider: profile.provider,
             oauthId: profile.id,
-            updatedAt: new Date(),
           })
           .returning();
 
@@ -203,12 +183,7 @@ export class AuthService {
         user: {
           id: user.id,
           email: user.email,
-          name: user.name,
-          lastname: user.lastname,
-          wilaya: user.wilaya,
-          daira: user.daira,
-          baladia: user.baladia,
-          phoneNumber: user.phoneNumber,
+          fullName: user.fullName,
         },
         ...tokens,
       };
