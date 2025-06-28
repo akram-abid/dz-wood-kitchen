@@ -151,11 +151,21 @@
   "password": "كلمة المرور",
   "forgotPassword": "هل نسيت كلمة المرور؟",
   "logIn": "تسجيل الدخول",
-  "don'tHaveAnAccount?": "ليس لديك حساب؟",
+  "don'tHaveAnAccount?": " ليس لديك حساب؟ ",
+  "alreadyHaveAccount": " هل لديك حساب؟ ",
   "signUp": "إنشاء حساب",
   "yourDreamKitchenAwaits": "مطبخ أحلامك في انتظارك",
   "dashboardAccess": "الوصول إلى لوحة التحكم المخصصة لتتبع تقدم مشروعك واستكشاف أفكار تصميم جديدة.",
   "trackOrderStatus": "تتبع حالة طلبك في الوقت الفعلي",
   "personalizedRecommendations": "احصل على توصيات تصميم مخصصة",
-  "exclusiveResources": "الوصول إلى موارد الأعضاء الحصرية"
+  "exclusiveResources": "الوصول إلى موارد الأعضاء الحصرية",
+  "enterYourPassword": "أدخل كلمة المرور الخاصة بك",
+  "orSignUpWithEmail": "أو أنشئ حسابًا بالبريد الإلكتروني",
+  "passwordRequirements": "استخدم 8 أحرف على الأقل مع مزيج من الحروف والأرقام",
+  "enterYourDetails": "أدخل تفاصيلك لإنشاء حسابك",
+  "signUpAccount": "إنشاء حساب",
+  "joinThousands": "انضم إلى آلاف العملاء الراضين الذين حولوا منازلهم بحلول مطابخنا الفاخرة.",
+  "customDesigns": "تصاميم مخصصة تناسب مساحتك",
+  "premiumMaterials": "مواد فاخرة وحرفية عالية",
+  "expertSupport": "دعم خبراء طوال مشروعك"
 }

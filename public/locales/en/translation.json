@@ -149,11 +149,21 @@
   "password": "Password",
   "forgotPassword": "Forgot password?",
   "logIn": "Log In",
-  "don'tHaveAnAccount?": "Don't have an account?",
+  "don'tHaveAnAccount?": "Don't have an account? ",
+  "alreadyHaveAccount": "Already have an account? ",
   "signUp": "Sign Up",
   "yourDreamKitchenAwaits": "Your dream kitchen awaits",
   "dashboardAccess": "Access your personalized dashboard to track your project progress and explore new design ideas.",
   "trackOrderStatus": "Track your order status in real-time",
   "personalizedRecommendations": "Get personalized design recommendations",
-  "exclusiveResources": "Access exclusive member resources"
+  "exclusiveResources": "Access exclusive member resources",
+  "enterYourPassword": "Enter your password",
+  "orSignUpWithEmail": "Or sign up with email",
+  "passwordRequirements": "Use at least 8 characters with a mix of letters and numbers",
+  "enterYourDetails": "Enter your details to create your account",
+  "signUpAccount": "Sign Up Account",
+  "joinThousands": "Join thousands of satisfied customers who have transformed their homes with our premium kitchen solutions.",
+  "customDesigns": "Custom designs tailored to your space",
+  "premiumMaterials": "Premium materials and craftsmanship",
+  "expertSupport": "Expert support throughout your project"
 }

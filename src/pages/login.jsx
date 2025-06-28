@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Mail,
   Lock,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
+import picture from "../assets/images/homeMain.jpg";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 
@@ -34,6 +35,16 @@ const LoginPage = () => {
     i18next.changeLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
   };
+
+   // Layout and direction effects
+  useEffect(() => {
+    const updateDirection = () => {
+      document.documentElement.dir = i18next.dir();
+    };
+    updateDirection();
+    i18next.on("languageChanged", updateDirection);
+    return () => i18next.off("languageChanged", updateDirection);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -262,11 +273,11 @@ const LoginPage = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    placeholder="Enter your password"
+                    placeholder={t("enterYourPassword")}
                     className={`w-full pl-10 pr-4 py-2 rounded-xl border transition-all duration-200 ${
                       darkMode
-                        ? "bg-gray-700 border-gray-600 text-white focus:border-amber-500"
-                        : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
+                        ? "bg-gray-700 border-gray-600 text-white focus:border-yellow-500"
+                        : "bg-white border-gray-300 text-gray-900 focus:border-yellow-500"
                     }`}
                     required
                   />
@@ -281,11 +292,11 @@ const LoginPage = () => {
                   href="/forgot-password"
                   className={`text-sm font-medium ${
                     darkMode
-                      ? "text-amber-400 hover:text-amber-300"
-                      : "text-blue-600 hover:text-blue-500"
+                      ? "text-yellow-400 hover:text-yellow-300"
+                      : "text-yellow-600 hover:text-yellow-500"
                   }`}
                 >
-                  {t("Forgot password?")}
+                  {t("forgotPassword")}
                 </a>
               </div>
 
@@ -311,8 +322,8 @@ const LoginPage = () => {
                 href="/signup"
                 className={`font-medium ${
                   darkMode
-                    ? "text-amber-400 hover:text-amber-300"
-                    : "text-blue-600 hover:text-blue-500"
+                    ? "text-yellow-400 hover:text-yellow-300"
+                    : "text-yellow-600 hover:text-yellow-500"
                 }`}
               >
                 {t("signUp")}
@@ -330,7 +341,7 @@ const LoginPage = () => {
           >
             <div className="text-center">
               <img
-                src="https://images.unsplash.com/photo-1556910638-9a985dd9f708"
+                src={picture}
                 alt="Kitchen Design"
                 className="w-full h-64 object-cover rounded-lg mb-6"
               />
@@ -351,7 +362,7 @@ const LoginPage = () => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <CheckCircle
-                    className={`mr-2 ${
+                    className={`mx-2 ${
                       darkMode ? "text-green-400" : "text-green-600"
                     }`}
                     size={20}
@@ -364,7 +375,7 @@ const LoginPage = () => {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle
-                    className={`mr-2 ${
+                    className={`mx-2 ${
                       darkMode ? "text-green-400" : "text-green-600"
                     }`}
                     size={20}
@@ -377,7 +388,7 @@ const LoginPage = () => {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle
-                    className={`mr-2 ${
+                    className={`mx-2 ${
                       darkMode ? "text-green-400" : "text-green-600"
                     }`}
                     size={20}
