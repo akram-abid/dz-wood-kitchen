@@ -10,9 +10,9 @@ import { SignupData, LoginData, OAuthProfile } from "../dtos/auth.dtos";
 const config = loadConfig();
 
 export class AuthService {
-  private generateTokens(userId: string) {
+  private generateTokens(userId: string, email: string, role: string) {
     const accessToken = jwt.sign(
-      { userId, type: "access" },
+      { userId, type: "access", email, role },
       config.JWT_SECRET,
       { expiresIn: "4d" },
     );
@@ -49,6 +49,7 @@ export class AuthService {
           email: data.email,
           password: hashedPassword,
           name: data.firstName,
+          role: "user",
           lastname: data.lastName,
           wilaya: data.wilaya,
           daira: data.daira,
@@ -108,7 +109,7 @@ export class AuthService {
       }
 
       // Generate tokens
-      const tokens = this.generateTokens(user.id);
+      const tokens = this.generateTokens(user.id, user.email, user.role);
 
       logger.info("User logged in successfully", {
         userId: user.id,
@@ -154,11 +155,12 @@ export class AuthService {
             email: profile.email,
             name: profile.firstName,
             lastname: profile.lastName,
-            password: "", // OAuth users don't have passwords
+            password: "",
             wilaya: "",
             daira: "",
             baladia: "",
             phoneNumber: "",
+            role: "user",
             oauthprovider: profile.provider,
             oauthId: profile.id,
             updatedAt: new Date(),
@@ -189,7 +191,7 @@ export class AuthService {
       }
 
       // Generate tokens
-      const tokens = this.generateTokens(user.id);
+      const tokens = this.generateTokens(user.id, user.email, user.role);
 
       logger.info("OAuth login successful", {
         userId: user.id,
