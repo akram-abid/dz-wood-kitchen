@@ -15,6 +15,13 @@
       "when": 1751100850292,
       "tag": "0001_bored_silver_surfer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751106806649,
+      "tag": "0002_bent_vampiro",
+      "breakpoints": true
     }
   ]
 }
