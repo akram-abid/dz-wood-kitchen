@@ -51,7 +51,7 @@ export const deletePostHandler = async (
 
     const deleted = await servicePostService.removePost(
       id,
-      "admin-id-placeholder",
+      req.ctx.user?.userId!,
     );
 
     return reply.send({ success: true, deleted });
