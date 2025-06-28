@@ -92,7 +92,9 @@ export const orders = pgTable("orders", {
   status: text("status").$default(() => "validation"),
   isValidated: pgBoolean("is_validated").$default(() => false),
   offer: doublePrecision("offer"),
-  installments: json("installments"),
+  installments:
+    json("installments").$type<{ date: string; amount: number }[]>(),
+  articles: json("articles"),
   daira: text("daira").notNull(),
   street: text("street").notNull(),
   baladia: text("baladia").notNull(),
