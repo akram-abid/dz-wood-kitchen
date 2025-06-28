@@ -142,5 +142,20 @@
   "amountPaid": "المبلغ المدفوع",
   "remainingBalance": "الرصيد المتبقي",
   "paymentMethod": "طريقة الدفع",
-  "nextPayment": "الدفعة القادمة"
+  "nextPayment": "الدفعة القادمة",
+  "welcomeBack": "مرحبًا بعودتك",
+  "loginDescription": "سجّل الدخول للوصول إلى حسابك وإدارة مشاريع مطبخك.",
+  "continueWithGoogle": "المتابعة مع جوجل",
+  "continueWithFacebook": "المتابعة مع فيسبوك",
+  "orLogInWithEmail": "أو سجّل الدخول بالبريد الإلكتروني",
+  "password": "كلمة المرور",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "logIn": "تسجيل الدخول",
+  "don'tHaveAnAccount?": "ليس لديك حساب؟",
+  "signUp": "إنشاء حساب",
+  "yourDreamKitchenAwaits": "مطبخ أحلامك في انتظارك",
+  "dashboardAccess": "الوصول إلى لوحة التحكم المخصصة لتتبع تقدم مشروعك واستكشاف أفكار تصميم جديدة.",
+  "trackOrderStatus": "تتبع حالة طلبك في الوقت الفعلي",
+  "personalizedRecommendations": "احصل على توصيات تصميم مخصصة",
+  "exclusiveResources": "الوصول إلى موارد الأعضاء الحصرية"
 }

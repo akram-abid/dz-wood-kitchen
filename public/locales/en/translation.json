@@ -141,6 +141,19 @@
   "estimatedTotal": "Estimated Total",
   "amountPaid": "Amount Paid",
   "remainingBalance": "Remaining Balance",
-  "paymentMethod": "Payment Method",
-  "nextPayment": "Next Payment Due"
+  "welcomeBack": "Welcome Back",
+  "loginDescription": "Log in to access your account and manage your kitchen projects.",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithFacebook": "Continue with Facebook",
+  "orLogInWithEmail": "Or log in with email",
+  "password": "Password",
+  "forgotPassword": "Forgot password?",
+  "logIn": "Log In",
+  "don'tHaveAnAccount?": "Don't have an account?",
+  "signUp": "Sign Up",
+  "yourDreamKitchenAwaits": "Your dream kitchen awaits",
+  "dashboardAccess": "Access your personalized dashboard to track your project progress and explore new design ideas.",
+  "trackOrderStatus": "Track your order status in real-time",
+  "personalizedRecommendations": "Get personalized design recommendations",
+  "exclusiveResources": "Access exclusive member resources"
 }
