@@ -1,18 +1,17 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  decimal,
-  json,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, decimal, json } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { pgEnum } from "drizzle-orm/pg-core";
+
+export const userRoleEnum = pgEnum("role", ["admin", "user"]);
 
 // Users table
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
+  role: userRoleEnum("role")
+    .notNull()
+    .$default(() => "user"),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
@@ -32,7 +31,7 @@ export const users = pgTable("users", {
 });
 
 // Admins table
-export const admins = pgTable("admins", {
+/*export const admins = pgTable("admins", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
@@ -46,7 +45,7 @@ export const admins = pgTable("admins", {
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-});
+});*/
 
 // Posts table
 export const posts = pgTable("posts", {
@@ -66,9 +65,10 @@ export const posts = pgTable("posts", {
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-  adminId: text("admin_id")
+
+  createdBy: text("created_by")
     .notNull()
-    .references(() => admins.id, { onDelete: "cascade" }),
+    .references(() => users.id, { onDelete: "cascade" }),
 });
 
 export const orders = pgTable("orders", {
@@ -105,14 +105,14 @@ export const orders = pgTable("orders", {
 });
 
 // Relations
-export const adminsRelations = relations(admins, ({ many }) => ({
+export const adminsRelations = relations(users, ({ many }) => ({
   posts: many(posts),
 }));
 
 export const postsRelations = relations(posts, ({ one }) => ({
-  admin: one(admins, {
-    fields: [posts.adminId],
-    references: [admins.id],
+  author: one(users, {
+    fields: [posts.createdBy],
+    references: [users.id],
   }),
 }));
 
@@ -131,8 +131,8 @@ export const ordersRelations = relations(orders, ({ one }) => ({
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
-export type Admin = typeof admins.$inferSelect;
-export type NewAdmin = typeof admins.$inferInsert;
+export type Admin = typeof users.$inferSelect;
+export type NewAdmin = typeof users.$inferInsert;
 
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
