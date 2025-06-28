@@ -15,6 +15,27 @@
       "when": 1750879278399,
       "tag": "0001_windy_puma",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751013486238,
+      "tag": "0002_hesitant_nicolaos",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751053735694,
+      "tag": "0003_silky_exiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1751058113175,
+      "tag": "0004_sticky_deathstrike",
+      "breakpoints": true
     }
   ]
 }
