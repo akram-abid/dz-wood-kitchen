@@ -148,9 +148,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
     "authenticate",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const token =
-          request.cookies.token ||
-          request.headers.authorization?.replace("Bearer ", "");
+        const token = request.cookies.token;
 
         if (!token) {
           throw server.httpErrors.unauthorized("Authentication required");
