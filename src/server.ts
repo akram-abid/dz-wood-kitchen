@@ -122,7 +122,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
   await server.register(multipart, {
     limits: {
       fileSize: config.FILE_SIZE_LIMIT,
-      files: 5,
+      files: 15,
     },
   });
 
