@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, decimal, json } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  decimal,
+  json,
+  boolean as pgBoolean,
+  doublePrecision,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { pgEnum } from "drizzle-orm/pg-core";
 
@@ -81,7 +89,10 @@ export const orders = pgTable("orders", {
   description: text("description").notNull(),
 
   woodType: text("wood_type"),
-
+  status: text("status").$default(() => "validation"),
+  isValidated: pgBoolean("is_validated").$default(() => false),
+  offer: doublePrecision("offer"),
+  installments: json("installments"),
   daira: text("daira").notNull(),
   street: text("street").notNull(),
   baladia: text("baladia").notNull(),
