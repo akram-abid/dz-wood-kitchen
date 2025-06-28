@@ -4,13 +4,21 @@ import {
   updateOrderHandler,
   deleteOrderHandler,
   getOrderByIdHandler,
+  getOrdersByFiltersHandler,
+  updateOrderStatusHandler,
+  updateOfferHandler,
+  toggleValidationHandler,
+  addInstallmentHandler,
+  setOrderArticlesHandler,
 } from "../controllers/order.controller";
-import { processFileUploads, orderImagesPath } from "../utils/uploader"; // Import the existing function
+import { processFileUploads, orderImagesPath } from "../utils/uploader";
 
 export async function orderRoutes(server: FastifyInstance) {
+  const { authenticate, authorize } = server;
+
   // Create Order
   server.post("/", {
-    preHandler: [server.authenticate],
+    preHandler: [authenticate],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
         const uploadResult = await processFileUploads(
@@ -40,7 +48,7 @@ export async function orderRoutes(server: FastifyInstance) {
 
   // Update Order
   server.patch("/:orderId", {
-    preHandler: [server.authenticate],
+    preHandler: [authenticate],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
         const orderId = (req.params as any).orderId;
@@ -75,15 +83,64 @@ export async function orderRoutes(server: FastifyInstance) {
     },
   });
 
-  // Delete Order
-  server.delete("/:id", {
-    preHandler: [server.authenticate],
+  // -------------------------
+  // GET: Fetch Orders
+  // -------------------------
+
+  // Get all orders (with optional filters)
+  server.get("/orders", {
+    preHandler: [authenticate],
+    handler: getOrdersByFiltersHandler,
+  });
+
+  // Get single order by ID
+  server.get("/orders/:orderId", {
+    preHandler: [authenticate],
+    handler: getOrderByIdHandler,
+  });
+
+  // -------------------------
+  // PATCH: Update Order Fields
+  // -------------------------
+
+  // Update order status (admin only)
+  server.patch("/orders/:orderId/status", {
+    preHandler: [authenticate, authorize(["admin"])],
+    handler: updateOrderStatusHandler,
+  });
+
+  // Update order offer
+  server.patch("/orders/:orderId/offer", {
+    preHandler: [authenticate],
+    handler: updateOfferHandler,
+  });
+
+  // Validate / Invalidate order (admin only)
+  server.patch("/orders/:orderId/validate", {
+    preHandler: [authenticate, authorize(["admin"])],
+    handler: toggleValidationHandler,
+  });
+
+  // Add new installment to order
+  server.patch("/orders/:orderId/installments", {
+    preHandler: [authenticate],
+    handler: addInstallmentHandler,
+  });
+
+  // -------------------------
+  // DELETE: Remove Order
+  // -------------------------
+
+  server.delete("/orders/:orderId", {
+    preHandler: [authenticate],
     handler: deleteOrderHandler,
   });
 
-  // Get Order by ID
-  server.get("/:id", {
+  // -------------------------
+  // POST : add articles to the compilted order
+  //
+  server.post("/orders/:orderId/articles", {
     preHandler: [server.authenticate],
-    handler: getOrderByIdHandler,
+    handler: setOrderArticlesHandler,
   });
 }

@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { dbDrizzle as db } from "../database/db";
 import { orders } from "../database/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 const orderSchema = z.object({
   title: z.string().optional(),
@@ -139,3 +139,177 @@ export const getOrderByIdHandler = async (
     return reply.code(500).send({ success: false, message: error.message });
   }
 };
+
+export async function addInstallmentHandler(
+  request: FastifyRequest<{
+    Params: { orderId: string };
+    Body: { newInstallment: { date: string; amount: number } };
+  }>,
+  reply: FastifyReply,
+) {
+  const { orderId } = request.params;
+  const { newInstallment } = request.body;
+
+  const order = await db.query.orders.findFirst({
+    where: eq(orders.id, orderId),
+  });
+
+  if (!order) {
+    return reply.code(404).send({
+      success: false,
+      message: "Order not found",
+    });
+  }
+
+  let updatedInstallments: { date: string; amount: number }[] = Array.isArray(
+    order.installments,
+  )
+    ? [...order.installments]
+    : [];
+
+  if (
+    order.isValidated &&
+    order.offer != null &&
+    updatedInstallments.length === 0
+  ) {
+    updatedInstallments.push({
+      date: new Date().toISOString().split("T")[0],
+      amount: Number(order.offer),
+    });
+  }
+
+  updatedInstallments.push(newInstallment);
+
+  await db
+    .update(orders)
+    .set({ installments: updatedInstallments })
+    .where(eq(orders.id, orderId));
+
+  reply.send({
+    success: true,
+    message: "Installment added",
+    data: updatedInstallments,
+  });
+}
+
+/**
+ * PATCH /orders/:orderId/status
+ */
+export async function updateOrderStatusHandler(
+  request: FastifyRequest<{
+    Params: { orderId: string };
+    Body: { status: string };
+  }>,
+  reply: FastifyReply,
+) {
+  const { orderId } = request.params;
+  const { status } = request.body;
+
+  await db.update(orders).set({ status }).where(eq(orders.id, orderId));
+
+  reply.send({ success: true, message: "Status updated" });
+}
+
+/**
+ * PATCH /orders/:orderId/offer
+ */
+export async function updateOfferHandler(
+  request: FastifyRequest<{
+    Params: { orderId: string };
+    Body: { offer: number };
+  }>,
+  reply: FastifyReply,
+) {
+  const { orderId } = request.params;
+  const { offer } = request.body;
+
+  await db.update(orders).set({ offer }).where(eq(orders.id, orderId));
+
+  reply.send({ success: true, message: "Offer updated" });
+}
+
+/**
+ * PATCH /orders/:orderId/validate
+ */
+export async function toggleValidationHandler(
+  request: FastifyRequest<{
+    Params: { orderId: string };
+    Body: { validate: boolean };
+  }>,
+  reply: FastifyReply,
+) {
+  const { orderId } = request.params;
+  const { validate } = request.body;
+
+  await db
+    .update(orders)
+    .set({ isValidated: validate })
+    .where(eq(orders.id, orderId));
+
+  reply.send({
+    success: true,
+    message: `Order ${validate ? "validated" : "invalidated"}`,
+  });
+}
+
+/**
+ * GET /orders?status=...&validated=true|false
+ */
+export async function getOrdersByFiltersHandler(
+  request: FastifyRequest<{
+    Querystring: { status?: string; validated?: string };
+  }>,
+  reply: FastifyReply,
+) {
+  const { status, validated } = request.query;
+
+  const filters = [];
+
+  if (status) filters.push(eq(orders.status, status));
+  if (validated === "true") filters.push(eq(orders.isValidated, true));
+  if (validated === "false") filters.push(eq(orders.isValidated, false));
+
+  const results = await db
+    .select()
+    .from(orders)
+    .where(and(...filters));
+
+  reply.send({ success: true, data: results });
+}
+
+/**
+ * POST /:orderId/articles
+ */
+
+export async function setOrderArticlesHandler(
+  request: FastifyRequest<{
+    Params: { orderId: string };
+    Body: { articles: any[] };
+  }>,
+  reply: FastifyReply,
+) {
+  const { orderId } = request.params;
+  const { articles } = request.body;
+
+  const order = await db.query.orders.findFirst({
+    where: eq(orders.id, orderId),
+  });
+
+  if (!order) {
+    return reply.code(404).send({ success: false, message: "Order not found" });
+  }
+
+  await db.update(orders).set({ articles }).where(eq(orders.id, orderId));
+
+  reply.send({
+    success: true,
+    message: "Articles set successfully",
+    data: articles,
+  });
+}
+
+/*
+ * Patch /:orderId/articles
+ */
+
+//export async function updateOrderArticlesHandler() {}
