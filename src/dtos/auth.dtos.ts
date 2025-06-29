@@ -4,7 +4,6 @@ export interface SignupData {
   email: string;
   password: string;
   fullName: string;
-  phoneNumber: string;
 }
 
 export interface LoginData {
