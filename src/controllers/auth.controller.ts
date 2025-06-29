@@ -1,9 +1,17 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { authService } from "../services/auth.service";
 import type { SignupData, LoginData } from "../dtos/auth.dtos";
+import { dbDrizzle as db } from "../database/db";
+import { users } from "../database/schema";
+import { eq } from "drizzle-orm";
 
 type SignupRequest = FastifyRequest<{ Body: SignupData }>;
 type LoginRequest = FastifyRequest<{ Body: LoginData }>;
+interface UpdateUserBody {
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+}
 
 interface GrantSessionData {
   response?: {
@@ -210,3 +218,42 @@ export async function facebookCallback(
     return reply.status(500).send({ error: "OAuth login failed" });
   }
 }
+
+export const updateUserInfoHandler = async (
+  req: FastifyRequest<{ Body: UpdateUserBody }>,
+  reply: FastifyReply,
+) => {
+  const userId = req.ctx.user?.userId!;
+
+  const { fullName, email, phoneNumber } = req.body;
+
+  const updateFields: Partial<UpdateUserBody> = {};
+  if (fullName) updateFields.fullName = fullName;
+  if (email) updateFields.email = email;
+  if (phoneNumber) updateFields.phoneNumber = phoneNumber;
+
+  if (Object.keys(updateFields).length === 0) {
+    return reply.code(400).send({
+      success: false,
+      message: "No fields provided to update",
+    });
+  }
+
+  try {
+    await db
+      .update(users)
+      .set({ ...updateFields, updatedAt: new Date() })
+      .where(eq(users.id, userId));
+
+    return reply.send({
+      success: true,
+      message: "User profile updated successfully",
+    });
+  } catch (err) {
+    req.log.error("Update user failed:", err);
+    return reply.code(500).send({
+      success: false,
+      message: "Failed to update user",
+    });
+  }
+};

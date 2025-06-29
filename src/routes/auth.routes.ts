@@ -4,6 +4,7 @@ import {
   facebookCallback,
   loginController,
   signupController,
+  updateUserInfoHandler,
 } from "../controllers/auth.controller";
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
@@ -12,4 +13,9 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
 
   app.get("/google/callback", googleCallback);
   app.get("/facebook/callback", facebookCallback);
+
+  app.get("/update", {
+    preHandler: [app.authenticate],
+    handler: updateUserInfoHandler,
+  });
 }
