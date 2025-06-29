@@ -401,9 +401,9 @@ const AdminDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+      <main className="px-4 sm:px-6 lg:px-8 flex-shrink-0 py-8 w-full">
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div className="flex flex-col max-w-7xl mx-auto md:flex-row justify-between items-start md:items-center mb-8">
           <h1
             className={`text-3xl font-bold mb-4 md:mb-0 ${
               darkMode ? "text-white" : "text-gray-900"
@@ -412,7 +412,7 @@ const AdminDashboard = () => {
             {t("adminDashboard")}
           </h1>
 
-          <div className="flex space-x-3 w-full md:w-auto">
+          <div className="flex space-x-3 w-full md:w-auto flex-shrink-0">
             <button
               onClick={() => setShowCreatePostModal(true)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
