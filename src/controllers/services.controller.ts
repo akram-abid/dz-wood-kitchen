@@ -10,6 +10,8 @@ import {
   getByAdminParamsSchema,
   getPostByIdSchema,
 } from "../dtos/services.dtos";
+import { handleControllerError } from "../utils/errors-handler";
+import * as APIError from "../utils/errors";
 
 export const addPostHandler = async (
   req: FastifyRequest,
@@ -20,10 +22,10 @@ export const addPostHandler = async (
 
     const post = await servicePostService.addPost(body);
 
-    return reply.code(201).send({ success: true, post });
+    reply.status(201);
+    return post;
   } catch (error: any) {
-    req.log.error("Add post error", error);
-    return reply.code(400).send({ success: false, message: error.message });
+    handleControllerError(error, "add post", req.log);
   }
 };
 
@@ -39,10 +41,10 @@ export const deletePostHandler = async (
       req.ctx.user?.userId!,
     );
 
-    return reply.send({ success: true, deleted });
+    reply.status(200);
+    return deleted;
   } catch (error: any) {
-    req.log.error("Delete post error", error);
-    return reply.code(400).send({ success: false, message: error.message });
+    handleControllerError(error, "delete post", req.log);
   }
 };
 
@@ -55,10 +57,10 @@ export const getPostsByAdminHandler = async (
 
     const posts = await servicePostService.getPostsByAdmin(page, limit);
 
-    return reply.send({ success: true, posts });
+    reply.status(200);
+    return { posts };
   } catch (error: any) {
-    req.log.error("Get posts error", error);
-    return reply.code(400).send({ success: false, message: error.message });
+    handleControllerError(error, "get psots", req.log);
   }
 };
 
@@ -71,10 +73,10 @@ export const getPostsById = async (
 
     const post = await servicePostService.getPostById(postId);
 
-    return reply.send({ success: true, post });
+    reply.status(200);
+    return post;
   } catch (error: any) {
-    req.log.error("Get posts error", error);
-    return reply.code(400).send({ success: false, message: error.message });
+    handleControllerError(error, "get post by id", req.log);
   }
 };
 
@@ -108,10 +110,7 @@ export const updatePostHandler = async (
     } = req.body;
 
     if (!adminId) {
-      return reply.code(401).send({
-        success: false,
-        message: "Unauthorized: adminId missing",
-      });
+      throw new APIError.UnauthorizedError("Unauthorized: adminId missing");
     }
 
     const updateData: any = {
@@ -136,13 +135,10 @@ export const updatePostHandler = async (
       updateData,
     );
 
-    return reply.send({ success: true, post: updatedPost });
+    reply.status(200);
+    return { post: updatedPost };
   } catch (error: any) {
-    req.log.error("Error updating post:", error);
-    return reply.code(400).send({
-      success: false,
-      message: error.message || "Failed to update post",
-    });
+    handleControllerError(error, "update post", req.log);
   }
 };
 
@@ -167,16 +163,10 @@ export const filterByWoodTypeHandler = async (
       .limit(10)
       .offset(offset);
 
-    return reply.code(200).send({
-      success: true,
-      message: "Posts fetched successfully",
-      data: result,
-    });
+    reply.code(200);
+
+    return { result };
   } catch (error: any) {
-    req.log.error("Error retrieving posts for admin:", error);
-    return reply.code(400).send({
-      success: false,
-      message: error.message || "Failed to fetch posts",
-    });
+    handleControllerError(error, "filter by wood type", req.log);
   }
 };

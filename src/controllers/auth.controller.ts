@@ -9,6 +9,8 @@ import {
   UpdateUserBody,
   GrantSessionData,
 } from "../dtos/auth.dtos";
+import * as APIError from "../utils/errors";
+import { handleControllerError } from "../utils/errors-handler";
 
 export async function signupController(
   req: SignupRequest,
@@ -22,20 +24,15 @@ export async function signupController(
       userId: result.user.id,
     });
 
-    return reply.code(201).send({
-      message: "Signup successful",
+    reply.status(201);
+
+    return {
       user: result.user,
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
-    });
+    };
   } catch (err: any) {
-    req.log.error("Signup controller error", { error: err.message });
-
-    const statusCode = err.message.includes("already exists") ? 409 : 500;
-
-    return reply.code(statusCode).send({
-      message: err.message || "Internal server error",
-    });
+    handleControllerError(err, "sign up", req.log);
   }
 }
 
@@ -48,7 +45,7 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
       userId: result.user.id,
     });
 
-    return reply
+    reply
       .setCookie("accessToken", result.accessToken, {
         httpOnly: true,
         secure: false,
@@ -63,20 +60,16 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       })
-      .code(200)
-      .send({
-        message: "Login successful",
-        user: result.user,
-        accessToken: result.accessToken,
-      });
+      .status(200);
+
+    // for curl testing
+    return {
+      message: "Login successful",
+      user: result.user,
+      accessToken: result.accessToken,
+    };
   } catch (err: any) {
-    req.log.error("Login controller error", { error: err.message });
-
-    const statusCode = err.message.includes("Invalid credentials") ? 401 : 500;
-
-    return reply.code(statusCode).send({
-      message: err.message || "Internal server error",
-    });
+    handleControllerError(err, "login", req.log);
   }
 }
 
@@ -86,7 +79,7 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     const grantData = (req.session as any).grant as GrantSessionData;
 
     if (!grantData?.response) {
-      return reply.status(401).send({ error: "Authentication failed" });
+      throw new APIError.UnauthorizedError("Authentication failed");
     }
 
     // For Google, the user data is in the raw response
@@ -94,15 +87,14 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     try {
       raw = JSON.parse(grantData.response.raw || "{}");
     } catch (parseError) {
-      return reply.status(400).send({ error: "Invalid OAuth response format" });
+      throw new APIError.ConflictError("Oauth parse error");
     }
 
     // Validate required fields
     if (!raw.sub || !raw.email) {
-      return reply.status(400).send({
-        error: "Missing required profile data",
-        message: "Google profile must include ID and email",
-      });
+      throw new APIError.BadRequestError(
+        "Missing required profile data, Google profile must include ID and email",
+      );
     }
 
     const profile = {
@@ -118,7 +110,7 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     // Clear grant data from session
     delete (req.session as any).grant;
 
-    return reply
+    reply
       .setCookie("accessToken", result.accessToken, {
         httpOnly: true,
         secure: false,
@@ -133,14 +125,15 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       })
-      .code(200)
-      .send({
-        message: "Login successful",
-        user: result.user,
-      });
+      .status(200);
+
+    // for curl testing
+    return {
+      message: "Login successful",
+      user: result.user,
+    };
   } catch (error) {
-    console.error("Google OAuth error:", error);
-    return reply.status(500).send({ error: "OAuth login failed" });
+    handleControllerError(error, "google oauth", req.log);
   }
 }
 
@@ -152,22 +145,21 @@ export async function facebookCallback(
     const grantData = (req.session as any).grant as GrantSessionData;
 
     if (!grantData?.response) {
-      return reply.status(401).send({ error: "Authentication failed" });
+      throw new APIError.UnauthorizedError("Authentication failed");
     }
 
     let raw;
     try {
       raw = JSON.parse(grantData.response.raw || "{}");
     } catch (parseError) {
-      return reply.status(400).send({ error: "Invalid OAuth response format" });
+      throw new APIError.ConflictError("Oauth parse error");
     }
 
     // Validate required fields
     if (!raw.id || !raw.email) {
-      return reply.status(400).send({
-        error: "Missing required profile data",
-        message: "Facebook profile must include ID and email",
-      });
+      throw new APIError.BadRequestError(
+        "Missing required profile data, Facebook profile must include ID and email",
+      );
     }
 
     const profile = {
@@ -182,7 +174,7 @@ export async function facebookCallback(
 
     // Clear grant data from session
     delete (req.session as any).grant;
-    return reply
+    reply
       .setCookie("accessToken", result.accessToken, {
         httpOnly: true,
         secure: false,
@@ -197,14 +189,14 @@ export async function facebookCallback(
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       })
-      .code(200)
-      .send({
-        message: "Login successful",
-        user: result.user,
-      });
+      .status(200);
+
+    return {
+      message: "Login successful",
+      user: result.user,
+    };
   } catch (error) {
-    console.error("Facebook OAuth error:", error);
-    return reply.status(500).send({ error: "OAuth login failed" });
+    handleControllerError(error, "facebook oauth", req.log);
   }
 }
 
@@ -222,10 +214,7 @@ export const updateUserInfoHandler = async (
   if (phoneNumber) updateFields.phoneNumber = phoneNumber;
 
   if (Object.keys(updateFields).length === 0) {
-    return reply.code(400).send({
-      success: false,
-      message: "No fields provided to update",
-    });
+    throw new APIError.BadRequestError("No fields provided to update");
   }
 
   try {
@@ -234,15 +223,13 @@ export const updateUserInfoHandler = async (
       .set({ ...updateFields, updatedAt: new Date() })
       .where(eq(users.id, userId));
 
-    return reply.send({
+    reply.status(200);
+
+    return {
       success: true,
       message: "User profile updated successfully",
-    });
+    };
   } catch (err) {
-    req.log.error("Update user failed:", err);
-    return reply.code(500).send({
-      success: false,
-      message: "Failed to update user",
-    });
+    handleControllerError(err, "update user data", req.log);
   }
 };

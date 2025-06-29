@@ -13,7 +13,8 @@ import {
   setArticlesDto,
   orderIdParamDto,
 } from "../dtos/order.dtos";
-
+import { handleControllerError } from "../utils/errors-handler";
+import * as APIError from "../utils/errors";
 export const createOrderHandler = async (
   req: FastifyRequest,
   reply: FastifyReply,
@@ -39,10 +40,11 @@ export const createOrderHandler = async (
       })
       .returning();
 
-    return reply.code(201).send({ success: true, order: newOrder[0] });
+    reply.code(201);
+
+    return { order: newOrder[0] };
   } catch (error: any) {
-    req.log.error("Order creation failed", error);
-    return reply.code(400).send({ success: false, message: error.message });
+    handleControllerError(error, "create order", req.log);
   }
 };
 
@@ -77,15 +79,13 @@ export const updateOrderHandler = async (
       .returning();
 
     if (updated.length === 0) {
-      return reply
-        .code(404)
-        .send({ success: false, message: "Order not found" });
+      throw new APIError.NotFoundError("Order not found");
     }
 
-    return reply.send({ success: true, order: updated[0] });
+    reply.status(200);
+    return { order: updated[0] };
   } catch (error: any) {
-    req.log.error("Update failed", error);
-    return reply.code(400).send({ success: false, message: error.message });
+    handleControllerError(error, "update order", req.log);
   }
 };
 
@@ -102,12 +102,11 @@ export const deleteOrderHandler = async (
       .returning();
 
     if (deleted.length === 0) {
-      return reply
-        .code(404)
-        .send({ success: false, message: "Order not found" });
+      throw new APIError.NotFoundError("Order not found");
     }
 
-    return reply.send({ success: true, order: deleted[0] });
+    reply.status(200);
+    return { order: deleted[0] };
   } catch (error: any) {
     req.log.error("Delete error", error);
     return reply.code(500).send({ success: false, message: error.message });
@@ -124,15 +123,13 @@ export const getOrderByIdHandler = async (
     const order = await db.select().from(orders).where(eq(orders.id, id));
 
     if (order.length === 0) {
-      return reply
-        .code(404)
-        .send({ success: false, message: "Order not found" });
+      throw new APIError.NotFoundError("Order not found");
     }
 
-    return reply.send({ success: true, order: order[0] });
+    reply.status(200);
+    return { order: order[0] };
   } catch (error: any) {
-    req.log.error("Fetch error", error);
-    return reply.code(500).send({ success: false, message: error.message });
+    handleControllerError(error, "get order", req.log);
   }
 };
 
@@ -151,10 +148,7 @@ export async function addInstallmentHandler(
   });
 
   if (!order) {
-    return reply.code(404).send({
-      success: false,
-      message: "Order not found",
-    });
+    throw new APIError.NotFoundError("Order not found");
   }
 
   let updatedInstallments: { date: string; amount: number }[] = Array.isArray(
@@ -181,11 +175,8 @@ export async function addInstallmentHandler(
     .set({ installments: updatedInstallments })
     .where(eq(orders.id, id));
 
-  reply.send({
-    success: true,
-    message: "Installment added",
-    data: updatedInstallments,
-  });
+  reply.status(200);
+  return updatedInstallments;
 }
 
 /**
@@ -203,7 +194,7 @@ export async function updateOrderStatusHandler(
 
   await db.update(orders).set({ status }).where(eq(orders.id, id));
 
-  reply.send({ success: true, message: "Status updated" });
+  return reply.status(200);
 }
 
 /**
@@ -221,7 +212,7 @@ export async function updateOfferHandler(
 
   await db.update(orders).set({ offer }).where(eq(orders.id, id));
 
-  reply.send({ success: true, message: "Offer updated" });
+  return reply.status(200);
 }
 
 /**
@@ -242,10 +233,8 @@ export async function toggleValidationHandler(
     .set({ isValidated: validate })
     .where(eq(orders.id, id));
 
-  reply.send({
-    success: true,
-    message: `Order ${validate ? "validated" : "invalidated"}`,
-  });
+  reply.status(200);
+  return { is_validated: `Order ${validate ? "validated" : "invalidated"}` };
 }
 
 /**
@@ -270,7 +259,8 @@ export async function getOrdersByFiltersHandler(
     .from(orders)
     .where(and(...filters));
 
-  reply.send({ success: true, data: results });
+  reply.status(200);
+  return results;
 }
 
 /**
@@ -292,16 +282,16 @@ export async function setOrderArticlesHandler(
   });
 
   if (!order) {
-    return reply.code(404).send({ success: false, message: "Order not found" });
+    throw new APIError.NotFoundError("Order not found");
   }
 
   await db.update(orders).set({ articles }).where(eq(orders.id, id));
 
-  reply.send({
-    success: true,
-    message: "Articles set successfully",
-    data: articles,
-  });
+  reply.status(200);
+
+  return {
+    articles: articles,
+  };
 }
 
 /*
