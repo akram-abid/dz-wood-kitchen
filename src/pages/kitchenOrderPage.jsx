@@ -16,6 +16,9 @@ import {
   Home,
   MessageSquare,
   Palette,
+  Phone,
+  Image,
+  Upload,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -48,6 +51,22 @@ const KitchenOrderPage = () => {
     { id: 12, wilaya_id: 10, name: "Bouira", name_ar: "البويرة" },
   ];
 
+  const baladias = [
+    { id: 1, daira_id: 1, name: "Adrar Center", name_ar: "أدرار المركز" },
+    { id: 2, daira_id: 1, name: "Adrar North", name_ar: "أدرار الشمالية" },
+    { id: 3, daira_id: 2, name: "Aougrout Center", name_ar: "أوقروت المركز" },
+    { id: 4, daira_id: 3, name: "Chlef Center", name_ar: "الشلف المركز" },
+    { id: 5, daira_id: 4, name: "Tenes Center", name_ar: "تنس المركز" },
+    { id: 6, daira_id: 5, name: "Laghouat Center", name_ar: "الأغواط المركز" },
+    { id: 7, daira_id: 6, name: "Oum El Bouaghi Center", name_ar: "أم البواقي المركز" },
+    { id: 8, daira_id: 7, name: "Batna Center", name_ar: "باتنة المركز" },
+    { id: 9, daira_id: 8, name: "Bejaia Center", name_ar: "بجاية المركز" },
+    { id: 10, daira_id: 9, name: "Biskra Center", name_ar: "بسكرة المركز" },
+    { id: 11, daira_id: 10, name: "Bechar Center", name_ar: "بشار المركز" },
+    { id: 12, daira_id: 11, name: "Blida Center", name_ar: "البليدة المركز" },
+    { id: 13, daira_id: 12, name: "Bouira Center", name_ar: "البويرة المركز" },
+  ];
+
   const [language, setLanguage] = useState("en");
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -55,11 +74,14 @@ const KitchenOrderPage = () => {
   const [orderData, setOrderData] = useState({
     fullName: "",
     email: "",
+    phone: "",
     wilaya: "",
     daira: "",
+    baladia: "",
     street: "",
     description: "",
     woodType: "",
+    files: [],
     kitchen: {
       id: "123",
       title: language === "en" ? "Modern Oak Kitchen" : "مطبخ بلوط حديث",
@@ -70,8 +92,10 @@ const KitchenOrderPage = () => {
 
   const [wilayaSearch, setWilayaSearch] = useState("");
   const [dairaSearch, setDairaSearch] = useState("");
+  const [baladiaSearch, setBaladiaSearch] = useState("");
   const [showWilayaSuggestions, setShowWilayaSuggestions] = useState(false);
   const [showDairaSuggestions, setShowDairaSuggestions] = useState(false);
+  const [showBaladiaSuggestions, setShowBaladiaSuggestions] = useState(false);
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -92,16 +116,48 @@ const KitchenOrderPage = () => {
         .sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
+  const filteredBaladias = orderData.daira
+    ? baladias
+        .filter(
+          (b) =>
+            b.daira_id ===
+              dairas.find((d) => d.name === orderData.daira)?.id &&
+            b.name.toLowerCase().includes(baladiaSearch.toLowerCase())
+        )
+        .sort((a, b) => a.name.localeCompare(b.name))
+    : [];
+
   const selectWilaya = (wilaya) => {
-    setOrderData((prev) => ({ ...prev, wilaya, daira: "" }));
+    setOrderData((prev) => ({ ...prev, wilaya, daira: "", baladia: "" }));
     setWilayaSearch(wilaya);
     setShowWilayaSuggestions(false);
   };
 
   const selectDaira = (daira) => {
-    setOrderData((prev) => ({ ...prev, daira }));
+    setOrderData((prev) => ({ ...prev, daira, baladia: "" }));
     setDairaSearch(daira);
     setShowDairaSuggestions(false);
+  };
+
+  const selectBaladia = (baladia) => {
+    setOrderData((prev) => ({ ...prev, baladia }));
+    setBaladiaSearch(baladia);
+    setShowBaladiaSuggestions(false);
+  };
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    setOrderData((prev) => ({
+      ...prev,
+      files: [...prev.files, ...files],
+    }));
+  };
+
+  const removeFile = (index) => {
+    setOrderData((prev) => ({
+      ...prev,
+      files: prev.files.filter((_, i) => i !== index),
+    }));
   };
 
   const validateForm = () => {
@@ -110,8 +166,12 @@ const KitchenOrderPage = () => {
     if (!orderData.email.trim()) newErrors.email = t("fillAllFields");
     else if (!/\S+@\S+\.\S+/.test(orderData.email))
       newErrors.email = t("invalidEmail");
+    if (!orderData.phone.trim()) newErrors.phone = t("fillAllFields");
+    else if (!/^(\+)?[\d\s-]{10,}$/.test(orderData.phone))
+      newErrors.phone = t("invalidPhone");
     if (!orderData.wilaya) newErrors.wilaya = t("fillAllFields");
     if (!orderData.daira) newErrors.daira = t("fillAllFields");
+    if (!orderData.baladia) newErrors.baladia = t("fillAllFields");
     if (!orderData.street.trim()) newErrors.street = t("fillAllFields");
     if (!orderData.woodType) newErrors.woodType = t("fillAllFields");
 
@@ -157,6 +217,7 @@ const KitchenOrderPage = () => {
     const handleClickOutside = () => {
       setShowWilayaSuggestions(false);
       setShowDairaSuggestions(false);
+      setShowBaladiaSuggestions(false);
       setIsLanguageDropdownOpen(false);
     };
     document.addEventListener("click", handleClickOutside);
@@ -181,12 +242,12 @@ const KitchenOrderPage = () => {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center flex-shrink-0">
-                      <img
-                        src={darkMode ? WLogo : Blogo}
-                        alt="the logo"
-                        className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
-                      />
-                    </div>
+            <img
+              src={darkMode ? WLogo : Blogo}
+              alt="the logo"
+              className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
+            />
+          </div>
 
           <div className="flex items-center space-x-3">
             <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -409,6 +470,40 @@ const KitchenOrderPage = () => {
                     <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                   )}
                 </div>
+
+                <div className="md:col-span-2">
+                  <label
+                    className={`block text-sm font-medium mb-2 ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    {t("phone")}
+                  </label>
+                  <div className="relative">
+                    <Phone
+                      className={`absolute left-3 top-3 ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                      size={20}
+                    />
+                    <input
+                      type="tel"
+                      value={orderData.phone}
+                      onChange={(e) =>
+                        setOrderData({ ...orderData, phone: e.target.value })
+                      }
+                      placeholder={t("enterPhone")}
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-200 ${
+                        darkMode
+                          ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-amber-500 focus:bg-gray-700"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:bg-white"
+                      } ${errors.phone ? "border-red-500" : ""}`}
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -429,7 +524,7 @@ const KitchenOrderPage = () => {
                 {t("locationInfo")}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Wilaya Dropdown - Fixed Version */}
+                {/* Wilaya Dropdown */}
                 <div
                   className="dropdown-container"
                   onClick={(e) => e.stopPropagation()}
@@ -460,7 +555,7 @@ const KitchenOrderPage = () => {
                     {orderData.wilaya && (
                       <button
                         onClick={() => {
-                          setOrderData({ ...orderData, wilaya: "", daira: "" });
+                          setOrderData({ ...orderData, wilaya: "", daira: "", baladia: "" });
                           setWilayaSearch("");
                         }}
                         className={`absolute right-3 top-3 ${
@@ -511,7 +606,7 @@ const KitchenOrderPage = () => {
                   )}
                 </div>
 
-                {/* Daira Dropdown - Fixed Version */}
+                {/* Daira Dropdown */}
                 <div
                   className="dropdown-container"
                   onClick={(e) => e.stopPropagation()}
@@ -545,7 +640,7 @@ const KitchenOrderPage = () => {
                     {orderData.daira && (
                       <button
                         onClick={() => {
-                          setOrderData({ ...orderData, daira: "" });
+                          setOrderData({ ...orderData, daira: "", baladia: "" });
                           setDairaSearch("");
                         }}
                         className={`absolute right-3 top-3 ${
@@ -596,7 +691,92 @@ const KitchenOrderPage = () => {
                   )}
                 </div>
 
-                {/* Street Address (unchanged) */}
+                {/* Baladia Dropdown */}
+                <div
+                  className="dropdown-container"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <label
+                    className={`block text-sm font-medium mb-2 ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    {t("baladia")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={baladiaSearch}
+                      onChange={(e) => {
+                        setBaladiaSearch(e.target.value);
+                        setShowBaladiaSuggestions(true);
+                      }}
+                      onFocus={() => setShowBaladiaSuggestions(true)}
+                      placeholder={t("selectBaladia")}
+                      disabled={!orderData.daira}
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
+                        darkMode
+                          ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-amber-500 focus:bg-gray-700"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:bg-white"
+                      } ${
+                        !orderData.daira ? "opacity-50 cursor-not-allowed" : ""
+                      } ${errors.baladia ? "border-red-500" : ""}`}
+                    />
+                    {orderData.baladia && (
+                      <button
+                        onClick={() => {
+                          setOrderData({ ...orderData, baladia: "" });
+                          setBaladiaSearch("");
+                        }}
+                        className={`absolute right-3 top-3 ${
+                          darkMode
+                            ? "text-gray-400 hover:text-gray-300"
+                            : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <X size={20} />
+                      </button>
+                    )}
+                  </div>
+                  {showBaladiaSuggestions && orderData.daira && (
+                    <div
+                      className={`dropdown-menu mt-1 max-h-60 overflow-auto rounded-xl shadow-xl border ${
+                        darkMode
+                          ? "bg-gray-800 border-gray-700"
+                          : "bg-white border-gray-200"
+                      }`}
+                    >
+                      {filteredBaladias.length > 0 ? (
+                        filteredBaladias.map((baladia) => (
+                          <div
+                            key={baladia.id}
+                            className={`px-4 py-3 cursor-pointer transition-colors ${
+                              darkMode
+                                ? "hover:bg-gray-700 text-white"
+                                : "hover:bg-gray-50 text-gray-900"
+                            }`}
+                            onClick={() => selectBaladia(baladia.name)}
+                          >
+                            {language === "en" ? baladia.name : baladia.name_ar}
+                          </div>
+                        ))
+                      ) : (
+                        <div
+                          className={`px-4 py-3 ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          {t("noOptionsFound")}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {errors.baladia && (
+                    <p className="text-red-500 text-sm mt-1">{errors.baladia}</p>
+                  )}
+                </div>
+
+                {/* Street Address */}
                 <div className="md:col-span-2">
                   <label
                     className={`block text-sm font-medium mb-2 ${
@@ -711,6 +891,94 @@ const KitchenOrderPage = () => {
                     />
                   </div>
                 </div>
+
+                {/* File Upload */}
+                <div>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${
+                      darkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    {t("uploadImages")}
+                  </label>
+                  <div
+                    className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 ${
+                      darkMode
+                        ? "border-gray-600 hover:border-amber-500 bg-gray-700/30"
+                        : "border-gray-300 hover:border-blue-500 bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <Upload
+                        size={40}
+                        className={`${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      />
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
+                      >
+                        {t("dragDropFiles")}
+                      </p>
+                      <label
+                        className={`px-4 py-2 rounded-lg font-medium cursor-pointer transition-colors ${
+                          darkMode
+                            ? "bg-amber-500 text-gray-900 hover:bg-amber-400"
+                            : "bg-blue-500 text-white hover:bg-blue-400"
+                        }`}
+                      >
+                        {t("selectFiles")}
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Uploaded Files Preview */}
+                  {orderData.files.length > 0 && (
+                    <div className="mt-4">
+                      <h4
+                        className={`text-sm font-medium mb-2 ${
+                          darkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
+                        {t("uploadedFiles")} ({orderData.files.length})
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {orderData.files.map((file, index) => (
+                          <div
+                            key={index}
+                            className="relative group rounded-lg overflow-hidden"
+                          >
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-24 object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <button
+                                onClick={() => removeFile(index)}
+                                className="p-1 rounded-full bg-red-500 text-white hover:bg-red-600"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate">
+                              {file.name}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -813,6 +1081,22 @@ const KitchenOrderPage = () => {
                         darkMode ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
+                      {t("phone")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.phone}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       {t("woodType")}
                     </span>
                     <p
@@ -863,6 +1147,22 @@ const KitchenOrderPage = () => {
                         darkMode ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
+                      {t("baladia")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.baladia}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       {t("street")}
                     </span>
                     <p
@@ -891,6 +1191,34 @@ const KitchenOrderPage = () => {
                   >
                     {orderData.description}
                   </p>
+                </div>
+              )}
+              {orderData.files.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <span
+                    className={`text-sm font-medium ${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    {t("uploadedImages")}
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                    {orderData.files.map((file, index) => (
+                      <div
+                        key={index}
+                        className="relative rounded-lg overflow-hidden"
+                      >
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Upload ${index + 1}`}
+                          className="w-full h-24 object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate">
+                          {file.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

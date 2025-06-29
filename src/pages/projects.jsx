@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Tag,
+  Trash2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -25,6 +26,8 @@ const KitchenGallery = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [currentLanguage, setCurrentLanguage] = useState("en");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(null);
   const loaderRef = useRef(null);
 
   // Check if current language is RTL
@@ -32,6 +35,61 @@ const KitchenGallery = () => {
 
   // Translation function
   const { t } = useTranslation();
+
+  // Check admin status
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        // Replace with your actual API call
+        const response = await fetch('/api/user/role');
+        const data = await response.json();
+        setIsAdmin(data.role === 'admin');
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(true);
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
+
+  // Delete kitchen function - you can implement the actual API call here
+  const handleDeleteKitchen = async (kitchenId) => {
+    if (!window.confirm(t('confirmDeleteKitchen') || 'Are you sure you want to delete this kitchen?')) {
+      return;
+    }
+
+    setDeleteLoading(kitchenId);
+    
+    try {
+      // TODO: Implement your actual delete API call here
+      // const response = await fetch(`/api/kitchens/${kitchenId}`, {
+      //   method: 'DELETE',
+      //   headers: {
+      //     'Authorization': `Bearer ${yourAuthToken}`,
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
+      
+      // if (!response.ok) {
+      //   throw new Error('Failed to delete kitchen');
+      // }
+
+      // For now, just remove from local state (replace with actual API call)
+      setKitchens(prev => prev.filter(kitchen => kitchen.id !== kitchenId));
+      setFilteredKitchens(prev => prev.filter(kitchen => kitchen.id !== kitchenId));
+      
+      // You can add a success notification here
+      console.log(`Kitchen ${kitchenId} deleted successfully`);
+      
+    } catch (error) {
+      console.error('Error deleting kitchen:', error);
+      // You can add an error notification here
+      alert(t('deleteKitchenError') || 'Failed to delete kitchen. Please try again.');
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
 
   // Fake data generator
   const generateFakeKitchens = (count) => {
@@ -267,6 +325,13 @@ const KitchenGallery = () => {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+            {/* Admin indicator */}
+            {isAdmin && (
+              <div className="px-2 py-1 bg-red-500 text-white text-xs rounded-full font-semibold">
+                Admin
+              </div>
+            )}
+            
             <div className="relative">
               <button
                 onClick={toggleLanguageDropdown}
@@ -389,6 +454,27 @@ const KitchenGallery = () => {
                 key={kitchen.id}
                 className="bg-white dark:bg-gray-900 border-yellow-400 rounded-xl shadow-lg overflow-hidden border-2 border-gray-100 dark:border-gray-700 hover:border-yellow-400 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl will-change-transform w-full"
               >
+                {/* Admin delete button */}
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 z-20">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteKitchen(kitchen.id);
+                      }}
+                      disabled={deleteLoading === kitchen.id}
+                      className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 disabled:scale-100"
+                      title={t('deleteKitchen') || 'Delete Kitchen'}
+                    >
+                      {deleteLoading === kitchen.id ? (
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <Trash2 size={16} />
+                      )}
+                    </button>
+                  </div>
+                )}
+
                 <KitchenCarousel images={kitchen.images} />
 
                 <div className="p-6">

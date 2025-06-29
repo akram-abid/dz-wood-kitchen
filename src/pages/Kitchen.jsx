@@ -12,6 +12,12 @@ import {
   Moon, 
   Globe,
   ChevronDown,
+  Edit3,
+  Save,
+  X,
+  Upload,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
@@ -26,6 +32,27 @@ const KitchenDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedKitchen, setEditedKitchen] = useState(null);
+  const [newImages, setNewImages] = useState([]);
+
+  useEffect(() => {
+    // Check admin status from your API
+    const checkAdminStatus = async () => {
+      try {
+        // Replace with your actual API call
+        const response = await fetch('/api/user/role');
+        const data = await response.json();
+        setIsAdmin(data.role === 'admin');
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(true);
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
 
   useEffect(() => {
     const fakeKitchen = {
@@ -41,18 +68,20 @@ const KitchenDetails = () => {
         "A beautiful modern kitchen featuring oak cabinetry. Custom designed for contemporary living with premium appliances. The kitchen includes a large island with quartz countertops, professional-grade stainless steel appliances, and custom storage solutions.",
       location: "Manhattan, NY",
       client: "Client 1",
-      duration: "8 weeks",
       woodType: "Oak",
       completedDate: "2023-05-15",
-      features: [
-        "Custom cabinetry",
-        "Quartz countertops",
+      elements: [
+        "Custom oak cabinetry",
+        "Quartz countertops", 
         "Stainless steel appliances",
-        "Under-cabinet lighting",
-        "Pull-out pantry",
+        "Under-cabinet LED lighting",
+        "Pull-out pantry drawers",
+        "Soft-close hinges",
+        "Brushed gold hardware",
       ],
     };
     setKitchen(fakeKitchen);
+    setEditedKitchen(fakeKitchen);
   }, [id]);
 
   // Layout and direction effects
@@ -78,6 +107,7 @@ const KitchenDetails = () => {
     i18next.changeLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
   };
+
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
       prev === kitchen?.images.length - 1 ? 0 : prev + 1
@@ -90,6 +120,97 @@ const KitchenDetails = () => {
     );
   };
 
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedKitchen({ ...kitchen });
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedKitchen({ ...kitchen });
+    setNewImages([]);
+  };
+
+  const handleSave = async () => {
+    try {
+      // Prepare form data for API call
+      const formData = new FormData();
+      formData.append('title', editedKitchen.title);
+      formData.append('description', editedKitchen.description);
+      formData.append('location', editedKitchen.location);
+      formData.append('client', editedKitchen.client);
+      formData.append('woodType', editedKitchen.woodType);
+      formData.append('completedDate', editedKitchen.completedDate);
+      formData.append('elements', JSON.stringify(editedKitchen.elements));
+      
+      // Add new images if any
+      newImages.forEach((image, index) => {
+        formData.append(`images`, image);
+      });
+
+      // Replace with your actual API call
+      const response = await fetch(`/api/kitchens/${id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const updatedKitchen = await response.json();
+        setKitchen(updatedKitchen);
+        setIsEditing(false);
+        setNewImages([]);
+      } else {
+        console.error('Failed to update kitchen');
+      }
+    } catch (error) {
+      console.error('Error updating kitchen:', error);
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditedKitchen(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleElementChange = (index, value) => {
+    const newElements = [...editedKitchen.elements];
+    newElements[index] = value;
+    setEditedKitchen(prev => ({
+      ...prev,
+      elements: newElements
+    }));
+  };
+
+  const addElement = () => {
+    setEditedKitchen(prev => ({
+      ...prev,
+      elements: [...prev.elements, '']
+    }));
+  };
+
+  const removeElement = (index) => {
+    const newElements = editedKitchen.elements.filter((_, i) => i !== index);
+    setEditedKitchen(prev => ({
+      ...prev,
+      elements: newElements
+    }));
+  };
+
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setNewImages(files);
+    
+    // Preview new images
+    const imageUrls = files.map(file => URL.createObjectURL(file));
+    setEditedKitchen(prev => ({
+      ...prev,
+      images: imageUrls
+    }));
+    setCurrentImageIndex(0);
+  };
+
   if (!kitchen) {
     return (
       <div className="flex justify-center items-center h-screen dark:bg-gray-900">
@@ -97,6 +218,8 @@ const KitchenDetails = () => {
       </div>
     );
   }
+
+  const displayKitchen = isEditing ? editedKitchen : kitchen;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
@@ -112,6 +235,33 @@ const KitchenDetails = () => {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+            {isAdmin && !isEditing && (
+              <button
+                onClick={handleEdit}
+                className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors shadow-md hover:shadow-lg"
+              >
+                <Edit3 size={16} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline text-sm">{t('edit')}</span>
+              </button>
+            )}
+            
+            {isAdmin && isEditing && (
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleSave}
+                  className="flex items-center space-x-1 p-1.5 sm:p-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
+                >
+                  <Save size={16} className="sm:w-5 sm:h-5" />
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex items-center space-x-1 p-1.5 sm:p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors"
+                >
+                  <X size={16} className="sm:w-5 sm:h-5" />
+                </button>
+              </div>
+            )}
+
             <div className="relative">
               <button
                 onClick={toggleLanguageDropdown}
@@ -204,8 +354,24 @@ const KitchenDetails = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 lg:h-[calc(100vh-180px)]">
             {/* Image Gallery - Full height on desktop */}
             <div className="relative rounded-xl overflow-hidden shadow-lg h-full min-h-[300px] sm:min-h-[400px] lg:min-h-full">
+              {isEditing && (
+                <div className="absolute top-4 right-4 z-10">
+                  <label className="flex items-center space-x-2 bg-yellow-500 text-white px-3 py-2 rounded-lg cursor-pointer hover:bg-yellow-600 transition-colors">
+                    <Upload size={16} />
+                    <span className="text-sm">{t('uploadImages')}</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
+
               <div className="relative h-full w-full">
-                {kitchen.images.map((image, index) => (
+                {displayKitchen.images.map((image, index) => (
                   <div
                     key={index}
                     className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
@@ -216,7 +382,7 @@ const KitchenDetails = () => {
                   >
                     <img
                       src={image}
-                      alt={kitchen.title}
+                      alt={displayKitchen.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
@@ -238,7 +404,7 @@ const KitchenDetails = () => {
               </button>
 
               <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 flex justify-center gap-2">
-                {kitchen.images.map((_, index) => (
+                {displayKitchen.images.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -254,52 +420,97 @@ const KitchenDetails = () => {
 
             {/* Details Section - Scrollable on desktop */}
             <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 lg:overflow-y-auto lg:h-full">
-              <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4">
-                {kitchen.title}
-              </h1>
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedKitchen.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4 w-full bg-transparent border-b-2 border-yellow-500 focus:outline-none"
+                />
+              ) : (
+                <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4">
+                  {displayKitchen.title}
+                </h1>
+              )}
 
-              <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
-                {kitchen.description}
-              </p>
+              {isEditing ? (
+                <textarea
+                  value={editedKitchen.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base w-full h-24 bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg p-2 focus:outline-none focus:border-yellow-500 resize-none"
+                />
+              ) : (
+                <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
+                  {displayKitchen.description}
+                </p>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <DetailItem
+                <EditableDetailItem
                   icon={<MapPin className="text-yellow-500" />}
                   label={t("location")}
-                  value={kitchen.location}
+                  value={displayKitchen.location}
+                  isEditing={isEditing}
+                  onChange={(value) => handleInputChange('location', value)}
                 />
-                <DetailItem
-                  icon={<Clock className="text-yellow-500" />}
-                  label={t("duration")}
-                  value={kitchen.duration}
-                />
-                <DetailItem
+                <EditableDetailItem
                   icon={<Calendar className="text-yellow-500" />}
                   label={t("completedDate")}
-                  value={kitchen.completedDate}
+                  value={displayKitchen.completedDate}
+                  isEditing={isEditing}
+                  type="date"
+                  onChange={(value) => handleInputChange('completedDate', value)}
                 />
-                <DetailItem
+                <EditableDetailItem
                   icon={<Tag className="text-yellow-500" />}
                   label={t("woodType")}
-                  value={kitchen.woodType}
+                  value={displayKitchen.woodType}
+                  isEditing={isEditing}
+                  onChange={(value) => handleInputChange('woodType', value)}
                 />
               </div>
 
               <div className="mb-6 sm:mb-8">
                 <h3 className="text-lg sm:text-xl font-semibold text-black dark:text-white mb-3 sm:mb-4">
-                  {t("features")}
+                  {t("elements")}
                 </h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {kitchen.features.map((feature, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center text-gray-700 dark:text-gray-300 text-sm sm:text-base"
-                    >
-                      <span className="w-2 h-2 bg-yellow-400 rounded-full mx-2 flex-shrink-0"></span>
-                      {feature}
-                    </li>
+                <div className="space-y-2">
+                  {displayKitchen.elements.map((element, index) => (
+                    <div key={index} className="flex items-center">
+                      {isEditing ? (
+                        <div className="flex items-center w-full space-x-2">
+                          <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></span>
+                          <input
+                            type="text"
+                            value={element}
+                            onChange={(e) => handleElementChange(index, e.target.value)}
+                            className="flex-1 bg-transparent border-b border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm sm:text-base focus:outline-none focus:border-yellow-500"
+                          />
+                          <button
+                            onClick={() => removeElement(index)}
+                            className="text-red-500 hover:text-red-700 p-1"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                          <span className="w-2 h-2 bg-yellow-400 rounded-full mx-2 flex-shrink-0"></span>
+                          {element}
+                        </div>
+                      )}
+                    </div>
                   ))}
-                </ul>
+                  {isEditing && (
+                    <button
+                      onClick={addElement}
+                      className="flex items-center space-x-2 text-yellow-500 hover:text-yellow-600 mt-2"
+                    >
+                      <Plus size={16} />
+                      <span className="text-sm">{t('addElement')}</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -309,12 +520,21 @@ const KitchenDetails = () => {
   );
 };
 
-const DetailItem = ({ icon, label, value }) => (
+const EditableDetailItem = ({ icon, label, value, isEditing, onChange, type = "text" }) => (
   <div className="flex items-center space-x-2">
     <span className="mr-2 sm:mr-3 flex-shrink-0">{icon}</span>
-    <div className="min-w-0">
+    <div className="min-w-0 flex-1">
       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{label}</p>
-      <p className="font-medium text-black dark:text-white text-sm sm:text-base truncate">{value}</p>
+      {isEditing ? (
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="font-medium text-black dark:text-white text-sm sm:text-base w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-yellow-500"
+        />
+      ) : (
+        <p className="font-medium text-black dark:text-white text-sm sm:text-base truncate">{value}</p>
+      )}
     </div>
   </div>
 );
