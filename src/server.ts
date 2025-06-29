@@ -22,6 +22,8 @@ import { grantPlugin } from "./plugins/grant.plugin";
 import { postRoutes } from "./routes/services.routes";
 import { setupStaticFiles } from "./utils/static";
 import { orderRoutes } from "./routes/order.routes";
+import responseFormatPlugin from "./plugins/response-format";
+import * as APIError from "./utils/errors";
 dotenv.config();
 const config = loadConfig();
 
@@ -151,27 +153,28 @@ const buildServer = async (): Promise<FastifyInstance> => {
         const token = request.cookies.token;
 
         if (!token) {
-          throw server.httpErrors.unauthorized("Authentication required");
+          throw new APIError.UnauthorizedError("Authentication required");
         }
 
         const payload = server.jwt.verify(token) as JwtPayload;
         request.ctx.user = payload;
       } catch (error) {
-        throw server.httpErrors.unauthorized("Invalid or expired token");
+        throw new APIError.UnauthorizedError("Invalid or expired token");
       }
     },
   );
 
-  // Role-based authorization decorator
+  await server.register(responseFormatPlugin);
 
+  // Role-based authorization decorator
   server.decorate("authorize", (roles: string[]) => {
     return async (request: FastifyRequest, reply: FastifyReply) => {
       if (!request.ctx.user) {
-        throw server.httpErrors.unauthorized("Authentication required");
+        throw new APIError.UnauthorizedError("Authentication required");
       }
 
       if (!roles.includes(request.ctx.user.role)) {
-        throw server.httpErrors.forbidden("Insufficient permissions");
+        throw new APIError.ForbiddenError("Insufficient permissions");
       }
     };
   });
@@ -193,35 +196,6 @@ const buildServer = async (): Promise<FastifyInstance> => {
         },
         "Request completed",
       );
-    },
-  );
-
-  // Global error handler
-  server.setErrorHandler(
-    async (error, request: FastifyRequest, reply: FastifyReply) => {
-      const { statusCode = 500, message } = error;
-
-      server.log.error(
-        {
-          reqId: request.id,
-          error: error.message,
-          stack: error.stack,
-          url: request.url,
-          method: request.method,
-        },
-        "Request error",
-      );
-      initLogger;
-
-      const response = {
-        error: statusCode >= 500 ? "Internal Server Error" : message,
-        statusCode,
-        timestamp: new Date().toISOString(),
-        path: request.url,
-        ...(config.NODE_ENV === "development" && { stack: error.stack }),
-      };
-
-      reply.status(statusCode).send(response);
     },
   );
 

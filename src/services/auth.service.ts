@@ -35,7 +35,7 @@ export class AuthService {
         .limit(1);
 
       if (existingUser.length > 0) {
-        throw new Error("User already exists with this email");
+        throw new Error("USER_ALREADY_EXISTS");
       }
 
       // Hash password
@@ -88,7 +88,7 @@ export class AuthService {
       const user = userResult[0];
 
       if (!user || !user.password) {
-        throw new Error("Invalid credentials");
+        throw new Error("INVALID_CREDENTIALS");
       }
 
       // Verify password
@@ -97,7 +97,7 @@ export class AuthService {
         user.password,
       );
       if (!isValidPassword) {
-        throw new Error("Invalid credentials");
+        throw new Error("INVALID_CREDENTIALS");
       }
 
       // Generate tokens

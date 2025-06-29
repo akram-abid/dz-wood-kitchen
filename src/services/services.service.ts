@@ -2,6 +2,7 @@ import { eq, and } from "drizzle-orm";
 import { dbDrizzle as db } from "../database/db";
 import { posts } from "../database/schema";
 import { logger } from "../utils/logger";
+import { SERVICE_ERRORS } from "../utils/errors-handler";
 
 interface PostInput {
   title: string;
@@ -20,7 +21,7 @@ export class ServicePostService {
   async addPost(data: PostInput) {
     try {
       if (data.imageFilenames.length > 15) {
-        throw new Error("A maximum of 15 images is allowed per post");
+        throw new Error(SERVICE_ERRORS.MAX_IMAGES);
       }
 
       const imageUrls = data.imageFilenames.map(
@@ -63,7 +64,7 @@ export class ServicePostService {
         .returning();
 
       if (result.length === 0) {
-        throw new Error("Post not found or already deleted");
+        throw new Error(SERVICE_ERRORS.POST_NOT_FOUND);
       }
 
       logger.info("Post deleted successfully", {
@@ -108,7 +109,7 @@ export class ServicePostService {
         .where(and(eq(posts.id, postId)));
 
       if (existingPost.length === 0) {
-        throw new Error("Post not found or you are not authorized");
+        throw new Error(SERVICE_ERRORS.POST_NOT_FOUND);
       }
 
       const updatePayload: any = {
