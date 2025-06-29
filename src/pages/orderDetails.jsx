@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import WLogo from "../assets/images/whiteLogo.png";
+import WLogo from "../assets/images/blackLogo.png";
 import {
   Clock,
   Hammer,
@@ -142,8 +142,8 @@ const OrderDetails = () => {
   ]);
 
   const handlePrintInvoice = () => {
-  // Create print styles
-  const printStyles = `
+    // Create print styles
+    const printStyles = `
     @media print {
       body * {
         visibility: hidden;
@@ -160,32 +160,64 @@ const OrderDetails = () => {
         padding: 20px;
         background: white !important;
         color: black !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+        max-height: none !important;
       }
       .no-print {
         display: none !important;
       }
-      .dark\\:bg-gray-800 {
+      .dark\\:bg-gray-800,
+      .dark\\:bg-gray-700 {
         background: white !important;
       }
       .dark\\:text-white {
         color: black !important;
       }
+      .bg-gray-100,
+      .bg-gray-50 {
+        background: #f8f9fa !important;
+      }
+      .border-gray-700,
+      .border-gray-200 {
+        border-color: #dee2e6 !important;
+      }
+      .rounded-lg,
+      .rounded-2xl {
+        border-radius: 8px !important;
+      }
+      .text-green-500 {
+        color: #28a745 !important;
+      }
+      /* Hide scrollbars in print */
+      #invoice-print-container {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+      #invoice-print-container::-webkit-scrollbar {
+        display: none !important;
+      }
+    }
+    
+    /* Hide scrollbars in normal view */
+    #invoice-print-container::-webkit-scrollbar {
+      display: none;
     }
   `;
 
-  // Create style element
-  const styleElement = document.createElement('style');
-  styleElement.innerHTML = printStyles;
-  document.head.appendChild(styleElement);
+    // Create style element
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = printStyles;
+    document.head.appendChild(styleElement);
 
-  // Print the invoice
-  window.print();
+    // Print the invoice
+    window.print();
 
-  // Clean up
-  setTimeout(() => {
-    document.head.removeChild(styleElement);
-  }, 1000);
-};
+    // Clean up
+    setTimeout(() => {
+      document.head.removeChild(styleElement);
+    }, 1000);
+  };
 
   // State for forms and editing
   const [priceProposal, setPriceProposal] = useState("");
@@ -489,7 +521,6 @@ const OrderDetails = () => {
           </div>
         </div>
       </header>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div
@@ -1270,7 +1301,6 @@ const OrderDetails = () => {
           </div>
         </div>
       </main>
-
       {/* Modals */}
       {/* Payment Form Modal */}
       {showPaymentForm && (
@@ -1435,7 +1465,6 @@ const OrderDetails = () => {
           </div>
         </div>
       )}
-
       {/* Completion Form Modal */}
       {showCompletionForm && (
         <div
@@ -1589,8 +1618,6 @@ const OrderDetails = () => {
           </div>
         </div>
       )}
-
-      {/* Invoice Modal */}
       {/* Invoice Modal */}
       {showInvoiceModal && (
         <div
@@ -1604,6 +1631,7 @@ const OrderDetails = () => {
             className={`relative rounded-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto ${
               darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
             }`}
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {/* Close Button */}
             <button
@@ -1621,7 +1649,7 @@ const OrderDetails = () => {
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center">
                 {/* Company Logo - Replace with your actual logo */}
-                <div className="mr-4 w-16 h-16 flex items-center justify-center">
+                <div className="mr-4 w-16 h-16 flex items-center justify-center print-logo">
                   <img
                     src={WLogo}
                     alt="Company Logo"
@@ -1763,8 +1791,8 @@ const OrderDetails = () => {
               </div>
             </div>
 
-            {/* Action Buttons (Sticky Bottom) */}
-            <div className="sticky bottom-0 pt-4 pb-2 -mx-6 px-6 -mb-6 rounded-b-2xl bg-gradient-to-t from-white/90 via-white/70 to-transparent dark:from-gray-800/90 dark:via-gray-800/70">
+            {/* Action Buttons - Removed gradient background */}
+            <div className="pt-4">
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowInvoiceModal(false)}
