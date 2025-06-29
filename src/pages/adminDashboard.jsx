@@ -324,7 +324,7 @@ const AdminDashboard = () => {
     >
       {/* Header */}
       <header
-        className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 overflow-x-hidden ${
+        className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
           darkMode
             ? "bg-gray-900/80 border-gray-700/50"
             : "bg-white/80 border-gray-200/50"
@@ -359,7 +359,7 @@ const AdminDashboard = () => {
               </button>
               {isLanguageDropdownOpen && (
                 <div
-                  className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden ${
+                  className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden z-50 ${
                     darkMode
                       ? "bg-gray-800 border-gray-700"
                       : "bg-white border-gray-200"
@@ -551,7 +551,6 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
-        {/* Orders Content */}
         {/* Orders Content */}
         {activeTab === "waiting" ? (
           <div className="space-y-6">
