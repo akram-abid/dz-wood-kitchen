@@ -223,12 +223,7 @@ export const updateUserInfoHandler = async (
       .set({ ...updateFields, updatedAt: new Date() })
       .where(eq(users.id, userId));
 
-    reply.status(200);
-
-    return {
-      success: true,
-      message: "User profile updated successfully",
-    };
+    return reply.status(200);
   } catch (err) {
     handleControllerError(err, "update user data", req.log);
   }
