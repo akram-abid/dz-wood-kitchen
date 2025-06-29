@@ -9,6 +9,7 @@ import ProfilePage from "./pages/profile";
 import SignupPage from "./pages/signup";
 import LoginPage from "./pages/login";
 import AdminDashboard from "./pages/adminDashboard";
+import OrderDetails from "./pages/orderDetails";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <AdminDashboard />,
+  },
+  {
+    path: "/orders/:id",
+    element: <OrderDetails />
   }
 ]);
 
