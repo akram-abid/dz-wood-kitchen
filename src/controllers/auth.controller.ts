@@ -1,25 +1,14 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { authService } from "../services/auth.service";
-import type { SignupData, LoginData } from "../dtos/auth.dtos";
 import { dbDrizzle as db } from "../database/db";
 import { users } from "../database/schema";
 import { eq } from "drizzle-orm";
-
-type SignupRequest = FastifyRequest<{ Body: SignupData }>;
-type LoginRequest = FastifyRequest<{ Body: LoginData }>;
-interface UpdateUserBody {
-  fullName?: string;
-  email?: string;
-  phoneNumber?: string;
-}
-
-interface GrantSessionData {
-  response?: {
-    access_token: string;
-    refresh_token?: string;
-    raw: string;
-  };
-}
+import {
+  SignupRequest,
+  LoginRequest,
+  UpdateUserBody,
+  GrantSessionData,
+} from "../dtos/auth.dtos";
 
 export async function signupController(
   req: SignupRequest,

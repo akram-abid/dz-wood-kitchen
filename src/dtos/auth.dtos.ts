@@ -1,3 +1,5 @@
+import { FastifyRequest } from "fastify";
+
 export interface SignupData {
   email: string;
   password: string;
@@ -17,4 +19,20 @@ export interface OAuthProfile {
   lastName: string;
   provider: "google" | "facebook";
   avatar?: string;
+}
+
+export type SignupRequest = FastifyRequest<{ Body: SignupData }>;
+export type LoginRequest = FastifyRequest<{ Body: LoginData }>;
+export interface UpdateUserBody {
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
+export interface GrantSessionData {
+  response?: {
+    access_token: string;
+    refresh_token?: string;
+    raw: string;
+  };
 }
