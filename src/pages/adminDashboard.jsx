@@ -314,107 +314,105 @@ const AdminDashboard = () => {
     return matchesSearch && matchesFilter;
   });
 
-  
-return (
-  <div
-    className={`min-h-screen w-full transition-all duration-300 ${
-      darkMode
-        ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-        : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
-    }`}
-  >
-    {/* Header */}
-    <header
-      className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
+  return (
+    <div
+      className={`min-h-screen w-full transition-all duration-300 ${
         darkMode
-          ? "bg-gray-900/80 border-gray-700/50"
-          : "bg-white/80 border-gray-200/50"
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+          : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
       }`}
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <div className="flex items-center flex-shrink-0">
-          <img
-            src={darkMode ? WLogo : Blogo}
-            alt="the logo"
-            className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
-          />
-        </div>
-
-        <div className="flex items-center space-x-3">
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={toggleLanguageDropdown}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-                darkMode
-                  ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                  : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-              }`}
-            >
-              <Globe size={18} />
-              <ChevronDown
-                size={16}
-                className={`transition-transform duration-200 ${
-                  isLanguageDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-            {isLanguageDropdownOpen && (
-              <div
-                className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden ${
-                  darkMode
-                    ? "bg-gray-800 border-gray-700"
-                    : "bg-white border-gray-200"
-                }`}
-              >
-                {[
-                  { code: "en", name: "English", flag: "🇺🇸" },
-                  { code: "ar", name: "العربية", flag: "🇸🇦" },
-                ].map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => handleLanguageChange(lang.code)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors ${
-                      darkMode
-                        ? "hover:bg-gray-700 text-white"
-                        : "hover:bg-gray-50 text-gray-900"
-                    } `}
-                  >
-                    <span className="text-lg">{lang.flag}</span>
-                    <span className="font-medium">{lang.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
+      {/* Header */}
+      <header
+        className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
+          darkMode
+            ? "bg-gray-900/80 border-gray-700/50"
+            : "bg-white/80 border-gray-200/50"
+        }`}
+      >
+        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center flex-shrink-0">
+            <img
+              src={darkMode ? WLogo : Blogo}
+              alt="the logo"
+              className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
+            />
           </div>
 
-          <button
-            onClick={toggleDarkMode}
-            className={`p-2 rounded-xl transition-all duration-200 ${
-              darkMode
-                ? "bg-gray-800 hover:bg-gray-700 text-amber-400 border border-gray-700"
-                : "bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 shadow-sm"
-            }`}
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-        </div>
-      </div>
-    </header>
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            <div className="relative" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={toggleLanguageDropdown}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 ${
+                  darkMode
+                    ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                    : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+                }`}
+              >
+                <Globe size={16} />
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-200 ${
+                    isLanguageDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {isLanguageDropdownOpen && (
+                <div
+                  className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden ${
+                    darkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  {[
+                    { code: "en", name: "English", flag: "🇺🇸" },
+                    { code: "ar", name: "العربية", flag: "🇸🇦" },
+                  ].map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang.code)}
+                      className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors ${
+                        darkMode
+                          ? "hover:bg-gray-700 text-white"
+                          : "hover:bg-gray-50 text-gray-900"
+                      } `}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <span className="font-medium">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-    {/* Main Content */}
-    <main className="px-4 sm:px-6 lg:px-8 flex-shrink-0 py-8 w-full">
-      <div className="max-w-7xl mx-auto">
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-xl transition-all duration-200 ${
+                darkMode
+                  ? "bg-gray-800 hover:bg-gray-700 text-amber-400 border border-gray-700"
+                  : "bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 shadow-sm"
+              }`}
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h1
-            className={`text-3xl font-bold mb-4 md:mb-0 ${
+            className={`text-2xl sm:text-3xl font-bold mb-4 md:mb-0 ${
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
             {t("adminDashboard")}
           </h1>
 
-          <div className="flex space-x-3 w-full md:w-auto flex-shrink-0">
+          <div className="flex space-x-3 w-full md:w-auto">
             <button
               onClick={() => setShowCreatePostModal(true)}
               className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
@@ -439,7 +437,6 @@ return (
             </button>
           </div>
         </div>
-
         {/* Tabs */}
         <div className="flex border-b mb-6">
           <button
@@ -485,6 +482,42 @@ return (
             {t("completedOrders")}
           </button>
         </div>
+        {/* Search and Filter */}
+        <div
+          className={`p-4 rounded-xl mb-6 ${
+            darkMode ? "bg-gray-800" : "bg-gray-100"
+          }`}
+        >
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  darkMode ? "text-gray-500" : "text-gray-400"
+                }`}
+                size={18}
+              />
+              <input
+                type="text"
+                placeholder={t("searchOrders")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                  darkMode
+                    ? "bg-gray-700 border-gray-600 text-white"
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                    darkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
 
             {activeTab === "orders" && (
               <div className="relative">
@@ -517,7 +550,8 @@ return (
               </div>
             )}
           </div>
-          
+        </div>
+        {/* Orders Content */}
         {/* Orders Content */}
         {activeTab === "waiting" ? (
           <div className="space-y-6">
