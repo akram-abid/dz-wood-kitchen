@@ -70,6 +70,7 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
       .send({
         message: "Login successful",
         user: result.user,
+        accessToken: result.accessToken,
       });
   } catch (err: any) {
     req.log.error("Login controller error", { error: err.message });
