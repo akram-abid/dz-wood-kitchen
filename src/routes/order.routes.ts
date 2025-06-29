@@ -51,7 +51,7 @@ export async function orderRoutes(server: FastifyInstance) {
     preHandler: [authenticate],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
       try {
-        const orderId = (req.params as any).orderId;
+        const { orderId } = req.params as { orderId: string };
         const uploadResult = await processFileUploads(
           req.parts(),
           reply,
@@ -69,7 +69,7 @@ export async function orderRoutes(server: FastifyInstance) {
           {
             ...req,
             body: updatePayload,
-            params: { orderId },
+            params: { id: orderId },
           } as any,
           reply,
         );
@@ -88,13 +88,13 @@ export async function orderRoutes(server: FastifyInstance) {
   // -------------------------
 
   // Get all orders (with optional filters)
-  server.get("/orders", {
+  server.get("/", {
     preHandler: [authenticate],
     handler: getOrdersByFiltersHandler,
   });
 
   // Get single order by ID
-  server.get("/orders/:orderId", {
+  server.get("/:id", {
     preHandler: [authenticate],
     handler: getOrderByIdHandler,
   });
@@ -104,25 +104,25 @@ export async function orderRoutes(server: FastifyInstance) {
   // -------------------------
 
   // Update order status (admin only)
-  server.patch("/orders/:orderId/status", {
+  server.patch("/:id/status", {
     preHandler: [authenticate, authorize(["admin"])],
     handler: updateOrderStatusHandler,
   });
 
   // Update order offer
-  server.patch("/orders/:orderId/offer", {
+  server.patch("/:id/offer", {
     preHandler: [authenticate],
     handler: updateOfferHandler,
   });
 
   // Validate / Invalidate order (admin only)
-  server.patch("/orders/:orderId/validate", {
+  server.patch("/:id/validate", {
     preHandler: [authenticate, authorize(["admin"])],
     handler: toggleValidationHandler,
   });
 
   // Add new installment to order
-  server.patch("/orders/:orderId/installments", {
+  server.patch("/:id/installments", {
     preHandler: [authenticate],
     handler: addInstallmentHandler,
   });
@@ -131,7 +131,7 @@ export async function orderRoutes(server: FastifyInstance) {
   // DELETE: Remove Order
   // -------------------------
 
-  server.delete("/orders/:orderId", {
+  server.delete("/:id", {
     preHandler: [authenticate],
     handler: deleteOrderHandler,
   });
@@ -139,7 +139,7 @@ export async function orderRoutes(server: FastifyInstance) {
   // -------------------------
   // POST : add articles to the compilted order
   //
-  server.post("/orders/:orderId/articles", {
+  server.post("/:id/articles", {
     preHandler: [server.authenticate],
     handler: setOrderArticlesHandler,
   });
