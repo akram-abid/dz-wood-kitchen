@@ -1,6 +1,9 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { z } from "zod";
 import { servicePostService } from "../services/services.service";
+import { dbDrizzle as db } from "../database/db";
+import { posts } from "../database/schema";
+import { eq } from "drizzle-orm";
 
 const addPostSchema = z.object({
   title: z.string(),
@@ -157,6 +160,41 @@ export const updatePostHandler = async (
     return reply.code(400).send({
       success: false,
       message: error.message || "Failed to update post",
+    });
+  }
+};
+
+export const filterByWoodTypeHandler = async (
+  req: FastifyRequest<{
+    Querystring: {
+      woodType: string;
+      page: number;
+    };
+  }>,
+  reply: FastifyReply,
+) => {
+  const { woodType, page } = req.query;
+
+  try {
+    const offset = (page - 1) * 10;
+
+    const result = await db
+      .select()
+      .from(posts)
+      .where(eq(posts.woodType, woodType))
+      .limit(10)
+      .offset(offset);
+
+    return reply.code(200).send({
+      success: true,
+      message: "Posts fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    req.log.error("Error retrieving posts for admin:", error);
+    return reply.code(400).send({
+      success: false,
+      message: error.message || "Failed to fetch posts",
     });
   }
 };

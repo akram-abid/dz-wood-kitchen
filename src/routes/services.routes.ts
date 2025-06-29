@@ -4,10 +4,8 @@ import {
   deletePostHandler,
   getPostsByAdminHandler,
   updatePostHandler,
+  filterByWoodTypeHandler,
 } from "../controllers/services.controller";
-import fs from "fs";
-import path from "path";
-import { pipeline } from "stream/promises";
 import { serviceImagesPath, processFileUploads } from "../utils/uploader";
 
 export async function postRoutes(server: FastifyInstance) {
@@ -21,7 +19,7 @@ export async function postRoutes(server: FastifyInstance) {
           reply,
           serviceImagesPath,
         );
-        if (!uploadResult) return; // Error already sent by processFileUploads
+        if (!uploadResult) return;
 
         const { fields, mediaFilenames } = uploadResult;
         const body = {
@@ -87,7 +85,11 @@ export async function postRoutes(server: FastifyInstance) {
 
   // Get All Posts by Admin
   server.get("/posts", {
-    preHandler: [server.authenticate, server.authorize(["admin"])],
     handler: getPostsByAdminHandler,
+  });
+
+  // filter by wood type
+  server.get("/posts/filter", {
+    handler: filterByWoodTypeHandler,
   });
 }
