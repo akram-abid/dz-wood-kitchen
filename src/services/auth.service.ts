@@ -55,7 +55,6 @@ export class AuthService {
           email: users.email,
           fullName: users.fullName,
           role: users.role,
-          phoneNumber: users.phoneNumber,
         });
 
       const user = newUser[0];
