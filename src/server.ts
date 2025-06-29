@@ -24,6 +24,8 @@ import { setupStaticFiles } from "./utils/static";
 import { orderRoutes } from "./routes/order.routes";
 import responseFormatPlugin from "./plugins/response-format";
 import * as APIError from "./utils/errors";
+import docsPlug from "./plugins/docs-render";
+
 dotenv.config();
 const config = loadConfig();
 
@@ -85,6 +87,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
 
   await grantPlugin(server);
   await setupStaticFiles(server);
+  await server.register(docsPlug);
 
   // Security headers
   await server.register(helmet, {
@@ -115,7 +118,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
   await server.register(jwt, {
     secret: config.JWT_SECRET,
     cookie: {
-      cookieName: "token",
+      cookieName: "accessToken",
       signed: false,
     },
   });
@@ -150,7 +153,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
     "authenticate",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const token = request.cookies.token;
+        const token = request.cookies.accessToken;
 
         if (!token) {
           throw new APIError.UnauthorizedError("Authentication required");
