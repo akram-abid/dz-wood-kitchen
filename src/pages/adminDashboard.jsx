@@ -316,7 +316,7 @@ const AdminDashboard = () => {
 
   return (
     <div
-      className={`min-h-screen w-full transition-all duration-300 ${
+      className={`min-h-screen w-full overflow-x-hidden transition-all duration-300 ${
         darkMode
           ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
           : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
@@ -324,13 +324,13 @@ const AdminDashboard = () => {
     >
       {/* Header */}
       <header
-        className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
+        className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 overflow-x-hidden ${
           darkMode
             ? "bg-gray-900/80 border-gray-700/50"
             : "bg-white/80 border-gray-200/50"
         }`}
       >
-        <div className="w-full max-w-7xl mx-auto flex justify-between items-center">
+        <div className="w-full max-w-7xl mx-auto flex justify-between items-center min-w-0">
           <div className="flex items-center flex-shrink-0">
             <img
               src={darkMode ? WLogo : Blogo}
@@ -339,11 +339,11 @@ const AdminDashboard = () => {
             />
           </div>
 
-          <div className="flex items-center space-x-3 flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 min-w-0">
             <div className="relative" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={toggleLanguageDropdown}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all duration-200 ${
+                className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 rounded-xl transition-all duration-200 ${
                   darkMode
                     ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
                     : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
@@ -412,28 +412,28 @@ const AdminDashboard = () => {
             {t("adminDashboard")}
           </h1>
 
-          <div className="flex space-x-3 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
             <button
               onClick={() => setShowCreatePostModal(true)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+              className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 whitespace-nowrap ${
                 darkMode
                   ? "bg-yellow-500 hover:bg-yellow-400 text-black"
                   : "bg-yellow-500 hover:bg-yellow-400 text-black"
               }`}
             >
-              <Plus size={18} />
-              <span>{t("createPost")}</span>
+              <Plus size={16} />
+              <span className="text-sm sm:text-base">{t("createPost")}</span>
             </button>
 
             <button
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+              className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 whitespace-nowrap ${
                 darkMode
                   ? "bg-gray-700 hover:bg-gray-600 text-white"
                   : "bg-gray-200 hover:bg-gray-300 text-gray-900"
               }`}
             >
-              <Home size={18} />
-              <span>{t("viewSite")}</span>
+              <Home size={16} />
+              <span className="text-sm sm:text-base">{t("viewSite")}</span>
             </button>
           </div>
         </div>
