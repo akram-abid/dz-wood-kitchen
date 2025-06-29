@@ -6,6 +6,7 @@ import {
   json,
   boolean as pgBoolean,
   doublePrecision,
+  serial,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { pgEnum } from "drizzle-orm/pg-core";
@@ -58,11 +59,9 @@ export const posts = pgTable("posts", {
     .$defaultFn(() => crypto.randomUUID()),
   title: text("title").notNull(),
   description: text("description").notNull(),
-  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   woodType: text("wood_type").notNull(),
   imageUrls: json("image_urls").notNull(),
-  items: json("items").notNull(),
-  estimatedTime: text("estimated_time").notNull(),
+  items: json("items"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -79,9 +78,8 @@ export const orders = pgTable("orders", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-
   title: text("title"),
-
+  trackingNumber: serial("tracking_number").notNull().unique(),
   description: text("description").notNull(),
 
   woodType: text("wood_type"),
