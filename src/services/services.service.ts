@@ -34,9 +34,7 @@ export class ServicePostService {
         .values({
           title: data.title,
           description: data.description,
-          price: data.price,
           woodType: data.woodType,
-          estimatedTime: data.estimatedTime,
           createdBy: data.adminId,
           imageUrls,
           items,
