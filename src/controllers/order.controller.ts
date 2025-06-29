@@ -3,27 +3,23 @@ import { z } from "zod";
 import { dbDrizzle as db } from "../database/db";
 import { orders } from "../database/schema";
 import { eq, and } from "drizzle-orm";
-
-const orderSchema = z.object({
-  title: z.string().optional(),
-  description: z.string(),
-  woodType: z.string().optional(),
-  daira: z.string(),
-  street: z.string(),
-  baladia: z.string(),
-  wilaya: z.string(),
-  phoneNumber: z.string(),
-  mediaFilenames: z.array(z.string()).max(10).optional(),
-  postId: z.string().uuid().optional(),
-  userId: z.string().uuid(),
-});
+import {
+  createOrderDto,
+  updateOrderDto,
+  addInstallmentDto,
+  updateStatusDto,
+  updateOfferDto,
+  toggleValidationDto,
+  setArticlesDto,
+  orderIdParamDto,
+} from "../dtos/order.dtos";
 
 export const createOrderHandler = async (
   req: FastifyRequest,
   reply: FastifyReply,
 ) => {
   try {
-    const body = orderSchema.parse(req.body);
+    const body = createOrderDto.parse(req.body);
     const mediaUrls = body.mediaFilenames?.map((f) => `/pictures/orders/${f}`);
 
     const newOrder = await db
@@ -53,13 +49,13 @@ export const createOrderHandler = async (
 export const updateOrderHandler = async (
   req: FastifyRequest<{
     Params: { orderId: string };
-    Body: Partial<z.infer<typeof orderSchema>>;
+    Body: Partial<z.infer<typeof updateOrderDto>>;
   }>,
   reply: FastifyReply,
 ) => {
   try {
     const { orderId } = req.params;
-    const data = orderSchema.partial().parse(req.body);
+    const data = updateOrderDto.parse(req.body);
 
     const updateData: any = {
       ...data,
@@ -94,11 +90,11 @@ export const updateOrderHandler = async (
 };
 
 export const deleteOrderHandler = async (
-  req: FastifyRequest<{ Params: { id: string } }>,
+  req: FastifyRequest<{ Params: z.infer<typeof orderIdParamDto> }>,
   reply: FastifyReply,
 ) => {
   try {
-    const { id } = req.params;
+    const { id } = orderIdParamDto.parse(req.params);
 
     const deleted = await db
       .delete(orders)
@@ -119,11 +115,11 @@ export const deleteOrderHandler = async (
 };
 
 export const getOrderByIdHandler = async (
-  req: FastifyRequest<{ Params: { id: string } }>,
+  req: FastifyRequest<{ Params: z.infer<typeof orderIdParamDto> }>,
   reply: FastifyReply,
 ) => {
   try {
-    const { id } = req.params;
+    const { id } = orderIdParamDto.parse(req.params);
 
     const order = await db.select().from(orders).where(eq(orders.id, id));
 
@@ -142,16 +138,16 @@ export const getOrderByIdHandler = async (
 
 export async function addInstallmentHandler(
   request: FastifyRequest<{
-    Params: { orderId: string };
-    Body: { newInstallment: { date: string; amount: number } };
+    Params: z.infer<typeof orderIdParamDto>;
+    Body: z.infer<typeof addInstallmentDto>;
   }>,
   reply: FastifyReply,
 ) {
-  const { orderId } = request.params;
-  const { newInstallment } = request.body;
+  const { id } = orderIdParamDto.parse(request.params);
+  const { newInstallment } = addInstallmentDto.parse(request.body);
 
   const order = await db.query.orders.findFirst({
-    where: eq(orders.id, orderId),
+    where: eq(orders.id, id),
   });
 
   if (!order) {
@@ -183,7 +179,7 @@ export async function addInstallmentHandler(
   await db
     .update(orders)
     .set({ installments: updatedInstallments })
-    .where(eq(orders.id, orderId));
+    .where(eq(orders.id, id));
 
   reply.send({
     success: true,
@@ -197,15 +193,15 @@ export async function addInstallmentHandler(
  */
 export async function updateOrderStatusHandler(
   request: FastifyRequest<{
-    Params: { orderId: string };
-    Body: { status: string };
+    Params: z.infer<typeof orderIdParamDto>;
+    Body: z.infer<typeof updateStatusDto>;
   }>,
   reply: FastifyReply,
 ) {
-  const { orderId } = request.params;
+  const { id } = request.params;
   const { status } = request.body;
 
-  await db.update(orders).set({ status }).where(eq(orders.id, orderId));
+  await db.update(orders).set({ status }).where(eq(orders.id, id));
 
   reply.send({ success: true, message: "Status updated" });
 }
@@ -215,15 +211,15 @@ export async function updateOrderStatusHandler(
  */
 export async function updateOfferHandler(
   request: FastifyRequest<{
-    Params: { orderId: string };
-    Body: { offer: number };
+    Params: z.infer<typeof orderIdParamDto>;
+    Body: z.infer<typeof updateOfferDto>;
   }>,
   reply: FastifyReply,
 ) {
-  const { orderId } = request.params;
+  const { id } = request.params;
   const { offer } = request.body;
 
-  await db.update(orders).set({ offer }).where(eq(orders.id, orderId));
+  await db.update(orders).set({ offer }).where(eq(orders.id, id));
 
   reply.send({ success: true, message: "Offer updated" });
 }
@@ -233,18 +229,18 @@ export async function updateOfferHandler(
  */
 export async function toggleValidationHandler(
   request: FastifyRequest<{
-    Params: { orderId: string };
-    Body: { validate: boolean };
+    Params: z.infer<typeof orderIdParamDto>;
+    Body: z.infer<typeof toggleValidationDto>;
   }>,
   reply: FastifyReply,
 ) {
-  const { orderId } = request.params;
+  const { id } = request.params;
   const { validate } = request.body;
 
   await db
     .update(orders)
     .set({ isValidated: validate })
-    .where(eq(orders.id, orderId));
+    .where(eq(orders.id, id));
 
   reply.send({
     success: true,
@@ -283,23 +279,23 @@ export async function getOrdersByFiltersHandler(
 
 export async function setOrderArticlesHandler(
   request: FastifyRequest<{
-    Params: { orderId: string };
-    Body: { articles: any[] };
+    Params: z.infer<typeof orderIdParamDto>;
+    Body: z.infer<typeof setArticlesDto>;
   }>,
   reply: FastifyReply,
 ) {
-  const { orderId } = request.params;
+  const { id } = request.params;
   const { articles } = request.body;
 
   const order = await db.query.orders.findFirst({
-    where: eq(orders.id, orderId),
+    where: eq(orders.id, id),
   });
 
   if (!order) {
     return reply.code(404).send({ success: false, message: "Order not found" });
   }
 
-  await db.update(orders).set({ articles }).where(eq(orders.id, orderId));
+  await db.update(orders).set({ articles }).where(eq(orders.id, id));
 
   reply.send({
     success: true,

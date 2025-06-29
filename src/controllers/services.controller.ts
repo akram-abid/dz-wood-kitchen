@@ -4,30 +4,12 @@ import { servicePostService } from "../services/services.service";
 import { dbDrizzle as db } from "../database/db";
 import { posts } from "../database/schema";
 import { eq } from "drizzle-orm";
-
-const addPostSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  price: z.string(),
-  items: z.array(z.string()).max(20),
-  woodType: z.string(),
-  estimatedTime: z.string(),
-  adminId: z.string().uuid(),
-  imageFilenames: z.array(z.string()).max(15),
-});
-
-const deletePostParamsSchema = z.object({
-  id: z.string().uuid(),
-});
-
-const getByAdminParamsSchema = z.object({
-  page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(25).default(15),
-});
-
-const getPostByIdSchema = z.object({
-  postId: z.string().uuid(),
-});
+import {
+  addPostSchema,
+  deletePostParamsSchema,
+  getByAdminParamsSchema,
+  getPostByIdSchema,
+} from "../dtos/services.dtos";
 
 export const addPostHandler = async (
   req: FastifyRequest,
