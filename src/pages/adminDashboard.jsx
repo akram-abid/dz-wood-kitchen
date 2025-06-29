@@ -129,22 +129,20 @@ const AdminDashboard = () => {
     },
   ]);
   const [waitingOrders, setWaitingOrders] = useState([
-  {
-    id: "ORD-7892",
-    date: "2023-06-10",
-    status: "waiting",
-    title: "Custom Walnut Desk",
-    client: "Alex Johnson",
-    email: "alex.j@example.com",
-    phone: "+1 (555) 234-5678",
-    woodType: "Walnut",
-    images: [
-      "https://images.unsplash.com/photo-1517705008128-361805f42e86",
-    ],
-    estimatedTotal: null, // Will be set by admin
-    clientValidated: false,
-  }
-]);
+    {
+      id: "ORD-7892",
+      date: "2023-06-10",
+      status: "waiting",
+      title: "Custom Walnut Desk",
+      client: "Alex Johnson",
+      email: "alex.j@example.com",
+      phone: "+1 (555) 234-5678",
+      woodType: "Walnut",
+      images: ["https://images.unsplash.com/photo-1517705008128-361805f42e86"],
+      estimatedTotal: null, // Will be set by admin
+      clientValidated: false,
+    },
+  ]);
 
   const handleAddElement = () => {
     if (completionForm.currentElement.trim()) {
@@ -326,7 +324,7 @@ const AdminDashboard = () => {
     >
       {/* Header */}
       <header
-        className={`backdrop-blur-md py-4 px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
+        className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
           darkMode
             ? "bg-gray-900/80 border-gray-700/50"
             : "bg-white/80 border-gray-200/50"
@@ -403,7 +401,7 @@ const AdminDashboard = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
         {/* Dashboard Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h1
@@ -555,218 +553,260 @@ const AdminDashboard = () => {
         </div>
         {/* Orders Content */}
         {/* Orders Content */}
-{activeTab === "waiting" ? (
-  <div className="space-y-6">
-    {waitingOrders.length > 0 ? (
-      waitingOrders.map((order) => (
-        <div 
-          key={order.id}
-          className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
-            darkMode
-              ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
-              : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
-          }`}
-          onClick={() => navigate(`/orders/${order.id}`)}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className={`text-xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                {order.title}
-              </h3>
-              <p className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-gray-600"
-              }`}>
-                {order.id} • {order.client}
-              </p>
-            </div>
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-              {t("waiting")}
-            </span>
+        {activeTab === "waiting" ? (
+          <div className="space-y-6">
+            {waitingOrders.length > 0 ? (
+              waitingOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
+                    darkMode
+                      ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
+                      : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
+                  }`}
+                  onClick={() => navigate(`/orders/${order.id}`)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3
+                        className={`text-xl font-bold ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.title}
+                      </h3>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {order.id} • {order.client}
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      {t("waiting")}
+                    </span>
+                  </div>
+                  {order.estimatedTotal && !order.clientValidated && (
+                    <div className="mt-4">
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("pendingClientApproval")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div
+                className={`rounded-2xl p-12 text-center ${
+                  darkMode
+                    ? "bg-gray-800/50 border-gray-700/50"
+                    : "bg-white/80 border-gray-200/50"
+                }`}
+              >
+                <Clock
+                  size={48}
+                  className={`mx-auto mb-4 ${
+                    darkMode ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
+                <h3
+                  className={`text-xl font-medium mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("noWaitingOrders")}
+                </h3>
+              </div>
+            )}
           </div>
-          {order.estimatedTotal && !order.clientValidated && (
-            <div className="mt-4">
-              <p className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-gray-500"
-              }`}>
-                {t("pendingClientApproval")}
-              </p>
-            </div>
-          )}
-        </div>
-      ))
-    ) : (
-      <div className={`rounded-2xl p-12 text-center ${
-        darkMode
-          ? "bg-gray-800/50 border-gray-700/50"
-          : "bg-white/80 border-gray-200/50"
-      }`}>
-        <Clock
-          size={48}
-          className={`mx-auto mb-4 ${
-            darkMode ? "text-gray-500" : "text-gray-400"
-          }`}
-        />
-        <h3 className={`text-xl font-medium mb-2 ${
-          darkMode ? "text-white" : "text-gray-900"
-        }`}>
-          {t("noWaitingOrders")}
-        </h3>
-      </div>
-    )}
-  </div>
-) : activeTab === "orders" ? (
-  <div className="space-y-6">
-    {filteredOrders.length > 0 ? (
-      filteredOrders.map((order) => (
-        <div
-          key={order.id}
-          className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
-            darkMode
-              ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
-              : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
-          }`}
-          onClick={() => navigate(`/orders/${order.id}`)}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className={`text-xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                {order.title}
-              </h3>
-              <p className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-gray-600"
-              }`}>
-                {order.id} • {order.client}
-              </p>
-            </div>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              order.status === "inProgress"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-green-100 text-green-800"
-            }`}>
-              {order.status === "inProgress"
-                ? t("inProgress")
-                : t("shipping")}
-            </span>
+        ) : activeTab === "orders" ? (
+          <div className="space-y-6">
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
+                    darkMode
+                      ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
+                      : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
+                  }`}
+                  onClick={() => navigate(`/orders/${order.id}`)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3
+                        className={`text-xl font-bold ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.title}
+                      </h3>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {order.id} • {order.client}
+                      </p>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        order.status === "inProgress"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {order.status === "inProgress"
+                        ? t("inProgress")
+                        : t("shipping")}
+                    </span>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-4">
+                    <div>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("amountPaid")}
+                      </p>
+                      <p
+                        className={`font-medium ${
+                          darkMode ? "text-green-400" : "text-green-600"
+                        }`}
+                      >
+                        ${order.amountPaid.toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("status")}
+                      </p>
+                      <p
+                        className={`font-medium ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.status === "inProgress"
+                          ? t("inProduction")
+                          : t("inShipping")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div
+                className={`rounded-2xl p-12 text-center ${
+                  darkMode
+                    ? "bg-gray-800/50 border-gray-700/50"
+                    : "bg-white/80 border-gray-200/50"
+                }`}
+              >
+                <Package
+                  size={48}
+                  className={`mx-auto mb-4 ${
+                    darkMode ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
+                <h3
+                  className={`text-xl font-medium mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("noOrdersFound")}
+                </h3>
+              </div>
+            )}
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <div>
-              <p className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-gray-500"
-              }`}>
-                {t("amountPaid")}
-              </p>
-              <p className={`font-medium ${
-                darkMode ? "text-green-400" : "text-green-600"
-              }`}>
-                ${order.amountPaid.toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-gray-500"
-              }`}>
-                {t("status")}
-              </p>
-              <p className={`font-medium ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                {order.status === "inProgress"
-                  ? t("inProduction")
-                  : t("inShipping")}
-              </p>
-            </div>
+        ) : (
+          <div className="space-y-6">
+            {completedOrders.length > 0 ? (
+              completedOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
+                    darkMode
+                      ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
+                      : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
+                  }`}
+                  onClick={() => navigate(`/orders/${order.id}`)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3
+                        className={`text-xl font-bold ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.title}
+                      </h3>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {order.id} • {order.client}
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {t("delivered")}
+                    </span>
+                  </div>
+                  <div className="mt-4">
+                    <p
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("completedOn")}
+                    </p>
+                    <p
+                      className={`font-medium ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {new Date(
+                        order.completionDetails?.completedAt || order.date
+                      ).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div
+                className={`rounded-2xl p-12 text-center ${
+                  darkMode
+                    ? "bg-gray-800/50 border-gray-700/50"
+                    : "bg-white/80 border-gray-200/50"
+                }`}
+              >
+                <CheckCircle
+                  size={48}
+                  className={`mx-auto mb-4 ${
+                    darkMode ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
+                <h3
+                  className={`text-xl font-medium mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("noCompletedOrders")}
+                </h3>
+              </div>
+            )}
           </div>
-        </div>
-      ))
-    ) : (
-      <div className={`rounded-2xl p-12 text-center ${
-        darkMode
-          ? "bg-gray-800/50 border-gray-700/50"
-          : "bg-white/80 border-gray-200/50"
-      }`}>
-        <Package
-          size={48}
-          className={`mx-auto mb-4 ${
-            darkMode ? "text-gray-500" : "text-gray-400"
-          }`}
-        />
-        <h3 className={`text-xl font-medium mb-2 ${
-          darkMode ? "text-white" : "text-gray-900"
-        }`}>
-          {t("noOrdersFound")}
-        </h3>
-      </div>
-    )}
-  </div>
-) : (
-  <div className="space-y-6">
-    {completedOrders.length > 0 ? (
-      completedOrders.map((order) => (
-        <div
-          key={order.id}
-          className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
-            darkMode
-              ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
-              : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
-          }`}
-          onClick={() => navigate(`/orders/${order.id}`)}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className={`text-xl font-bold ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}>
-                {order.title}
-              </h3>
-              <p className={`text-sm ${
-                darkMode ? "text-gray-400" : "text-gray-600"
-              }`}>
-                {order.id} • {order.client}
-              </p>
-            </div>
-            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-              {t("delivered")}
-            </span>
-          </div>
-          <div className="mt-4">
-            <p className={`text-sm ${
-              darkMode ? "text-gray-400" : "text-gray-500"
-            }`}>
-              {t("completedOn")}
-            </p>
-            <p className={`font-medium ${
-              darkMode ? "text-white" : "text-gray-900"
-            }`}>
-              {new Date(order.completionDetails?.completedAt || order.date).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className={`rounded-2xl p-12 text-center ${
-        darkMode
-          ? "bg-gray-800/50 border-gray-700/50"
-          : "bg-white/80 border-gray-200/50"
-      }`}>
-        <CheckCircle
-          size={48}
-          className={`mx-auto mb-4 ${
-            darkMode ? "text-gray-500" : "text-gray-400"
-          }`}
-        />
-        <h3 className={`text-xl font-medium mb-2 ${
-          darkMode ? "text-white" : "text-gray-900"
-        }`}>
-          {t("noCompletedOrders")}
-        </h3>
-      </div>
-    )}
-  </div>
-)}
+        )}
         {/* Create Post Modal */}
         {showCreatePostModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
