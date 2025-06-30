@@ -11,6 +11,7 @@ import {
 } from "../dtos/auth.dtos";
 import * as APIError from "../utils/errors";
 import { handleControllerError } from "../utils/errors-handler";
+import jwt from "jsonwebtoken";
 
 export async function signupController(
   req: SignupRequest,
@@ -81,8 +82,14 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
       throw new APIError.UnauthorizedError("Authentication failed");
     }
 
-    const profile = grantData.response;
+    const idToken = grantData.response.id_token;
+    if (!idToken) {
+      throw new APIError.BadRequestError(
+        "Missing id_token from Google OAuth response",
+      );
+    }
 
+    const profile = jwt.decode(idToken) as any;
     req.log.info(profile);
 
     if (!profile.sub || !profile.email) {
