@@ -11,20 +11,18 @@ const config = loadConfig();
 
 export async function grantPlugin(app: FastifyInstance): Promise<void> {
   // Register cookie plugin first
-  await app.register(fastifyCookie, {
-    secret: config.JWT_SECRET,
-  });
+  await app.register(fastifyCookie);
 
   console.log("Grant plugin loaded with /connect/* routes");
 
-  // Register session plugin
   await app.register(fastifySession, {
     secret: config.JWT_SECRET,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      sameSite: "strict" as const,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      path: "/",
     },
     saveUninitialized: false,
   });
