@@ -7,7 +7,7 @@ export const grantConfig = {
     origin: config.APP_URL || "http://localhost:3000",
     transport: "session",
     state: true,
-    prefix: "",
+    prefix: "/connect",
   },
   google: {
     key: config.GOOGLE_CLIENT_ID,
