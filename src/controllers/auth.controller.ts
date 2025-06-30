@@ -83,6 +83,8 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
 
     const profile = grantData.response;
 
+    req.log.info(profile);
+
     if (!profile.sub || !profile.email) {
       throw new APIError.BadRequestError(
         "Missing required profile data, Google profile must include ID and email",
