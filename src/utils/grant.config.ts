@@ -4,7 +4,8 @@ const config = loadConfig();
 
 export const grantConfig = {
   defaults: {
-    origin: config.APP_URL || "http://localhost:3000",
+    protocol: "https",
+    host: config.APP_URL || "http://localhost:3000",
     transport: "session",
     state: true,
     prefix: "/connect",
