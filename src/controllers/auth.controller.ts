@@ -75,39 +75,31 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
 
 export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
   try {
-    // Grant stores OAuth data in req.session.grant
     const grantData = (req.session as any).grant as GrantSessionData;
 
     if (!grantData?.response) {
       throw new APIError.UnauthorizedError("Authentication failed");
     }
 
-    // For Google, the user data is in the raw response
-    let raw;
-    try {
-      raw = JSON.parse(grantData.response.raw || "{}");
-    } catch (parseError) {
-      throw new APIError.ConflictError("Oauth parse error");
-    }
+    const profile = grantData.response;
 
-    // Validate required fields
-    if (!raw.sub || !raw.email) {
+    if (!profile.sub || !profile.email) {
       throw new APIError.BadRequestError(
         "Missing required profile data, Google profile must include ID and email",
       );
     }
 
-    const profile = {
-      id: raw.sub,
-      email: raw.email,
-      firstName: raw.given_name || "",
-      lastName: raw.family_name || "",
+    const userProfile = {
+      id: profile.sub,
+      email: profile.email,
+      firstName: profile.given_name || "",
+      lastName: profile.family_name || "",
       provider: "google" as const,
     };
 
-    const result = await authService.oauthLogin(profile);
+    const result = await authService.oauthLogin(userProfile);
 
-    // Clear grant data from session
+    // Clear grant session data
     delete (req.session as any).grant;
 
     reply
@@ -116,18 +108,17 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
         secure: false,
         sameSite: "strict",
         path: "/",
-        maxAge: 60 * 60 * 24 * 4,
+        maxAge: 60 * 60 * 24 * 4, // 4 days
       })
       .setCookie("refreshToken", result.refreshToken, {
         httpOnly: true,
         secure: false,
         sameSite: "strict",
         path: "/",
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: 60 * 60 * 24 * 7, // 7 days
       })
       .status(200);
 
-    // for curl testing
     return {
       message: "Login successful",
       user: result.user,

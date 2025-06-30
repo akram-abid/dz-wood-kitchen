@@ -32,6 +32,11 @@ export interface GrantSessionData {
   response?: {
     access_token: string;
     refresh_token?: string;
-    raw: string;
+    token_type?: string;
+    sub: string;
+    email: string;
+    given_name?: string;
+    family_name?: string;
+    [key: string]: any;
   };
 }
