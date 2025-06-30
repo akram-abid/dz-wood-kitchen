@@ -45,4 +45,6 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Wait for db, then run migrations, then seed, then start app
-CMD ["sh", "-c", "./wait-for-it.sh db:5432 -- pnpm drizzle-kit push && pnpm exec tsx scripts/seed.ts && node dist/server.js"]x scripts/seed.ts && node dist/server.js
+
+CMD ["sh", "-c", "./wait-for-it.sh db:5432 -- pnpm drizzle-kit push && pnpm exec tsx scripts/seed.ts && node dist/server.js"]
+
