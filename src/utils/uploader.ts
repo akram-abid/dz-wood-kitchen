@@ -17,8 +17,10 @@ export const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
   "image/jpg",
+  "file",
   "video/mp4",
 ];
+
 export const MAX_FILES_LIMIT = 15;
 
 export interface ProcessedUpload {
@@ -33,42 +35,107 @@ export async function processFileUploads(
 ): Promise<ProcessedUpload | null> {
   const fields: Record<string, any> = {};
   const mediaFilenames: string[] = [];
+  const savedFiles: string[] = [];
 
   try {
     for await (const part of parts) {
+      console.log("Processing part:", {
+        type: part.type,
+        fieldname: part.fieldname,
+        filename: part.filename,
+        mimetype: part.mimetype,
+      });
+
       if (part.type === "file") {
-        if (!ALLOWED_MIME_TYPES.includes(part.mimetype || "")) {
-          reply.code(400).send({
-            success: false,
-            message: "Unsupported file type",
-          });
+        if (mediaFilenames.length >= MAX_FILES_LIMIT) {
+          await cleanupFiles(savedFiles);
+          if (!reply.sent) {
+            reply.code(400).send({
+              success: false,
+              message: `Max ${MAX_FILES_LIMIT} files allowed`,
+            });
+          }
           return null;
         }
 
-        const filename = `${Date.now()}-${part.filename}`;
+        if (!ALLOWED_MIME_TYPES.includes(part.mimetype || "")) {
+          await cleanupFiles(savedFiles);
+          if (!reply.sent) {
+            reply.code(400).send({
+              success: false,
+              message: "Unsupported file type",
+            });
+          }
+          return null;
+        }
+
+        const sanitizedFilename = part.filename.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const filename = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${sanitizedFilename}`;
         const filepath = path.join(filePath, filename);
 
         await pipeline(part.file, fs.createWriteStream(filepath));
         mediaFilenames.push(filename);
+        savedFiles.push(filepath);
       } else if (part.type === "field") {
-        fields[part.fieldname] = part.value;
+        console.log("Field:", part.fieldname, "=", part.value);
+
+        // Handle the field value - await it if it's a promise
+        let fieldValue = part.value;
+        if (typeof fieldValue?.then === "function") {
+          fieldValue = await fieldValue;
+        }
+
+        if (fields[part.fieldname]) {
+          if (Array.isArray(fields[part.fieldname])) {
+            fields[part.fieldname].push(fieldValue);
+          } else {
+            fields[part.fieldname] = [fields[part.fieldname], fieldValue];
+          }
+        } else {
+          // Try to parse JSON strings
+          if (
+            typeof fieldValue === "string" &&
+            (fieldValue.startsWith("[") || fieldValue.startsWith("{"))
+          ) {
+            try {
+              fields[part.fieldname] = JSON.parse(fieldValue);
+            } catch {
+              fields[part.fieldname] = fieldValue;
+            }
+          } else {
+            fields[part.fieldname] = fieldValue;
+          }
+        }
+      } else {
+        console.log("Unknown part type:", part.type);
       }
     }
 
-    if (mediaFilenames.length > MAX_FILES_LIMIT) {
-      reply.code(400).send({
-        success: false,
-        message: `Max ${MAX_FILES_LIMIT} files allowed`,
-      });
-      return null;
-    }
-
+    console.log("Final fields:", fields);
+    console.log("Media filenames:", mediaFilenames);
     return { fields, mediaFilenames };
   } catch (error) {
-    reply.code(500).send({
-      success: false,
-      message: "Error processing file upload",
-    });
+    console.error("Error in processFileUploads:", error);
+    await cleanupFiles(savedFiles);
+    if (!reply.sent) {
+      reply.code(500).send({
+        success: false,
+        message: "Error processing file upload",
+      });
+    }
     return null;
+  }
+}
+
+// Helper function to cleanup files
+async function cleanupFiles(filePaths: string[]): Promise<void> {
+  for (const filepath of filePaths) {
+    try {
+      if (fs.existsSync(filepath)) {
+        await fs.promises.unlink(filepath);
+      }
+    } catch (error) {
+      console.error(`Failed to cleanup file ${filepath}:`, error);
+    }
   }
 }

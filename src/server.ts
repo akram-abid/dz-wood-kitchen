@@ -125,6 +125,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
 
   // Multipart/form-data support
   await server.register(multipart, {
+    attachFieldsToBody: false,
     limits: {
       fileSize: config.FILE_SIZE_LIMIT,
       files: 15,
