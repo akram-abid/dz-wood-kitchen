@@ -108,7 +108,21 @@ const buildServer = async (): Promise<FastifyInstance> => {
 
   // CORS configuration
   await server.register(cors, {
-    origin: config.CORS_ORIGIN,
+    origin: (origin, callback) => {
+      // Handle both string and array formats
+      const allowedOrigins = Array.isArray(config.CORS_ORIGIN)
+        ? config.CORS_ORIGIN
+        : config.CORS_ORIGIN.split(",");
+
+      // Allow requests with no origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"), false);
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
