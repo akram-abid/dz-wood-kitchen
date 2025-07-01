@@ -15,6 +15,9 @@ import {
 } from "../dtos/order.dtos";
 import { handleControllerError } from "../utils/errors-handler";
 import * as APIError from "../utils/errors";
+import { orderImagesPath, cleanupFiles } from "../utils/uploader";
+import path from "path";
+
 export const createOrderHandler = async (
   req: FastifyRequest,
   reply: FastifyReply,
@@ -52,13 +55,20 @@ export const createOrderHandler = async (
 
 export const updateOrderHandler = async (
   req: FastifyRequest<{
-    Params: { orderId: string };
+    Params: { id: string };
     Body: Partial<z.infer<typeof updateOrderDto>>;
   }>,
   reply: FastifyReply,
 ) => {
   try {
-    const { orderId } = req.params;
+    const { id } = req.params;
+
+    const order = await db.select().from(orders).where(eq(orders.id, id));
+
+    if (order.length === 0) {
+      throw new APIError.NotFoundError("Order not found");
+    }
+
     const data = updateOrderDto.parse(req.body);
 
     const updateData: any = {
@@ -70,22 +80,29 @@ export const updateOrderHandler = async (
       updateData.mediaUrls = data.mediaFilenames.map(
         (f) => `/pictures/orders/${f}`,
       );
-      // Remove mediaFilenames from updateData since it's not a database field
-      delete updateData.mediaFilenames;
     }
 
-    const updated = await db
+    const [updatedOrder] = await db
       .update(orders)
       .set(updateData)
-      .where(eq(orders.id, orderId))
+      .where(eq(orders.id, id))
       .returning();
 
-    if (updated.length === 0) {
-      throw new APIError.NotFoundError("Order not found");
+    console.log(updatedOrder.mediaUrls);
+
+    if (order[0]?.mediaUrls) {
+      const oldImages = order[0].mediaUrls.map((url: string) => {
+        return path.join(process.cwd(), url);
+      });
+
+      // fire and forget ...
+      cleanupFiles(oldImages).catch((err) => {
+        console.error("Failed to cleanup old images:", err);
+      });
     }
 
     reply.status(200);
-    return { order: updated[0] };
+    return;
   } catch (error: any) {
     handleControllerError(error, "update order", req.log);
   }

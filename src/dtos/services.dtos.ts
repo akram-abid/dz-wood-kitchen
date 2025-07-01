@@ -10,6 +10,8 @@ export const addPostSchema = z.object({
   mediaFilenames: z.array(z.string()).max(15),
 });
 
+export const updatePostSchema = addPostSchema.partial();
+
 export const deletePostParamsSchema = z.object({
   id: z.string().uuid(),
 });

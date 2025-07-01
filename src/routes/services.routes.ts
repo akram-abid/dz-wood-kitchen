@@ -53,7 +53,7 @@ export async function postRoutes(server: FastifyInstance) {
           reply,
           serviceImagesPath,
         );
-        if (!uploadResult) return; // Error already sent by processFileUploads
+        if (!uploadResult) return;
 
         const { fields, mediaFilenames } = uploadResult;
         const updatePayload = {

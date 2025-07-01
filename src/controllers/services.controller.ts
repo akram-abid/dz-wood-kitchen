@@ -9,6 +9,7 @@ import {
   deletePostParamsSchema,
   getByAdminParamsSchema,
   getPostByIdSchema,
+  updatePostSchema,
 } from "../dtos/services.dtos";
 import { handleControllerError } from "../utils/errors-handler";
 import * as APIError from "../utils/errors";
@@ -83,57 +84,15 @@ export const getPostsById = async (
 export const updatePostHandler = async (
   req: FastifyRequest<{
     Params: { postId: string };
-    Body: {
-      title?: string;
-      description?: string;
-      price?: string;
-      woodType?: string;
-      estimatedTime?: string;
-      items?: string[];
-      imageFilenames?: string[];
-      adminId?: string;
-    };
+    Body: z.infer<typeof updatePostSchema>;
   }>,
   reply: FastifyReply,
 ) => {
   try {
     const { postId } = req.params;
-    const {
-      title,
-      description,
-      price,
-      woodType,
-      estimatedTime,
-      items,
-      imageFilenames,
-      adminId,
-    } = req.body;
+    const updateData = updatePostSchema.parse(req.body);
 
-    if (!adminId) {
-      throw new APIError.UnauthorizedError("Unauthorized: adminId missing");
-    }
-
-    const updateData: any = {
-      ...(title && { title }),
-      ...(description && { description }),
-      ...(price && { price }),
-      ...(woodType && { woodType }),
-      ...(estimatedTime && { estimatedTime }),
-      ...(items && { items }),
-    };
-
-    if (imageFilenames && imageFilenames.length > 0) {
-      const imageUrls = imageFilenames.map(
-        (filename) => `/pictures/services/${filename}`,
-      );
-      updateData.imageUrls = imageUrls;
-    }
-
-    const updatedPost = await servicePostService.updatePost(
-      postId,
-      adminId,
-      updateData,
-    );
+    const updatedPost = await servicePostService.updatePost(postId, updateData);
 
     reply.status(200);
     return { post: updatedPost };

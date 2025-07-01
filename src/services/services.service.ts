@@ -4,7 +4,8 @@ import { posts } from "../database/schema";
 import { logger } from "../utils/logger";
 import { SERVICE_ERRORS } from "../utils/errors-handler";
 import { jsonb } from "drizzle-orm/pg-core";
-
+import { cleanupFiles } from "../utils/uploader";
+import path from "path";
 interface PostInput {
   title: string;
   description: string;
@@ -124,7 +125,7 @@ export class ServicePostService {
       throw err;
     }
   }
-  async updatePost(postId: string, adminId: string, data: UpdatePostInput) {
+  async updatePost(postId: string, data: UpdatePostInput) {
     try {
       const existingPost = await db
         .select()
@@ -135,32 +136,27 @@ export class ServicePostService {
         throw new Error(SERVICE_ERRORS.POST_NOT_FOUND);
       }
 
-      const updatePayload: any = {
-        ...("title" in data && { title: data.title }),
-        ...("description" in data && { description: data.description }),
-        ...("price" in data && { price: data.price }),
-        ...("woodType" in data && { woodType: data.woodType }),
-        ...("estimatedTime" in data && { estimatedTime: data.estimatedTime }),
-        ...("items" in data && { items: data.items }),
-        ...("mediaFilenames" in data &&
-          data.mediaFilenames && {
-            imageUrls: data.mediaFilenames.map(
-              (filename) => `/pictures/services/${filename}`,
-            ),
-          }),
-        updatedAt: new Date(),
-      };
+      const updatedData: Record<string, any> = { ...data };
 
-      const result = await db
-        .update(posts)
-        .set(updatePayload)
-        .where(and(eq(posts.id, postId), eq(posts.createdBy, adminId)))
-        .returning();
+      if (data.mediaFilenames) {
+        updatedData.imageUrls = data.mediaFilenames.map(
+          (filename) => `/pictures/services/${filename}`,
+        );
+        const oldImages = existingPost[0].imageUrls.map((flPath) =>
+          path.join(process.cwd(), flPath),
+        );
+        cleanupFiles(oldImages).catch((err) =>
+          logger.warn("Cleanup failed:", err),
+        );
+      }
+
+      delete updatedData.mediaFilenames;
+
+      const result = await db.update(posts).set(updatedData).returning();
 
       logger.info("Post updated successfully", {
         postId,
-        adminId,
-        updatedFields: Object.keys(updatePayload),
+        updatedFields: Object.keys(data),
       });
 
       return result[0];

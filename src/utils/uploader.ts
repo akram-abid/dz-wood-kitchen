@@ -128,7 +128,7 @@ export async function processFileUploads(
 }
 
 // Helper function to cleanup files
-async function cleanupFiles(filePaths: string[]): Promise<void> {
+export async function cleanupFiles(filePaths: string[]): Promise<void> {
   for (const filepath of filePaths) {
     try {
       if (fs.existsSync(filepath)) {
