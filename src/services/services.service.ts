@@ -3,15 +3,14 @@ import { dbDrizzle as db } from "../database/db";
 import { posts } from "../database/schema";
 import { logger } from "../utils/logger";
 import { SERVICE_ERRORS } from "../utils/errors-handler";
+import { jsonb } from "drizzle-orm/pg-core";
 
 interface PostInput {
   title: string;
   description: string;
-  price: string;
   woodType: string;
-  estimatedTime: string;
   adminId: string;
-  imageFilenames: string[];
+  mediaFilenames: string[];
   items: string[];
 }
 
@@ -20,15 +19,32 @@ type UpdatePostInput = Partial<Omit<PostInput, "adminId">>;
 export class ServicePostService {
   async addPost(data: PostInput) {
     try {
-      if (data.imageFilenames.length > 15) {
+      if (data.mediaFilenames.length > 15) {
         throw new Error(SERVICE_ERRORS.MAX_IMAGES);
       }
 
-      const imageUrls = data.imageFilenames.map(
+      const imageUrls = data.mediaFilenames.map(
         (filename) => `/pictures/services/${filename}`,
       );
 
       const items = data.items.map((item) => item.trim());
+
+      console.log("💬 insert debug", {
+        title: data.title,
+        imageUrls,
+        items,
+        typeofImageUrls: typeof imageUrls,
+        typeofItems: typeof items,
+        isImageUrlsArray: Array.isArray(imageUrls),
+        isItemsArray: Array.isArray(items),
+      });
+
+      console.log("🔥 About to insert:", {
+        imageUrls: data.mediaFilenames.map(
+          (filename) => `/pictures/services/${filename}`,
+        ),
+        items: data.items.map((item) => item.trim()),
+      });
 
       const newPost = await db
         .insert(posts)
@@ -42,7 +58,12 @@ export class ServicePostService {
           createdAt: new Date(),
           updatedAt: new Date(),
         })
-        .returning();
+        .returning()
+        .execute()
+        .catch((err) => {
+          console.error("❌ DB ERROR SQL:", err);
+          throw err;
+        });
 
       logger.info("Post created successfully", {
         postId: newPost[0].id,
@@ -119,9 +140,9 @@ export class ServicePostService {
         ...("woodType" in data && { woodType: data.woodType }),
         ...("estimatedTime" in data && { estimatedTime: data.estimatedTime }),
         ...("items" in data && { items: data.items }),
-        ...("imageFilenames" in data &&
-          data.imageFilenames && {
-            imageUrls: data.imageFilenames.map(
+        ...("mediaFilenames" in data &&
+          data.mediaFilenames && {
+            imageUrls: data.mediaFilenames.map(
               (filename) => `/pictures/services/${filename}`,
             ),
           }),

@@ -13,6 +13,8 @@ export async function postRoutes(server: FastifyInstance) {
   server.post("/posts", {
     preHandler: [server.authenticate, server.authorize(["admin"])],
     handler: async (req: FastifyRequest, reply: FastifyReply) => {
+      //req.log.info(req.body);
+      req.log.info(req.ctx);
       try {
         const uploadResult = await processFileUploads(
           req.parts(),
