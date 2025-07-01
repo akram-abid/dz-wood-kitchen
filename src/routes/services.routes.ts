@@ -5,6 +5,7 @@ import {
   getPostsByAdminHandler,
   updatePostHandler,
   filterByWoodTypeHandler,
+  getPostsById,
 } from "../controllers/services.controller";
 import { serviceImagesPath, processFileUploads } from "../utils/uploader";
 
@@ -93,5 +94,9 @@ export async function postRoutes(server: FastifyInstance) {
   // filter by wood type
   server.get("/posts/filter", {
     handler: filterByWoodTypeHandler,
+  });
+
+  server.get("/posts/:postId", {
+    handler: getPostsById,
   });
 }
