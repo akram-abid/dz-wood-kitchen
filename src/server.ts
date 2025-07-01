@@ -127,6 +127,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    credentials: false,
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
 
