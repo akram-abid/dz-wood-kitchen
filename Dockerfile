@@ -31,6 +31,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/drizzle.config.ts ./
+COPY --from=builder /app/drizzle ./drizzle
 COPY --from=builder /app/docs ./docs
 
 # Copy wait-for-it script
@@ -46,5 +47,5 @@ EXPOSE 3000
 
 # Wait for db, then run migrations, then seed, then start app
 
-CMD ["sh", "-c", "./wait-for-it.sh db:5432 -- pnpm drizzle-kit push && pnpm exec tsx scripts/seed.ts && node dist/server.js"]
+CMD ["sh", "-c", "./wait-for-it.sh db:5432 -- npx drizzle-kit migrate && pnpm exec tsx scripts/seed.ts && node dist/server.js"]
 
