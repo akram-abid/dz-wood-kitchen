@@ -32,6 +32,8 @@ const responseFormatPlugin: FastifyPluginAsync = async (
     const message =
       statusCode === 500 && !isDev ? "INTERNAL SERVER ERROR" : error.message;
 
+    request.log.error(error);
+
     reply.status(statusCode).send({
       status: "error",
       error: error.name,
