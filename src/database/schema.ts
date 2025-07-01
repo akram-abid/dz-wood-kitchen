@@ -7,6 +7,7 @@ import {
   boolean as pgBoolean,
   doublePrecision,
   serial,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { pgEnum } from "drizzle-orm/pg-core";
@@ -60,8 +61,8 @@ export const posts = pgTable("posts", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   woodType: text("wood_type").notNull(),
-  imageUrls: json("image_urls").notNull(),
-  items: json("items"),
+  imageUrls: text("image_urls").array().notNull(),
+  items: text("items").array(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

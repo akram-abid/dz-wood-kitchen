@@ -43,6 +43,27 @@
       "when": 1751201157098,
       "tag": "0005_clean_sinister_six",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1751307317066,
+      "tag": "0006_daily_ultron",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1751311551287,
+      "tag": "0007_parched_nick_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1751311618707,
+      "tag": "0008_slippery_goblin_queen",
+      "breakpoints": true
     }
   ]
 }
