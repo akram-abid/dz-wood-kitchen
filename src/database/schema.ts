@@ -83,7 +83,8 @@ export const orders = pgTable("orders", {
   title: text("title"),
   trackingNumber: serial("tracking_number").notNull().unique(),
   description: text("description").notNull(),
-
+  email: text("email").notNull(),
+  fullName: text("fullName").notNull(),
   woodType: text("wood_type"),
   status: text("status").$default(() => "validation"),
   isValidated: pgBoolean("is_validated").$default(() => false),
@@ -97,7 +98,7 @@ export const orders = pgTable("orders", {
   wilaya: text("wilaya").notNull(),
   phoneNumber: text("phone_number").notNull(),
 
-  mediaUrls: json("media_urls"),
+  mediaUrls: text("edia_urls").array(),
 
   postId: text("post_id").references(() => posts.id, { onDelete: "set null" }),
 
