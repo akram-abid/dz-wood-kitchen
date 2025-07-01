@@ -46,24 +46,8 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
       userId: result.user.id,
     });
 
-    reply
-      .setCookie("accessToken", result.accessToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 4,
-      })
-      .setCookie("refreshToken", result.refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      })
-      .status(200);
+    reply.status(200);
 
-    // for curl testing
     return {
       message: "Login successful",
       user: result.user,
@@ -111,26 +95,13 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     // Clear grant session data
     delete (req.session as any).grant;
 
-    reply
-      .setCookie("accessToken", result.accessToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 4, // 4 days
-      })
-      .setCookie("refreshToken", result.refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
-      })
-      .status(200);
+    reply.status(200);
 
     return {
       message: "Login successful",
       user: result.user,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
     };
   } catch (error) {
     handleControllerError(error, "google oauth", req.log);
@@ -174,26 +145,12 @@ export async function facebookCallback(
 
     // Clear grant data from session
     delete (req.session as any).grant;
-    reply
-      .setCookie("accessToken", result.accessToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 4,
-      })
-      .setCookie("refreshToken", result.refreshToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      })
-      .status(200);
+    reply.status(200);
 
     return {
       message: "Login successful",
       user: result.user,
+      accessToken: result.accessToken,
     };
   } catch (error) {
     handleControllerError(error, "facebook oauth", req.log);

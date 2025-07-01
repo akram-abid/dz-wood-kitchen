@@ -126,7 +126,6 @@ const buildServer = async (): Promise<FastifyInstance> => {
         callback(new Error("Not allowed by CORS"), false);
       }
     },
-    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   });
@@ -134,10 +133,6 @@ const buildServer = async (): Promise<FastifyInstance> => {
   // JWT authentication
   await server.register(jwt, {
     secret: config.JWT_SECRET,
-    cookie: {
-      cookieName: "accessToken",
-      signed: false,
-    },
   });
 
   // Multipart/form-data support
@@ -171,13 +166,11 @@ const buildServer = async (): Promise<FastifyInstance> => {
     "authenticate",
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const token = request.cookies.accessToken;
+        const payload = (await request.jwtVerify()) as JwtPayload;
 
-        if (!token) {
+        if (!payload) {
           throw new APIError.UnauthorizedError("Authentication required");
         }
-
-        const payload = server.jwt.verify(token) as JwtPayload;
         request.ctx.user = payload;
       } catch (error) {
         throw new APIError.UnauthorizedError("Invalid or expired token");
