@@ -63,6 +63,7 @@ export const posts = pgTable("posts", {
   woodType: text("wood_type").notNull(),
   imageUrls: text("image_urls").array().notNull(),
   items: text("items").array(),
+  location: text("location"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

@@ -64,6 +64,13 @@
       "when": 1751311618707,
       "tag": "0008_slippery_goblin_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1751378218813,
+      "tag": "0009_legal_spot",
+      "breakpoints": true
     }
   ]
 }
