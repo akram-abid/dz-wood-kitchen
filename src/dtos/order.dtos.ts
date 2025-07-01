@@ -2,6 +2,8 @@ import { z } from "zod";
 
 export const createOrderDto = z.object({
   title: z.string().optional(),
+  email: z.string().email(),
+  fullName: z.string(),
   description: z.string(),
   woodType: z.string().optional(),
   daira: z.string(),

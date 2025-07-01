@@ -26,15 +26,17 @@ export const createOrderHandler = async (
     const newOrder = await db
       .insert(orders)
       .values({
-        title: body.title,
+        title: body.title ?? "",
+        email: body.email,
+        fullName: body.fullName,
         description: body.description,
-        woodType: body.woodType,
+        woodType: body.woodType ?? "",
         daira: body.daira,
         street: body.street,
         baladia: body.baladia,
         wilaya: body.wilaya,
         phoneNumber: body.phoneNumber,
-        mediaUrls,
+        mediaUrls: mediaUrls ?? [],
         postId: body.postId,
         userId: body.userId,
       })
