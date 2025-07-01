@@ -195,10 +195,16 @@ const buildServer = async (): Promise<FastifyInstance> => {
   });
 
   // Request logging hook
+
   server.addHook(
     "onResponse",
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const duration = Date.now() - request.ctx.startTime;
+      const startTime = request.ctx?.startTime;
+
+      if (!startTime) return;
+
+      const duration = Date.now() - startTime;
+
       server.log.info(
         {
           reqId: request.id,
