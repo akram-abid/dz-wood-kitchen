@@ -85,6 +85,13 @@
       "when": 1751382114691,
       "tag": "0011_worried_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1751399061874,
+      "tag": "0012_chief_daredevil",
+      "breakpoints": true
     }
   ]
 }

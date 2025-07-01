@@ -1,0 +1,1 @@
+ALTER TABLE "orders" RENAME COLUMN "edia_urls" TO "media_urls";

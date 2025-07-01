@@ -98,7 +98,7 @@ export const orders = pgTable("orders", {
   wilaya: text("wilaya").notNull(),
   phoneNumber: text("phone_number").notNull(),
 
-  mediaUrls: text("edia_urls").array(),
+  mediaUrls: text("media_urls").array(),
 
   postId: text("post_id").references(() => posts.id, { onDelete: "set null" }),
 
