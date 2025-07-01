@@ -16,9 +16,12 @@ import {
 } from "lucide-react";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
+import apiFetch from "../utils/api/apiFetch";
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,6 +29,34 @@ const SignupPage = () => {
     email: "",
     password: "",
   });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const signupData = {
+      fullName: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+    };
+    console.log("User Signup Data:", {
+      email: formData.email,
+      password: formData.password,
+      fullName: formData.fullName,
+    });
+
+    const result = await apiFetch("/api/v1/auth/signup", signupData);
+
+    if (result.success) {
+      console.log("Signup successful:", result.data);
+      navigate("/login", {
+        state: {
+          message: t("signupSuccessMessage"),
+        },
+      });
+    } else {
+      console.error("Signup failed:", result.error);
+      // Handle error (show error message to user)
+    }
+  };
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleLanguageDropdown = () => {
@@ -54,11 +85,6 @@ const SignupPage = () => {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
   };
 
   return (
@@ -292,7 +318,7 @@ const SignupPage = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                 {t("password")}
+                  {t("password")}
                 </label>
                 <div className="relative">
                   <Lock
@@ -326,7 +352,8 @@ const SignupPage = () => {
 
               <button
                 type="submit"
-                className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
+                onClick={handleSubmit}
+                className={`cursor-pointer w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
                   darkMode
                     ? "bg-yellow-500 hover:bg-yellow-400 text-white"
                     : "bg-yellow-500 hover:bg-yellow-400 text-white"

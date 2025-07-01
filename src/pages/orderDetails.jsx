@@ -26,6 +26,8 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const currentLanguage = i18next.language;
+  const isRTL = currentLanguage === "ar";
 
   console.log("Order ID: ", id);
 
@@ -142,7 +144,6 @@ const OrderDetails = () => {
   ]);
 
   const handlePrintInvoice = () => {
-    // Create print styles
     const printStyles = `
     @media print {
       body * {
@@ -401,6 +402,7 @@ const OrderDetails = () => {
   function handleLanguageChange(languageCode) {
     i18next.changeLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
+    document.documentElement.dir = languageCode === "ar" ? "rtl" : "ltr";
   }
 
   function toggleLanguageDropdown() {
@@ -432,6 +434,7 @@ const OrderDetails = () => {
           ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
           : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
       }`}
+      dir={isRTL ? "rtl" : "ltr"}
     >
       {/* Header */}
       <header
@@ -458,7 +461,7 @@ const OrderDetails = () => {
               darkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            Order Details - {order.id}
+            {t("orderDetails")} - {order.id}
           </h1>
 
           <div className="flex items-center space-x-3">
@@ -481,7 +484,9 @@ const OrderDetails = () => {
               </button>
               {isLanguageDropdownOpen && (
                 <div
-                  className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden ${
+                  className={`absolute ${
+                    isRTL ? "left-0" : "right-0"
+                  } mt-2 w-40 rounded-xl shadow-xl border overflow-hidden ${
                     darkMode
                       ? "bg-gray-800 border-gray-700"
                       : "bg-white border-gray-200"
@@ -539,7 +544,7 @@ const OrderDetails = () => {
                     type="text"
                     value={editedTitle}
                     onChange={(e) => setEditedTitle(e.target.value)}
-                    placeholder="Enter order title..."
+                    placeholder={t("enterOrderTitle")}
                     className={`text-2xl font-bold bg-transparent border-b-2 border-dashed outline-none ${
                       darkMode
                         ? "text-white border-gray-600 placeholder-gray-400"
@@ -593,14 +598,15 @@ const OrderDetails = () => {
                   ? "bg-purple-100 text-purple-800"
                   : "bg-green-100 text-green-800"
               }`}
+              style={{ marginLeft: isRTL ? "auto" : "0" }}
             >
               {order.status === "waiting"
-                ? "Waiting"
+                ? t("waiting")
                 : order.status === "inProgress"
-                ? "In Progress"
+                ? t("inProgress")
                 : order.status === "shipping"
-                ? "Shipping"
-                : "Delivered"}
+                ? t("shipping")
+                : t("delivered")}
             </span>
           </div>
 
@@ -630,11 +636,11 @@ const OrderDetails = () => {
                   darkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Client Information
+                {t("clientInformation")}
               </h3>
               <div
-                className={`p-4 rounded-lg ${
-                  darkMode ? "bg-gray-700" : "bg-gray-100"
+                className={`p-4 rounded-lg  ${
+                  darkMode ? "bg-gray-700 text-white" : "bg-gray-100"
                 }`}
               >
                 <p className="font-medium">{order.client}</p>
@@ -650,29 +656,30 @@ const OrderDetails = () => {
                   darkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Order Information
+                {t("orderInformation")}
               </h3>
               <div
                 className={`p-4 rounded-lg ${
-                  darkMode ? "bg-gray-700" : "bg-gray-100"
+                  darkMode ? "bg-gray-700 text-white" : "bg-gray-100"
                 }`}
               >
                 <p>
-                  <span className="font-medium">ID:</span> {order.id}
+                  <span className="font-medium">{t("id")}:</span> {order.id}
                 </p>
                 <p>
-                  <span className="font-medium">Wood Type:</span>{" "}
+                  <span className="font-medium">{t("woodType")}:</span>{" "}
                   {order.woodType}
                 </p>
                 {order.estimatedTotal && (
                   <p>
-                    <span className="font-medium">Estimated Total:</span> $
-                    {order.estimatedTotal?.toLocaleString() || "N/A"}
+                    <span className="font-medium">{t("estimatedTotal")}:</span>
+                    {order.estimatedTotal?.toLocaleString() +
+                      ` ${t("algerianDinar")}` || "N/A"}
                   </p>
                 )}
                 {order.status === "delivered" && (
                   <p>
-                    <span className="font-medium">Completed:</span>{" "}
+                    <span className="font-medium">{t("completed")}:</span>{" "}
                     {new Date(
                       order.completionDetails?.completedAt || order.date
                     ).toLocaleDateString()}
@@ -694,29 +701,33 @@ const OrderDetails = () => {
                   darkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                Price Proposal
+                {t("priceProposal")}
               </h3>
 
               {!order.estimatedTotal ? (
                 <div className="flex items-center space-x-3">
                   <div className="relative flex-1">
                     <span
-                      className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                      className={`absolute ${
+                        isRTL ? "right-3" : "left-3"
+                      } top-1/2 transform -translate-y-1/2 ${
                         darkMode ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
-                      $
+                      {`${t("algerianDinar")} `}
                     </span>
                     <input
                       type="number"
                       value={priceProposal}
                       onChange={(e) => setPriceProposal(e.target.value)}
-                      className={`w-full pl-8 pr-4 py-2 rounded-lg border ${
+                      className={`w-full ${
+                        isRTL ? "pr-9 pl-5" : "pl-9 pr-5"
+                      } py-2 rounded-lg border ${
                         darkMode
                           ? "bg-gray-600 border-gray-500 text-white"
                           : "bg-white border-gray-300 text-gray-900"
                       }`}
-                      placeholder="Enter estimated price"
+                      placeholder={t("enterEstimatedPrice")}
                     />
                   </div>
                   <button
@@ -728,7 +739,7 @@ const OrderDetails = () => {
                         : "bg-yellow-500 hover:bg-yellow-400 text-black"
                     }`}
                   >
-                    Submit Proposal
+                    {t("submitProposal")}
                   </button>
                 </div>
               ) : (
@@ -746,7 +757,7 @@ const OrderDetails = () => {
                         darkMode ? "text-green-400" : "text-green-600"
                       }`}
                     >
-                      Price proposal submitted
+                      {t("priceProposalSubmitted")}
                     </p>
                   </div>
                   <button
@@ -768,7 +779,7 @@ const OrderDetails = () => {
                         : "bg-gray-200 hover:bg-gray-300 text-gray-900"
                     }`}
                   >
-                    Edit Price
+                    {t("editPrice")}
                   </button>
                 </div>
               )}
@@ -789,7 +800,7 @@ const OrderDetails = () => {
                   }`}
                 >
                   <DollarSign className="mr-2" size={18} />
-                  Payment Information
+                  {t("paymentInformation")}
                 </h3>
                 {order.status !== "delivered" && (
                   <button
@@ -801,7 +812,7 @@ const OrderDetails = () => {
                     }`}
                   >
                     <Plus size={14} />
-                    <span>Add Payment</span>
+                    <span>{t("addPayment")}</span>
                   </button>
                 )}
               </div>
@@ -813,14 +824,15 @@ const OrderDetails = () => {
                       darkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    Estimated Total
+                    {t("estimatedTotal")}
                   </p>
                   <p
                     className={`font-medium ${
                       darkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    ${order.estimatedTotal?.toLocaleString() || "N/A"}
+                    {order.estimatedTotal?.toLocaleString() +
+                      ` ${t("algerianDinar")}` || "N/A"}
                   </p>
                 </div>
                 <div>
@@ -829,14 +841,15 @@ const OrderDetails = () => {
                       darkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    Amount Paid
+                    {t("amountPaid")}
                   </p>
                   <p
                     className={`font-medium ${
                       darkMode ? "text-green-400" : "text-green-600"
                     }`}
                   >
-                    ${(order.amountPaid || 0).toLocaleString()}
+                    {(order.amountPaid || 0).toLocaleString() +
+                      ` ${t("algerianDinar")}`}
                   </p>
                 </div>
                 <div>
@@ -845,17 +858,16 @@ const OrderDetails = () => {
                       darkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    Remaining Balance
+                    {t("remainingBalance")}
                   </p>
                   <p
                     className={`font-medium ${
                       darkMode ? "text-amber-400" : "text-amber-600"
                     }`}
                   >
-                    $
                     {(
                       (order.estimatedTotal || 0) - (order.amountPaid || 0)
-                    ).toLocaleString()}
+                    ).toLocaleString() + ` ${t("algerianDinar")}`}
                   </p>
                 </div>
               </div>
@@ -867,7 +879,7 @@ const OrderDetails = () => {
                       darkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
-                    Payment History
+                    {t("paymentHistory")}
                   </h4>
                   <div
                     className={`rounded-lg overflow-hidden border ${
@@ -890,7 +902,8 @@ const OrderDetails = () => {
                                 darkMode ? "text-white" : "text-gray-900"
                               }`}
                             >
-                              ${payment.amount.toLocaleString()}
+                              {payment.amount.toLocaleString() +
+                                ` ${t("algerianDinar")}`}
                             </p>
                             <p
                               className={`text-xs ${
@@ -929,14 +942,14 @@ const OrderDetails = () => {
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  Completion Details
+                  {t("completionDetails")}
                 </h3>
                 <button
                   onClick={() => setShowInvoiceModal(true)}
                   className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition-colors"
                 >
                   <Receipt size={16} />
-                  <span>View Invoice</span>
+                  <span>{t("viewInvoice")}</span>
                 </button>
               </div>
 
@@ -946,7 +959,7 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Elements Used
+                  {t("elementsMaded")}
                 </h4>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {order.completionDetails.elements.map((element, index) => (
@@ -970,7 +983,7 @@ const OrderDetails = () => {
                         darkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
-                      Notes
+                      {t("notes")}
                     </h4>
                     <p
                       className={`p-3 rounded-lg ${
@@ -998,13 +1011,15 @@ const OrderDetails = () => {
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              Order Progress
+              {t("orderProgress")}
             </h3>
 
             <div className="relative">
               {/* Progress line */}
               <div
-                className={`absolute left-4 top-0 h-full w-0.5 ${
+                className={`absolute ${
+                  isRTL ? "right-4" : "left-4"
+                } top-0 h-full w-0.5 ${
                   darkMode ? "bg-gray-600" : "bg-gray-300"
                 }`}
               ></div>
@@ -1014,7 +1029,9 @@ const OrderDetails = () => {
                 {/* Waiting step */}
                 <div className="relative flex items-start">
                   <div
-                    className={`absolute left-4 -ml-0.5 w-2 h-2 rounded-full mt-1.5 ${
+                    className={`absolute ${
+                      isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
+                    } w-2 h-2 rounded-full mt-1.5 ${
                       order.progress >= 0
                         ? darkMode
                           ? "bg-yellow-400"
@@ -1024,7 +1041,7 @@ const OrderDetails = () => {
                         : "bg-gray-400"
                     }`}
                   ></div>
-                  <div className="ml-8 flex-1">
+                  <div className={`${isRTL ? "mr-8" : "ml-8"} flex-1`}>
                     <div className="flex items-center">
                       <Clock
                         className={`mr-2 ${
@@ -1049,7 +1066,7 @@ const OrderDetails = () => {
                             : "text-gray-500"
                         }`}
                       >
-                        Waiting
+                        {t("waiting")}
                       </h4>
                     </div>
                     {order.progress >= 0 && (
@@ -1058,7 +1075,7 @@ const OrderDetails = () => {
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        Order received and waiting for processing
+                        {t("orderReceivedAndWaiting")}
                       </p>
                     )}
                   </div>
@@ -1067,7 +1084,9 @@ const OrderDetails = () => {
                 {/* In Progress step */}
                 <div className="relative flex items-start">
                   <div
-                    className={`absolute left-4 -ml-0.5 w-2 h-2 rounded-full mt-1.5 ${
+                    className={`absolute ${
+                      isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
+                    } w-2 h-2 rounded-full mt-1.5 ${
                       order.progress >= 1
                         ? darkMode
                           ? "bg-blue-400"
@@ -1077,7 +1096,7 @@ const OrderDetails = () => {
                         : "bg-gray-400"
                     }`}
                   ></div>
-                  <div className="ml-8 flex-1">
+                  <div className={`${isRTL ? "mr-8" : "ml-8"} flex-1`}>
                     <div className="flex items-center">
                       <Hammer
                         className={`mr-2 ${
@@ -1102,7 +1121,7 @@ const OrderDetails = () => {
                             : "text-gray-500"
                         }`}
                       >
-                        In Progress
+                        {t("inProgress")}
                       </h4>
                     </div>
                     {order.progress >= 1 && (
@@ -1111,7 +1130,7 @@ const OrderDetails = () => {
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        Order is being manufactured
+                        {t("orderBeingManufactured")}
                       </p>
                     )}
                   </div>
@@ -1120,7 +1139,9 @@ const OrderDetails = () => {
                 {/* Shipping step */}
                 <div className="relative flex items-start">
                   <div
-                    className={`absolute left-4 -ml-0.5 w-2 h-2 rounded-full mt-1.5 ${
+                    className={`absolute ${
+                      isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
+                    } w-2 h-2 rounded-full mt-1.5 ${
                       order.progress >= 2
                         ? darkMode
                           ? "bg-purple-400"
@@ -1130,7 +1151,7 @@ const OrderDetails = () => {
                         : "bg-gray-400"
                     }`}
                   ></div>
-                  <div className="ml-8 flex-1">
+                  <div className={`${isRTL ? "mr-8" : "ml-8"} flex-1`}>
                     <div className="flex items-center">
                       <Truck
                         className={`mr-2 ${
@@ -1155,7 +1176,7 @@ const OrderDetails = () => {
                             : "text-gray-500"
                         }`}
                       >
-                        Shipping
+                        {t("shipping")}
                       </h4>
                     </div>
                     {order.progress >= 2 && (
@@ -1164,7 +1185,7 @@ const OrderDetails = () => {
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        Order is being shipped to the client
+                        {t("orderBeingShipped")}
                       </p>
                     )}
                   </div>
@@ -1173,7 +1194,9 @@ const OrderDetails = () => {
                 {/* Delivered step */}
                 <div className="relative flex items-start">
                   <div
-                    className={`absolute left-4 -ml-0.5 w-2 h-2 rounded-full mt-1.5 ${
+                    className={`absolute ${
+                      isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
+                    } w-2 h-2 rounded-full mt-1.5 ${
                       order.progress >= 3
                         ? darkMode
                           ? "bg-green-400"
@@ -1183,7 +1206,7 @@ const OrderDetails = () => {
                         : "bg-gray-400"
                     }`}
                   ></div>
-                  <div className="ml-8 flex-1">
+                  <div className={`${isRTL ? "mr-8" : "ml-8"} flex-1`}>
                     <div className="flex items-center">
                       <CheckCircle
                         className={`mr-2 ${
@@ -1208,7 +1231,7 @@ const OrderDetails = () => {
                             : "text-gray-500"
                         }`}
                       >
-                        Delivered
+                        {t("delivered")}
                       </h4>
                     </div>
                     {order.progress >= 3 && (
@@ -1217,7 +1240,7 @@ const OrderDetails = () => {
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        Order has been delivered to the client
+                        {t("orderDeliveredToClient")}
                       </p>
                     )}
                   </div>
@@ -1241,7 +1264,7 @@ const OrderDetails = () => {
                     }`}
                   >
                     <Clock size={16} />
-                    <span>Set to Waiting</span>
+                    <span>{t("setToWaiting")}</span>
                   </button>
                 )}
                 {order.status !== "inProgress" && (
@@ -1254,7 +1277,7 @@ const OrderDetails = () => {
                     }`}
                   >
                     <Hammer size={16} />
-                    <span>Set to In Progress</span>
+                    <span>{t("setToInProgress")}</span>
                   </button>
                 )}
                 {order.status !== "shipping" && (
@@ -1267,7 +1290,7 @@ const OrderDetails = () => {
                     }`}
                   >
                     <Truck size={16} />
-                    <span>Set to Shipping</span>
+                    <span>{t("setToShipping")}</span>
                   </button>
                 )}
                 <button
@@ -1279,7 +1302,7 @@ const OrderDetails = () => {
                   }`}
                 >
                   <CheckCircle size={16} />
-                  <span>Mark as Completed</span>
+                  <span>{t("markAsCompleted")}</span>
                 </button>
               </>
             )}
@@ -1295,7 +1318,7 @@ const OrderDetails = () => {
                 }`}
               >
                 <Receipt size={16} />
-                <span>View Invoice</span>
+                <span>{t("viewInvoice")}</span>
               </button>
             )}
           </div>
@@ -1313,10 +1336,13 @@ const OrderDetails = () => {
             className={`relative rounded-2xl w-full max-w-md p-6 ${
               darkMode ? "bg-gray-800" : "bg-white"
             }`}
+            dir={isRTL ? "rtl" : "ltr"}
           >
             <button
               onClick={() => setShowPaymentForm(false)}
-              className={`absolute top-4 right-4 p-1 rounded-full ${
+              className={`absolute top-4 ${
+                isRTL ? "left-4" : "right-4"
+              } p-1 rounded-full ${
                 darkMode
                   ? "hover:bg-gray-700 text-gray-300"
                   : "hover:bg-gray-100 text-gray-500"
@@ -1330,7 +1356,7 @@ const OrderDetails = () => {
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              Add Payment
+              {t("addPayment")}
             </h3>
 
             <div className="space-y-4">
@@ -1340,15 +1366,17 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Amount
+                  {t("amount")}
                 </label>
                 <div className="relative">
                   <span
-                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                    className={`absolute ${
+                      isRTL ? "right-3" : "left-3"
+                    } top-1/2 transform -translate-y-1/2 ${
                       darkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    $
+                    {` ${t("algerianDinar")}`}
                   </span>
                   <input
                     type="number"
@@ -1356,7 +1384,9 @@ const OrderDetails = () => {
                     onChange={(e) =>
                       setPaymentData({ ...paymentData, amount: e.target.value })
                     }
-                    className={`w-full pl-8 pr-4 py-2 rounded-lg border ${
+                    className={`w-full ${
+                      isRTL ? "pr-9 pl-5" : "pl-9 pr-5"
+                    } py-2 rounded-lg border ${
                       darkMode
                         ? "bg-gray-700 border-gray-600 text-white"
                         : "bg-white border-gray-300 text-gray-900"
@@ -1372,7 +1402,7 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Date
+                  {t("date")}
                 </label>
                 <input
                   type="date"
@@ -1394,7 +1424,7 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Payment Method
+                  {t("paymentMethod")}
                 </label>
                 <select
                   value={paymentData.method}
@@ -1407,11 +1437,11 @@ const OrderDetails = () => {
                       : "bg-white border-gray-300 text-gray-900"
                   }`}
                 >
-                  <option value="Credit Card">Credit Card</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Check">Check</option>
-                  <option value="Other">Other</option>
+                  <option value="Credit Card">{t("creditCard")}</option>
+                  <option value="Bank Transfer">{t("bankTransfer")}</option>
+                  <option value="Cash">{t("cash")}</option>
+                  <option value="Check">{t("check")}</option>
+                  <option value="Other">{t("other")}</option>
                 </select>
               </div>
 
@@ -1421,7 +1451,7 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Notes
+                  {t("notes")}
                 </label>
                 <textarea
                   value={paymentData.notes}
@@ -1434,7 +1464,7 @@ const OrderDetails = () => {
                       : "bg-white border-gray-300 text-gray-900"
                   }`}
                   rows={3}
-                  placeholder="Any additional notes..."
+                  placeholder={t("anyAdditionalNotes")}
                 ></textarea>
               </div>
 
@@ -1447,7 +1477,7 @@ const OrderDetails = () => {
                       : "bg-gray-200 hover:bg-gray-300 text-gray-900"
                   }`}
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={handleAddPayment}
@@ -1458,7 +1488,7 @@ const OrderDetails = () => {
                       : "bg-blue-600 hover:bg-blue-500 text-white"
                   }`}
                 >
-                  Add Payment
+                  {t("addPayment")}
                 </button>
               </div>
             </div>
@@ -1476,10 +1506,13 @@ const OrderDetails = () => {
             className={`relative rounded-2xl w-full max-w-md p-6 ${
               darkMode ? "bg-gray-800" : "bg-white"
             }`}
+            dir={isRTL ? "rtl" : "ltr"}
           >
             <button
               onClick={() => setShowCompletionForm(false)}
-              className={`absolute top-4 right-4 p-1 rounded-full ${
+              className={`absolute top-4 ${
+                isRTL ? "left-4" : "right-4"
+              } p-1 rounded-full ${
                 darkMode
                   ? "hover:bg-gray-700 text-gray-300"
                   : "hover:bg-gray-100 text-gray-500"
@@ -1493,7 +1526,7 @@ const OrderDetails = () => {
                 darkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              Complete Order
+              {t("completeOrder")}
             </h3>
 
             <div className="space-y-4">
@@ -1503,7 +1536,7 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Elements
+                  {t("elements")}
                 </label>
                 <div className="flex space-x-2">
                   <input
@@ -1521,7 +1554,7 @@ const OrderDetails = () => {
                         ? "bg-gray-700 border-gray-600 text-white"
                         : "bg-white border-gray-300 text-gray-900"
                     }`}
-                    placeholder="Add element (e.g., Cabinet doors)"
+                    placeholder={t("addElementPlaceholder")}
                   />
                   <button
                     onClick={handleAddElement}
@@ -1571,7 +1604,7 @@ const OrderDetails = () => {
                     darkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Completion Notes
+                  {t("completionNotes")}
                 </label>
                 <textarea
                   value={completionForm.notes}
@@ -1587,7 +1620,7 @@ const OrderDetails = () => {
                       : "bg-white border-gray-300 text-gray-900"
                   }`}
                   rows={3}
-                  placeholder="Any notes about the completion..."
+                  placeholder={t("completionNotesPlaceholder")}
                 ></textarea>
               </div>
 
@@ -1600,7 +1633,7 @@ const OrderDetails = () => {
                       : "bg-gray-200 hover:bg-gray-300 text-gray-900"
                   }`}
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   onClick={handleCompleteOrder}
@@ -1611,7 +1644,7 @@ const OrderDetails = () => {
                       : "bg-green-600 hover:bg-green-500 text-white"
                   }`}
                 >
-                  Complete Order
+                  {t("completeOrder")}
                 </button>
               </div>
             </div>
@@ -1632,11 +1665,14 @@ const OrderDetails = () => {
               darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
             }`}
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            dir={isRTL ? "rtl" : "ltr"}
           >
             {/* Close Button */}
             <button
               onClick={() => setShowInvoiceModal(false)}
-              className={`absolute top-4 right-4 p-1 rounded-full no-print ${
+              className={`absolute top-4 ${
+                isRTL ? "left-4" : "right-4"
+              } p-1 rounded-full no-print ${
                 darkMode
                   ? "hover:bg-gray-700 text-gray-300"
                   : "hover:bg-gray-100 text-gray-500"
@@ -1649,7 +1685,7 @@ const OrderDetails = () => {
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center">
                 {/* Company Logo - Replace with your actual logo */}
-                <div className="mr-4 w-16 h-16 flex items-center justify-center print-logo">
+                <div className="mx-4 w-16 h-16 flex items-center justify-center print-logo">
                   <img
                     src={WLogo}
                     alt="Company Logo"
@@ -1657,12 +1693,14 @@ const OrderDetails = () => {
                   />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Invoice</h2>
-                  <p className="text-sm opacity-80">Order #{order.id}</p>
+                  <h2 className="text-2xl font-bold">{t("invoice")}</h2>
+                  <p className="text-sm opacity-80">
+                    {t("order")} #{order.id}
+                  </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-medium">Furniture Craft</p>
+                <p className="font-medium">{t("furnitureCraft")}</p>
                 <p className="text-sm">123 Workshop St, Woodville</p>
                 <p className="text-sm">contact@furniturecraft.com</p>
               </div>
@@ -1672,7 +1710,7 @@ const OrderDetails = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Client Information */}
               <div>
-                <h3 className="font-bold mb-2">Bill To</h3>
+                <h3 className="font-bold mb-2">{t("billTo")}</h3>
                 <div
                   className={`p-4 rounded-lg ${
                     darkMode ? "bg-gray-700" : "bg-gray-100"
@@ -1687,24 +1725,24 @@ const OrderDetails = () => {
 
               {/* Order Information */}
               <div>
-                <h3 className="font-bold mb-2">Order Details</h3>
+                <h3 className="font-bold mb-2">{t("orderDetails")}</h3>
                 <div
                   className={`p-4 rounded-lg ${
                     darkMode ? "bg-gray-700" : "bg-gray-100"
                   }`}
                 >
                   <div className="grid grid-cols-2 gap-2">
-                    <p className="text-sm">Order ID:</p>
+                    <p className="text-sm">{t("orderID")}:</p>
                     <p className="text-sm font-medium">{order.id}</p>
-                    <p className="text-sm">Order Date:</p>
+                    <p className="text-sm">{t("orderDate")}:</p>
                     <p className="text-sm font-medium">{order.date}</p>
-                    <p className="text-sm">Completion Date:</p>
+                    <p className="text-sm">{t("completionDate")}:</p>
                     <p className="text-sm font-medium">
                       {new Date(
                         order.completionDetails?.completedAt || order.date
                       ).toLocaleDateString()}
                     </p>
-                    <p className="text-sm">Wood Type:</p>
+                    <p className="text-sm">{t("woodType")}:</p>
                     <p className="text-sm font-medium">{order.woodType}</p>
                   </div>
                 </div>
@@ -1713,17 +1751,19 @@ const OrderDetails = () => {
 
             {/* Elements Section */}
             <div className="mb-6">
-              <h3 className="font-bold mb-2">Elements</h3>
+              <h3 className="font-bold mb-2">{t("elements")}</h3>
               <div
-                className={`rounded-lg border ${
+                className={`rounded-lg border flex flex-wrap gap-2 p-3 ${
                   darkMode ? "border-gray-700" : "border-gray-200"
                 }`}
               >
                 {order.completionDetails?.elements.map((element, index) => (
                   <div
                     key={index}
-                    className={`p-3 border-b last:border-b-0 ${
-                      darkMode ? "bg-gray-700" : "bg-gray-50"
+                    className={`px-3 py-2 rounded border ${
+                      darkMode
+                        ? "bg-gray-700 border-gray-600"
+                        : "bg-gray-50 border-gray-200"
                     }`}
                   >
                     <p>{element}</p>
@@ -1734,7 +1774,7 @@ const OrderDetails = () => {
 
             {/* Payment Summary */}
             <div className="mb-6">
-              <h3 className="font-bold mb-2">Payment Summary</h3>
+              <h3 className="font-bold mb-2">{t("paymentSummary")}</h3>
               <div
                 className={`rounded-lg border ${
                   darkMode ? "border-gray-700" : "border-gray-200"
@@ -1746,9 +1786,11 @@ const OrderDetails = () => {
                     darkMode ? "bg-gray-700" : "bg-gray-50"
                   }`}
                 >
-                  <p className="text-sm font-medium">Description</p>
-                  <p className="text-sm font-medium text-right">Amount</p>
-                  <p className="text-sm font-medium text-right">Date</p>
+                  <p className="text-sm font-medium">{t("description")}</p>
+                  <p className="text-sm font-medium text-right">
+                    {t("amount")}
+                  </p>
+                  <p className="text-sm font-medium text-right">{t("date")}</p>
                 </div>
 
                 {/* Payment Rows */}
@@ -1760,10 +1802,11 @@ const OrderDetails = () => {
                     }`}
                   >
                     <p className="text-sm">
-                      Payment {index + 1} ({payment.method})
+                      {t("payment")} {index + 1} ({payment.method})
                     </p>
                     <p className="text-sm text-right font-medium">
-                      ${payment.amount.toLocaleString()}
+                      {payment.amount.toLocaleString() +
+                        ` ${t("algerianDinar")}`}
                     </p>
                     <p className="text-sm text-right opacity-80">
                       {payment.date}
@@ -1781,9 +1824,10 @@ const OrderDetails = () => {
                   className={`p-3 ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}
                 >
                   <div className="grid grid-cols-3 gap-4">
-                    <p className="text-sm font-medium">Total Paid</p>
+                    <p className="text-sm font-medium">{t("totalPaid")}</p>
                     <p className="text-right text-lg font-bold text-green-500">
-                      ${order.amountPaid?.toLocaleString()}
+                      {order.amountPaid?.toLocaleString() +
+                        ` ${t("algerianDinar")}`}
                     </p>
                     <p></p>
                   </div>
@@ -1802,14 +1846,14 @@ const OrderDetails = () => {
                       : "bg-gray-200 hover:bg-gray-300"
                   }`}
                 >
-                  Close
+                  {t("close")}
                 </button>
                 <button
                   onClick={handlePrintInvoice}
                   className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white no-print flex items-center space-x-2"
                 >
                   <FileText size={16} />
-                  <span>Print Invoice</span>
+                  <span>{t("printInvoice")}</span>
                 </button>
               </div>
             </div>

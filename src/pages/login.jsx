@@ -13,12 +13,16 @@ import {
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import picture from "../assets/images/homeMain.jpg";
+import apiFetch from "../utils/api/apiFetch";
+import { useNavigate } from "react-router-dom";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 
 const LoginPage = () => {
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(true);
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -36,7 +40,7 @@ const LoginPage = () => {
     setIsLanguageDropdownOpen(false);
   };
 
-   // Layout and direction effects
+  // Layout and direction effects
   useEffect(() => {
     const updateDirection = () => {
       document.documentElement.dir = i18next.dir();
@@ -54,9 +58,32 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    setIsLoading(true);
+
+    try {
+      const loginData = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      const result = await apiFetch("/api/v1/auth/login", loginData);
+
+      if (result.success) {
+        const { user, accessToken } = result.data.data;
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+        navigate("/profile");
+      } else {
+        console.error("Login failed:", result.error);
+        // Optionally show error message to user
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false); // Stop loading in any case
+    }
   };
 
   return (
@@ -285,9 +312,7 @@ const LoginPage = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  
-                </div>
+                <div className="flex items-center"></div>
                 <a
                   href="/forgot-password"
                   className={`text-sm font-medium ${
@@ -302,13 +327,40 @@ const LoginPage = () => {
 
               <button
                 type="submit"
-                className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
+                disabled={isLoading}
+                className={`cursor-pointer w-full py-3 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center ${
                   darkMode
                     ? "bg-yellow-500 hover:bg-yellow-400 text-white"
                     : "bg-yellow-500 hover:bg-yellow-400 text-white"
-                }`}
+                } ${isLoading ? "opacity-70" : ""}`}
               >
-                {t("logIn")}
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    {" "}{t("loggingIn")}{" "}
+                  </>
+                ) : (
+                  t("logIn")
+                )}
               </button>
             </form>
 

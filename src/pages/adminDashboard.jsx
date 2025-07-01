@@ -424,24 +424,13 @@ const AdminDashboard = () => {
               <Plus size={16} />
               <span className="text-sm sm:text-base">{t("createPost")}</span>
             </button>
-
-            <button
-              className={`flex items-center justify-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 whitespace-nowrap ${
-                darkMode
-                  ? "bg-gray-700 hover:bg-gray-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-900"
-              }`}
-            >
-              <Home size={16} />
-              <span className="text-sm sm:text-base">{t("viewSite")}</span>
-            </button>
           </div>
         </div>
         {/* Tabs */}
         <div className="flex border-b mb-6">
           <button
             onClick={() => setActiveTab("waiting")}
-            className={`px-6 py-3 font-medium text-sm transition-colors ${
+            className={`cursor-pointer px-6 py-3 font-medium text-sm transition-colors ${
               activeTab === "waiting"
                 ? darkMode
                   ? "text-yellow-400 border-b-2 border-yellow-400"
@@ -455,7 +444,7 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => setActiveTab("orders")}
-            className={`px-6 py-3 font-medium text-sm transition-colors ${
+            className={`cursor-pointer px-6 py-3 font-medium text-sm transition-colors ${
               activeTab === "orders"
                 ? darkMode
                   ? "text-yellow-400 border-b-2 border-yellow-400"
@@ -469,7 +458,7 @@ const AdminDashboard = () => {
           </button>
           <button
             onClick={() => setActiveTab("completed")}
-            className={`px-6 py-3 font-medium text-sm transition-colors ${
+            className={`cursor-pointer px-6 py-3 font-medium text-sm transition-colors ${
               activeTab === "completed"
                 ? darkMode
                   ? "text-yellow-400 border-b-2 border-yellow-400"
@@ -530,7 +519,7 @@ const AdminDashboard = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className={`pl-10 pr-4 py-2 rounded-lg border appearance-none ${
+                  className={`px-8 py-2 rounded-lg border appearance-none ${
                     darkMode
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300 text-gray-900"
@@ -542,7 +531,7 @@ const AdminDashboard = () => {
                   <option value="shipping">{t("shipping")}</option>
                 </select>
                 <ChevronDown
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none ${
+                  className={`absolute right-3 top-1/2  transform -translate-y-1/2 pointer-events-none ${
                     darkMode ? "text-gray-400" : "text-gray-500"
                   }`}
                   size={16}
@@ -679,7 +668,7 @@ const AdminDashboard = () => {
                           darkMode ? "text-green-400" : "text-green-600"
                         }`}
                       >
-                        ${order.amountPaid.toLocaleString()}
+                        {order.amountPaid.toLocaleString()+ ` ${t("algerianDinar")}`}
                       </p>
                     </div>
                     <div>

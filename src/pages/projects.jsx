@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import apiFetch from "../utils/api/apiFetch";
 
 const KitchenGallery = () => {
   const navigate = useNavigate();
@@ -143,6 +144,9 @@ const KitchenGallery = () => {
       featured: i % 3 === 0,
     }));
   };
+
+  useEffect(() => { }, [])
+
 
   // Load more kitchens for infinite scroll
   const loadMoreKitchens = useCallback(() => {

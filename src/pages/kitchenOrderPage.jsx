@@ -20,36 +20,12 @@ import {
   Image,
   Upload,
 } from "lucide-react";
+import processLocationData from "../utils/algeriaLocationData";
+import rawLocationData from "../assets/addresses.json";
 import { useTranslation } from "react-i18next";
 
 const KitchenOrderPage = () => {
-  const wilayas = [
-    { id: 1, name: "Adrar", name_ar: "أدرار" },
-    { id: 2, name: "Chlef", name_ar: "الشلف" },
-    { id: 3, name: "Laghouat", name_ar: "الأغواط" },
-    { id: 4, name: "Oum El Bouaghi", name_ar: "أم البواقي" },
-    { id: 5, name: "Batna", name_ar: "باتنة" },
-    { id: 6, name: "Bejaia", name_ar: "بجاية" },
-    { id: 7, name: "Biskra", name_ar: "بسكرة" },
-    { id: 8, name: "Bechar", name_ar: "بشار" },
-    { id: 9, name: "Blida", name_ar: "البليدة" },
-    { id: 10, name: "Bouira", name_ar: "البويرة" },
-  ];
-
-  const dairas = [
-    { id: 1, wilaya_id: 1, name: "Adrar", name_ar: "أدرار" },
-    { id: 2, wilaya_id: 1, name: "Aougrout", name_ar: "أوقروت" },
-    { id: 3, wilaya_id: 2, name: "Chlef", name_ar: "الشلف" },
-    { id: 4, wilaya_id: 2, name: "Tenes", name_ar: "تنس" },
-    { id: 5, wilaya_id: 3, name: "Laghouat", name_ar: "الأغواط" },
-    { id: 6, wilaya_id: 4, name: "Oum El Bouaghi", name_ar: "أم البواقي" },
-    { id: 7, wilaya_id: 5, name: "Batna", name_ar: "باتنة" },
-    { id: 8, wilaya_id: 6, name: "Bejaia", name_ar: "بجاية" },
-    { id: 9, wilaya_id: 7, name: "Biskra", name_ar: "بسكرة" },
-    { id: 10, wilaya_id: 8, name: "Bechar", name_ar: "بشار" },
-    { id: 11, wilaya_id: 9, name: "Blida", name_ar: "البليدة" },
-    { id: 12, wilaya_id: 10, name: "Bouira", name_ar: "البويرة" },
-  ];
+  const { wilayas, dairas, communes } = processLocationData(rawLocationData);
 
   const baladias = [
     { id: 1, daira_id: 1, name: "Adrar Center", name_ar: "أدرار المركز" },
@@ -58,7 +34,12 @@ const KitchenOrderPage = () => {
     { id: 4, daira_id: 3, name: "Chlef Center", name_ar: "الشلف المركز" },
     { id: 5, daira_id: 4, name: "Tenes Center", name_ar: "تنس المركز" },
     { id: 6, daira_id: 5, name: "Laghouat Center", name_ar: "الأغواط المركز" },
-    { id: 7, daira_id: 6, name: "Oum El Bouaghi Center", name_ar: "أم البواقي المركز" },
+    {
+      id: 7,
+      daira_id: 6,
+      name: "Oum El Bouaghi Center",
+      name_ar: "أم البواقي المركز",
+    },
     { id: 8, daira_id: 7, name: "Batna Center", name_ar: "باتنة المركز" },
     { id: 9, daira_id: 8, name: "Bejaia Center", name_ar: "بجاية المركز" },
     { id: 10, daira_id: 9, name: "Biskra Center", name_ar: "بسكرة المركز" },
@@ -111,18 +92,19 @@ const KitchenOrderPage = () => {
           (d) =>
             d.wilaya_id ===
               wilayas.find((w) => w.name === orderData.wilaya)?.id &&
-            d.name.toLowerCase().includes(dairaSearch.toLowerCase())
+            (d.name.toLowerCase().includes(dairaSearch.toLowerCase()) ||
+              d.name_ar.includes(dairaSearch))
         )
         .sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
-  const filteredBaladias = orderData.daira
-    ? baladias
+  const filteredCommunes = orderData.daira
+    ? communes
         .filter(
           (b) =>
-            b.daira_id ===
-              dairas.find((d) => d.name === orderData.daira)?.id &&
-            b.name.toLowerCase().includes(baladiaSearch.toLowerCase())
+            b.daira_id === dairas.find((d) => d.name === orderData.daira)?.id &&
+            (b.name.toLowerCase().includes(baladiaSearch.toLowerCase()) ||
+              b.name_ar.includes(baladiaSearch))
         )
         .sort((a, b) => a.name.localeCompare(b.name))
     : [];
@@ -139,9 +121,9 @@ const KitchenOrderPage = () => {
     setShowDairaSuggestions(false);
   };
 
-  const selectBaladia = (baladia) => {
-    setOrderData((prev) => ({ ...prev, baladia }));
-    setBaladiaSearch(baladia);
+  const selectBaladia = (commune) => {
+    setOrderData((prev) => ({ ...prev, baladia: commune }));
+    setBaladiaSearch(commune);
     setShowBaladiaSuggestions(false);
   };
 
@@ -550,15 +532,24 @@ const KitchenOrderPage = () => {
                         darkMode
                           ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-amber-500 focus:bg-gray-700"
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:bg-white"
-                      } ${errors.wilaya ? "border-red-500" : ""}`}
+                      } ${errors.wilaya ? "border-red-500" : ""} ${
+                        i18next.dir() === "rtl" ? "pr-2" : "pl-2"
+                      }`}
                     />
                     {orderData.wilaya && (
                       <button
                         onClick={() => {
-                          setOrderData({ ...orderData, wilaya: "", daira: "", baladia: "" });
+                          setOrderData({
+                            ...orderData,
+                            wilaya: "",
+                            daira: "",
+                            baladia: "",
+                          });
                           setWilayaSearch("");
                         }}
-                        className={`absolute right-3 top-3 ${
+                        className={`absolute top-3 ${
+                          i18next.dir() === "rtl" ? "left-3" : "right-3"
+                        } ${
                           darkMode
                             ? "text-gray-400 hover:text-gray-300"
                             : "text-gray-500 hover:text-gray-700"
@@ -587,7 +578,9 @@ const KitchenOrderPage = () => {
                             }`}
                             onClick={() => selectWilaya(wilaya.name)}
                           >
-                            {language === "en" ? wilaya.name : wilaya.name_ar}
+                            {i18next.language === "en"
+                              ? wilaya.name
+                              : wilaya.name_ar}
                           </div>
                         ))
                       ) : (
@@ -635,15 +628,23 @@ const KitchenOrderPage = () => {
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:bg-white"
                       } ${
                         !orderData.wilaya ? "opacity-50 cursor-not-allowed" : ""
-                      } ${errors.daira ? "border-red-500" : ""}`}
+                      } ${errors.daira ? "border-red-500" : ""} ${
+                        i18next.dir() === "rtl" ? "pr-2" : "pl-2"
+                      }`}
                     />
                     {orderData.daira && (
                       <button
                         onClick={() => {
-                          setOrderData({ ...orderData, daira: "", baladia: "" });
+                          setOrderData({
+                            ...orderData,
+                            daira: "",
+                            baladia: "",
+                          });
                           setDairaSearch("");
                         }}
-                        className={`absolute right-3 top-3 ${
+                        className={`absolute top-3 ${
+                          i18next.dir() === "rtl" ? "left-3" : "right-3"
+                        } ${
                           darkMode
                             ? "text-gray-400 hover:text-gray-300"
                             : "text-gray-500 hover:text-gray-700"
@@ -672,7 +673,9 @@ const KitchenOrderPage = () => {
                             }`}
                             onClick={() => selectDaira(daira.name)}
                           >
-                            {language === "en" ? daira.name : daira.name_ar}
+                            {i18next.language === "en"
+                              ? daira.name
+                              : daira.name_ar}
                           </div>
                         ))
                       ) : (
@@ -720,7 +723,9 @@ const KitchenOrderPage = () => {
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:bg-white"
                       } ${
                         !orderData.daira ? "opacity-50 cursor-not-allowed" : ""
-                      } ${errors.baladia ? "border-red-500" : ""}`}
+                      } ${errors.baladia ? "border-red-500" : ""} ${
+                        i18next.dir() === "rtl" ? "pr-2" : "pl-2"
+                      }`} 
                     />
                     {orderData.baladia && (
                       <button
@@ -728,7 +733,9 @@ const KitchenOrderPage = () => {
                           setOrderData({ ...orderData, baladia: "" });
                           setBaladiaSearch("");
                         }}
-                        className={`absolute right-3 top-3 ${
+                        className={`absolute top-3 ${
+                          i18next.dir() === "rtl" ? "left-3" : "right-3"
+                        } ${
                           darkMode
                             ? "text-gray-400 hover:text-gray-300"
                             : "text-gray-500 hover:text-gray-700"
@@ -746,18 +753,20 @@ const KitchenOrderPage = () => {
                           : "bg-white border-gray-200"
                       }`}
                     >
-                      {filteredBaladias.length > 0 ? (
-                        filteredBaladias.map((baladia) => (
+                      {filteredCommunes.length > 0 ? (
+                        filteredCommunes.map((commune) => (
                           <div
-                            key={baladia.id}
+                            key={commune.id}
                             className={`px-4 py-3 cursor-pointer transition-colors ${
                               darkMode
                                 ? "hover:bg-gray-700 text-white"
                                 : "hover:bg-gray-50 text-gray-900"
                             }`}
-                            onClick={() => selectBaladia(baladia.name)}
+                            onClick={() => selectBaladia(commune.name)}
                           >
-                            {language === "en" ? baladia.name : baladia.name_ar}
+                            {i18next.language === "en"
+                              ? commune.name
+                              : commune.name_ar}
                           </div>
                         ))
                       ) : (
@@ -772,7 +781,9 @@ const KitchenOrderPage = () => {
                     </div>
                   )}
                   {errors.baladia && (
-                    <p className="text-red-500 text-sm mt-1">{errors.baladia}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.baladia}
+                    </p>
                   )}
                 </div>
 
@@ -915,18 +926,11 @@ const KitchenOrderPage = () => {
                           darkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                       />
-                      <p
-                        className={`text-sm ${
-                          darkMode ? "text-gray-300" : "text-gray-600"
-                        }`}
-                      >
-                        {t("dragDropFiles")}
-                      </p>
                       <label
                         className={`px-4 py-2 rounded-lg font-medium cursor-pointer transition-colors ${
                           darkMode
-                            ? "bg-amber-500 text-gray-900 hover:bg-amber-400"
-                            : "bg-blue-500 text-white hover:bg-blue-400"
+                            ? "bg-yellow-500 text-gray-900 hover:bg-yellow-400"
+                            : "bg-yellow-500 text-white hover:bg-yellow-400"
                         }`}
                       >
                         {t("selectFiles")}
@@ -988,8 +992,8 @@ const KitchenOrderPage = () => {
                 onClick={handleSubmitOrder}
                 className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 focus:scale-105 ${
                   darkMode
-                    ? "bg-gradient-to-r from-amber-500 to-orange-500 text-gray-900 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25"
-                    : "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-500 hover:to-purple-500 shadow-lg hover:shadow-blue-500/25"
+                    ? "bg-gradient-to-r bg-yellow-500 text-gray-900 hover:from-yellow-400  shadow-lg hover:shadow-amber-500/25"
+                    : "bg-gradient-to-r bg-yellow-500  text-white hover:from-yellow-400 shadow-lg hover:shadow-blue-500/25"
                 }`}
               >
                 {t("submitOrder")}

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import {
+  Receipt,
+  FileText,
+  Plus,
   User,
   Mail,
   Edit,
@@ -23,17 +26,20 @@ import {
 } from "lucide-react";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [language, setLanguage] = useState("en");
+  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [tempName, setTempName] = useState("John Doe");
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [userData, setUserData] = useState({
     name: "John Doe",
     email: "john.doe@example.com",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   });
 
   const [currentOrders, setCurrentOrders] = useState([
@@ -43,14 +49,27 @@ const ProfilePage = () => {
       status: "inProgress",
       title: "Modern Oak Kitchen",
       image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
-      progress: 1, // 0: waiting, 1: production, 2: shipping, 3: completed
+      progress: 1,
       estimatedTotal: 12500,
       amountPaid: 5000,
       paymentMethod: "Credit Card",
+      payments: [
+        {
+          amount: 3000,
+          date: "2023-05-20",
+          method: "Credit Card",
+          notes: "Initial deposit",
+        },
+        {
+          amount: 2000,
+          date: "2023-06-15",
+          method: "Credit Card",
+          notes: "Final payment",
+        },
+      ],
       nextPaymentDate: "2023-06-15",
     },
   ]);
-
   const [completedOrders, setCompletedOrders] = useState([
     {
       id: "ORD-4567",
@@ -59,7 +78,40 @@ const ProfilePage = () => {
       title: "Classic Walnut Kitchen",
       image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
       totalPaid: 9800,
+      amountPaid: 9800, // Add this
       paymentMethod: "Bank Transfer",
+      payments: [
+        // Add payments array
+        {
+          amount: 5000,
+          date: "2023-03-15",
+          method: "Bank Transfer",
+          notes: "Initial deposit",
+        },
+        {
+          amount: 4800,
+          date: "2023-03-25",
+          method: "Bank Transfer",
+          notes: "Final payment",
+        },
+        {
+          amount: 5000,
+          date: "2023-03-15",
+          method: "Bank Transfer",
+          notes: "Initial deposit",
+        },
+        {
+          amount: 4800,
+          date: "2023-03-25",
+          method: "Bank Transfer",
+          notes: "Final payment",
+        },{
+          amount: 5000,
+          date: "2023-03-15",
+          method: "Bank Transfer",
+          notes: "Initial deposit",
+        },
+      ],
     },
     {
       id: "ORD-1234",
@@ -136,6 +188,31 @@ const ProfilePage = () => {
     return steps;
   };
 
+  const getInitialsAvatar = (name) => {
+    const initials = name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+    const colors = [
+      "bg-red-500",
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-yellow-500",
+      "bg-pink-500",
+    ];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+    return (
+      <div
+        className={`w-24 h-24 rounded-full ${randomColor} flex items-center justify-center text-white text-3xl font-bold`}
+      >
+        {initials}
+      </div>
+    );
+  };
+
   return (
     <div
       className={`min-h-screen transition-all duration-300 ${
@@ -165,7 +242,7 @@ const ProfilePage = () => {
             <div className="relative" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={toggleLanguageDropdown}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
+                className={`cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
                   darkMode
                     ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
                     : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
@@ -219,13 +296,24 @@ const ProfilePage = () => {
 
             <button
               onClick={toggleDarkMode}
-              className={`p-2 rounded-xl transition-all duration-200 ${
+              className={`cursor-pointer p-2 rounded-xl transition-all duration-200 ${
                 darkMode
                   ? "bg-gray-800 hover:bg-gray-700 text-amber-400 border border-gray-700"
                   : "bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 shadow-sm"
               }`}
             >
               {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button
+              onClick={() => navigate("/")} // You'll need to handle the navigation logic
+              className={`cursor-pointer flex gap-1 items-center px-5 py-2 rounded-xl transition-all duration-200 ${
+                darkMode
+                  ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                  : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+              }`}
+            >
+              <Home size={20} />
+              {t("home")}
             </button>
           </div>
         </div>
@@ -265,7 +353,7 @@ const ProfilePage = () => {
               {!isEditing ? (
                 <button
                   onClick={handleEdit}
-                  className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm ${
+                  className={`cursor-pointer flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm ${
                     darkMode
                       ? "bg-gray-700 hover:bg-gray-600 text-amber-400"
                       : "bg-gray-100 hover:bg-gray-200 text-blue-600"
@@ -281,21 +369,13 @@ const ProfilePage = () => {
               {/* Avatar */}
               <div className="relative group">
                 <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-amber-500">
-                  <img
-                    src={userData.avatar}
-                    alt="User Avatar"
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-600">
+                    <User
+                      size={40}
+                      className="text-gray-500 dark:text-gray-400"
+                    />
+                  </div>
                 </div>
-                {isEditing && (
-                  <button
-                    className={`absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      darkMode ? "bg-gray-700" : "bg-white"
-                    } border-2 border-amber-500`}
-                  >
-                    <Edit size={16} className="text-amber-500" />
-                  </button>
-                )}
               </div>
 
               {/* User Info */}
@@ -562,8 +642,136 @@ const ProfilePage = () => {
                           </div>
                         </div>
 
-                        {/* Rest of your order details (payment info, etc.) */}
-                        {/* ... */}
+                        {/* Payment Information */}
+                        <div className="mt-6">
+                          <h4
+                            className={`flex items-center text-sm font-medium mb-3 ${
+                              darkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
+                          >
+                            <DollarSign className="mr-1" size={16} />
+                            {t("paymentInformation")}
+                          </h4>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                              <p
+                                className={`text-sm ${
+                                  darkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                {t("estimatedTotal")}
+                              </p>
+                              <p
+                                className={`font-medium ${
+                                  darkMode ? "text-white" : "text-gray-900"
+                                }`}
+                              >
+                                {order.estimatedTotal?.toLocaleString() +
+                                  ` ${t("algerianDinar")}` || "N/A"}
+                              </p>
+                            </div>
+                            <div>
+                              <p
+                                className={`text-sm ${
+                                  darkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                {t("amountPaid")}
+                              </p>
+                              <p
+                                className={`font-medium ${
+                                  darkMode ? "text-green-400" : "text-green-600"
+                                }`}
+                              >
+                                {order.amountPaid?.toLocaleString() +
+                                  ` ${t("algerianDinar")}` || "0"}
+                              </p>
+                            </div>
+                            <div>
+                              <p
+                                className={`text-sm ${
+                                  darkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                {t("remainingBalance")}
+                              </p>
+                              <p
+                                className={`font-medium ${
+                                  darkMode ? "text-amber-400" : "text-amber-600"
+                                }`}
+                              >
+                                {(
+                                  (order.estimatedTotal || 0) -
+                                  (order.amountPaid || 0)
+                                ).toLocaleString() + ` ${t("algerianDinar")}`}
+                              </p>
+                            </div>
+                          </div>
+
+                          {order.payments?.length > 0 && (
+                            <div>
+                              <h4
+                                className={`text-sm font-medium mb-2 ${
+                                  darkMode ? "text-gray-300" : "text-gray-700"
+                                }`}
+                              >
+                                {t("paymentHistory")}
+                              </h4>
+                              <div
+                                className={`rounded-lg overflow-hidden border ${
+                                  darkMode
+                                    ? "border-gray-600"
+                                    : "border-gray-200"
+                                }`}
+                              >
+                                {order.payments.map((payment, index) => (
+                                  <div
+                                    key={index}
+                                    className={`p-3 border-b last:border-b-0 ${
+                                      darkMode
+                                        ? "border-gray-600 bg-gray-800/50"
+                                        : "border-gray-200 bg-gray-50"
+                                    }`}
+                                  >
+                                    <div className="flex justify-between items-center">
+                                      <div>
+                                        <p
+                                          className={`font-medium ${
+                                            darkMode
+                                              ? "text-white"
+                                              : "text-gray-900"
+                                          }`}
+                                        >
+                                          {payment.amount.toLocaleString() +
+                                            ` ${t("algerianDinar")}`}
+                                        </p>
+                                        <p
+                                          className={`text-xs ${
+                                            darkMode
+                                              ? "text-gray-400"
+                                              : "text-gray-500"
+                                          }`}
+                                        >
+                                          {payment.date} • {payment.method}
+                                        </p>
+                                      </div>
+                                      <p
+                                        className={`text-xs ${
+                                          darkMode
+                                            ? "text-gray-400"
+                                            : "text-gray-500"
+                                        }`}
+                                      >
+                                        {payment.notes}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -581,116 +789,380 @@ const ProfilePage = () => {
           </div>
 
           {/* Completed Orders */}
-          <div
-            className={`rounded-2xl p-6 border transition-all duration-300 ${
-              darkMode
-                ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm"
-                : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
-            }`}
-          >
-            <h2
-              className={`text-xl font-semibold mb-6 flex items-center ${
-                darkMode ? "text-white" : "text-gray-900"
+          {completedOrders.map((order) => (
+            <div
+              key={order.id}
+              className={`p-4 rounded-xl border transition-all duration-200 ${
+                darkMode
+                  ? "bg-gray-700/50 border-gray-600 hover:bg-gray-700"
+                  : "bg-gray-50 border-gray-200 hover:bg-gray-100"
               }`}
             >
-              <CheckCircle className="mr-2" size={20} />
-              {t("completedOrders")}
-            </h2>
-
-            {completedOrders.length > 0 ? (
-              <div className="space-y-4">
-                {completedOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className={`p-4 rounded-xl border transition-all duration-200 ${
-                      darkMode
-                        ? "bg-gray-700/50 border-gray-600 hover:bg-gray-700"
-                        : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+              <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
+                <div className="flex-1">
+                  <h3
+                    className={`font-semibold ${
+                      darkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
-                      <div className="flex-1">
-                        <h3
-                          className={`font-semibold ${
-                            darkMode ? "text-white" : "text-gray-900"
+                    {order.title}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
+                    <div>
+                      <span
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("status")}
+                      </span>
+                      <div className="flex items-center">
+                        <CheckCircle
+                          size={16}
+                          className={`mr-1 ${
+                            darkMode ? "text-green-400" : "text-green-600"
+                          }`}
+                        />
+                        <span
+                          className={`font-medium ${
+                            darkMode ? "text-green-400" : "text-green-600"
                           }`}
                         >
-                          {order.title}
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-                          <div>
-                            <span
-                              className={`text-sm ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              {t("status")}
-                            </span>
-                            <div className="flex items-center">
-                              <CheckCircle
-                                size={16}
-                                className={`mr-1 ${
-                                  darkMode ? "text-green-400" : "text-green-600"
-                                }`}
-                              />
-                              <span
-                                className={`font-medium ${
-                                  darkMode ? "text-green-400" : "text-green-600"
-                                }`}
-                              >
-                                {t("delivered")}
-                              </span>
-                            </div>
-                          </div>
-                          <div>
-                            <span
-                              className={`text-sm ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              {t("date")}
-                            </span>
-                            <p
-                              className={`font-medium ${
-                                darkMode ? "text-white" : "text-gray-900"
-                              }`}
-                            >
-                              {order.date}
-                            </p>
-                          </div>
-                          <div>
-                            <span
-                              className={`text-sm ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              {t("amountPaid")}
-                            </span>
-                            <p
-                              className={`font-medium ${
-                                darkMode ? "text-green-400" : "text-green-600"
-                              }`}
-                            >
-                              ${order.totalPaid.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
+                          {t("delivered")}
+                        </span>
                       </div>
                     </div>
+                    <div>
+                      <span
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("date")}
+                      </span>
+                      <p
+                        className={`font-medium ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.date}
+                      </p>
+                    </div>
+                    <div>
+                      <span
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("amountPaid")}
+                      </span>
+                      <p
+                        className={`font-medium ${
+                          darkMode ? "text-green-400" : "text-green-600"
+                        }`}
+                      >
+                        {order.totalPaid.toLocaleString() +
+                          ` ${t("algerianDinar")}`}
+                      </p>
+                    </div>
                   </div>
-                ))}
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setShowInvoiceModal(true);
+                  }}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm ${
+                    darkMode
+                      ? "bg-gray-600 hover:bg-gray-500 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                  }`}
+                >
+                  <Receipt size={16} />
+                  <span>{t("viewInvoice")}</span>
+                </button>
               </div>
-            ) : (
-              <p
-                className={`text-center py-8 ${
-                  darkMode ? "text-gray-400" : "text-gray-500"
+            </div>
+          ))}
+        </div>
+        {/* Invoice Modal */}
+        {showInvoiceModal && selectedOrder && (
+          <div
+            className={`fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto backdrop-blur-sm ${
+              darkMode ? "bg-black/50" : "bg-black/30"
+            }`}
+          >
+            {/* Main Invoice Container */}
+            <div
+              id="invoice-print-container"
+              className={`relative rounded-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto ${
+                darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+              }`}
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowInvoiceModal(false)}
+                className={`absolute top-4 right-4 p-1 rounded-full no-print ${
+                  darkMode
+                    ? "hover:bg-gray-700 text-gray-300"
+                    : "hover:bg-gray-100 text-gray-500"
                 }`}
               >
-                {t("noCompletedOrders")}
-              </p>
-            )}
+                <X size={20} />
+              </button>
+
+              {/* Invoice Header */}
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center">
+                  <img
+                    src={darkMode ? WLogo : Blogo}
+                    alt="Company Logo"
+                    className="w-16 h-auto mr-4" // Changed h-16 to h-auto to maintain aspect ratio
+                  />
+                  <div>
+                    <h2 className="text-2xl font-bold">{t("invoice")}</h2>
+                    <p className="text-sm opacity-80">
+                      {t("order")} #{selectedOrder.id}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">{t("furnitureCraft")}</p>
+                  <p className="text-sm">123 Workshop St, Woodville</p>
+                  <p className="text-sm">contact@furniturecraft.com</p>
+                </div>
+              </div>
+
+              {/* Client and Order Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Client Information */}
+                <div>
+                  <h3 className="font-bold mb-2">{t("billTo")}</h3>
+                  <div
+                    className={`p-4 rounded-lg ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
+                  >
+                    <p className="font-medium">{userData.name}</p>
+                    <p className="text-sm">{userData.email}</p>
+                  </div>
+                </div>
+
+                {/* Order Information */}
+                <div>
+                  <h3 className="font-bold mb-2">{t("orderDetails")}</h3>
+                  <div
+                    className={`p-4 rounded-lg ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
+                  >
+                    <div className="grid grid-cols-2 gap-2">
+                      <p className="text-sm">{t("orderID")}:</p>
+                      <p className="text-sm font-medium">{selectedOrder.id}</p>
+                      <p className="text-sm">{t("orderDate")}:</p>
+                      <p className="text-sm font-medium">
+                        {selectedOrder.date}
+                      </p>
+                      {selectedOrder.status === "delivered" && (
+                        <>
+                          <p className="text-sm">{t("completionDate")}:</p>
+                          <p className="text-sm font-medium">
+                            {new Date(
+                              selectedOrder.completionDetails?.completedAt ||
+                                selectedOrder.date
+                            ).toLocaleDateString()}
+                          </p>
+                        </>
+                      )}
+                      <p className="text-sm">{t("woodType")}:</p>
+                      <p className="text-sm font-medium">
+                        {selectedOrder.woodType}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Elements Section */}
+              {selectedOrder.completionDetails?.elements && (
+                <div className="mb-6">
+                  <h3 className="font-bold mb-2">{t("elements")}</h3>
+                  <div
+                    className={`rounded-lg border flex flex-wrap gap-2 p-3 ${
+                      darkMode ? "border-gray-700" : "border-gray-200"
+                    }`}
+                  >
+                    {selectedOrder.completionDetails.elements.map(
+                      (element, index) => (
+                        <div
+                          key={index}
+                          className={`px-3 py-2 rounded border ${
+                            darkMode
+                              ? "bg-gray-700 border-gray-600"
+                              : "bg-gray-50 border-gray-200"
+                          }`}
+                        >
+                          <p>{element}</p>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Summary */}
+              <div className="mb-6">
+                <h3 className="font-bold mb-2">{t("paymentSummary")}</h3>
+                <div
+                  className={`rounded-lg border ${
+                    darkMode ? "border-gray-700" : "border-gray-200"
+                  }`}
+                >
+                  {/* Header Row */}
+                  <div
+                    className={`p-3 border-b grid grid-cols-3 gap-4 ${
+                      darkMode ? "bg-gray-700" : "bg-gray-50"
+                    }`}
+                  >
+                    <p className="text-sm font-medium">{t("description")}</p>
+                    <p className="text-sm font-medium text-right">
+                      {t("amount")}
+                    </p>
+                    <p className="text-sm font-medium text-right">
+                      {t("date")}
+                    </p>
+                  </div>
+
+                  {/* Payment Rows */}
+                  {selectedOrder.payments?.map((payment, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 border-b last:border-b-0 grid grid-cols-3 gap-4 ${
+                        darkMode ? "bg-gray-800" : "bg-white"
+                      }`}
+                    >
+                      <p className="text-sm">
+                        {t("payment")} {index + 1} ({payment.method})
+                      </p>
+                      <p className="text-sm text-right font-medium">
+                        {payment.amount.toLocaleString() +
+                          ` ${t("algerianDinar")}`}
+                      </p>
+                      <p className="text-sm text-right opacity-80">
+                        {payment.date}
+                      </p>
+                      {payment.notes && (
+                        <p className="text-xs mt-1 opacity-70 col-span-3">
+                          {payment.notes}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Total Row */}
+                  <div
+                    className={`p-3 ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
+                  >
+                    <div className="grid grid-cols-3 gap-4">
+                      <p className="text-sm font-medium">{t("totalPaid")}</p>
+                      <p className="text-right text-lg font-bold text-green-500">
+                        {(
+                          selectedOrder.totalPaid ||
+                          selectedOrder.amountPaid ||
+                          0
+                        ).toLocaleString() + ` ${t("algerianDinar")}`}
+                      </p>
+                      <p></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-4">
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowInvoiceModal(false)}
+                    className={`px-4 py-2 rounded-lg no-print ${
+                      darkMode
+                        ? "bg-gray-700 hover:bg-gray-600"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                  >
+                    {t("close")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const printStyles = `
+                @media print {
+                  body * {
+                    visibility: hidden;
+                  }
+                  #invoice-print-container, #invoice-print-container * {
+                    visibility: visible;
+                  }
+                  #invoice-print-container {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    max-width: 100%;
+                    padding: 20px;
+                    background: white !important;
+                    color: black !important;
+                    border-radius: 0 !important;
+                    overflow: visible !important;
+                    max-height: none !important;
+                  }
+                  .no-print {
+                    display: none !important;
+                  }
+                  .dark\\:bg-gray-800,
+                  .dark\\:bg-gray-700 {
+                    background: white !important;
+                  }
+                  .dark\\:text-white {
+                    color: black !important;
+                  }
+                  .bg-gray-100,
+                  .bg-gray-50 {
+                    background: #f8f9fa !important;
+                  }
+                  .border-gray-700,
+                  .border-gray-200 {
+                    border-color: #dee2e6 !important;
+                  }
+                  .rounded-lg,
+                  .rounded-2xl {
+                    border-radius: 8px !important;
+                  }
+                  .text-green-500 {
+                    color: #28a745 !important;
+                  }
+                }
+              `;
+
+                      const styleElement = document.createElement("style");
+                      styleElement.innerHTML = printStyles;
+                      document.head.appendChild(styleElement);
+                      window.print();
+                      setTimeout(() => {
+                        document.head.removeChild(styleElement);
+                      }, 1000);
+                    }}
+                    className="px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white no-print flex items-center space-x-2"
+                  >
+                    <FileText size={16} />
+                    <span>{t("printInvoice")}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
