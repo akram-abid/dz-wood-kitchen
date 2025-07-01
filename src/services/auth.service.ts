@@ -9,9 +9,14 @@ import { SignupData, LoginData, OAuthProfile } from "../dtos/auth.dtos";
 const config = loadConfig();
 
 export class AuthService {
-  private generateTokens(userId: string, email: string, role: string) {
+  private generateTokens(
+    userId: string,
+    email: string,
+    role: string,
+    name: string,
+  ) {
     const accessToken = jwt.sign(
-      { userId, type: "access", email, role },
+      { userId, type: "access", email, role, name },
       config.JWT_SECRET,
       { expiresIn: "4d" },
     );
@@ -60,7 +65,12 @@ export class AuthService {
       const user = newUser[0];
 
       // Generate tokens
-      const tokens = this.generateTokens(user.id, user.email, user.role);
+      const tokens = this.generateTokens(
+        user.id,
+        user.email,
+        user.role,
+        user.fullName,
+      );
 
       logger.info("User registered successfully", {
         userId: user.id,
@@ -101,7 +111,12 @@ export class AuthService {
       }
 
       // Generate tokens
-      const tokens = this.generateTokens(user.id, user.email, user.role);
+      const tokens = this.generateTokens(
+        user.id,
+        user.email,
+        user.role,
+        user.fullName,
+      );
 
       logger.info("User logged in successfully", {
         userId: user.id,
@@ -171,7 +186,12 @@ export class AuthService {
       }
 
       // Generate tokens
-      const tokens = this.generateTokens(user.id, user.email, user.role);
+      const tokens = this.generateTokens(
+        user.id,
+        user.email,
+        user.role,
+        user.fullName,
+      );
 
       logger.info("OAuth login successful", {
         userId: user.id,

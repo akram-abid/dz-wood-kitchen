@@ -11,7 +11,8 @@ interface PostInput {
   woodType: string;
   adminId: string;
   mediaFilenames: string[];
-  items: string[];
+  items?: string[];
+  location?: string;
 }
 
 type UpdatePostInput = Partial<Omit<PostInput, "adminId">>;
@@ -27,7 +28,7 @@ export class ServicePostService {
         (filename) => `/pictures/services/${filename}`,
       );
 
-      const items = data.items.map((item) => item.trim());
+      const items = data.items?.map((item) => item.trim());
 
       console.log("💬 insert debug", {
         title: data.title,
@@ -43,7 +44,7 @@ export class ServicePostService {
         imageUrls: data.mediaFilenames.map(
           (filename) => `/pictures/services/${filename}`,
         ),
-        items: data.items.map((item) => item.trim()),
+        items: data.items?.map((item) => item.trim()),
       });
 
       const newPost = await db
@@ -54,7 +55,8 @@ export class ServicePostService {
           woodType: data.woodType,
           createdBy: data.adminId,
           imageUrls,
-          items,
+          items: items ?? [],
+          location: data.location ?? "",
           createdAt: new Date(),
           updatedAt: new Date(),
         })

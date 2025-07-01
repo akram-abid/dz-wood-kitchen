@@ -3,8 +3,9 @@ import { z } from "zod";
 export const addPostSchema = z.object({
   title: z.string(),
   description: z.string(),
-  items: z.array(z.string()).max(20),
+  items: z.array(z.string()).max(20).optional(),
   woodType: z.string(),
+  location: z.string().optional(),
   adminId: z.string().uuid(),
   mediaFilenames: z.array(z.string()).max(15),
 });

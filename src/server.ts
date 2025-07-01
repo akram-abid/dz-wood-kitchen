@@ -114,6 +114,9 @@ const buildServer = async (): Promise<FastifyInstance> => {
         ? config.CORS_ORIGIN
         : config.CORS_ORIGIN.split(",");
 
+      server.log.info(allowedOrigins);
+      server.log.info("the comming origin : ", origin);
+
       // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) return callback(null, true);
 
