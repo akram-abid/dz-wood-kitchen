@@ -112,7 +112,7 @@ export async function orderRoutes(server: FastifyInstance) {
 
   // Update order offer
   server.patch("/:id/offer", {
-    preHandler: [authenticate],
+    preHandler: [authenticate, authorize(["admin"])],
     handler: updateOfferHandler,
   });
 

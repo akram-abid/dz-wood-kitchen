@@ -259,9 +259,12 @@ export async function updateOfferHandler(
   const { id } = request.params;
   const { offer } = request.body;
 
+  request.log.info(offer);
+
   await db.update(orders).set({ offer }).where(eq(orders.id, id));
 
-  return reply.status(200);
+  reply.status(200);
+  return "offer updated";
 }
 
 /**
