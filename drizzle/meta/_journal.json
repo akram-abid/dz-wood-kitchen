@@ -92,6 +92,13 @@
       "when": 1751399061874,
       "tag": "0012_chief_daredevil",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1751455445572,
+      "tag": "0013_chubby_nick_fury",
+      "breakpoints": true
     }
   ]
 }

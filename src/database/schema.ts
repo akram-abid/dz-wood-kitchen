@@ -13,6 +13,12 @@ import { relations } from "drizzle-orm";
 import { pgEnum } from "drizzle-orm/pg-core";
 
 export const userRoleEnum = pgEnum("role", ["admin", "user"]);
+export const orderStatusEnum = pgEnum("status", [
+  "waiting",
+  "inProgress",
+  "inShipping",
+  "delivered",
+]);
 
 // Users table
 export const users = pgTable("users", {
@@ -86,7 +92,9 @@ export const orders = pgTable("orders", {
   email: text("email").notNull(),
   fullName: text("fullName").notNull(),
   woodType: text("wood_type"),
-  status: text("status").$default(() => "validation"),
+  status: orderStatusEnum("status")
+    .notNull()
+    .$default(() => "waiting"),
   isValidated: pgBoolean("is_validated").$default(() => false),
   offer: doublePrecision("offer"),
   installments:
