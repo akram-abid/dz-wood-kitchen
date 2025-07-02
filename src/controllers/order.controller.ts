@@ -210,6 +210,12 @@ export async function updateOrderStatusHandler(
 ) {
   const { id } = request.params;
   const { status } = request.body;
+
+  request.log.info("request body : ");
+  request.log.info(request.body);
+  request.log.info("status");
+  request.log.info(status);
+
   const validStatuses = [
     "waiting",
     "inProgress",
