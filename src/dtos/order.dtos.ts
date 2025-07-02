@@ -18,11 +18,15 @@ export const createOrderDto = z.object({
 
 export const updateOrderDto = createOrderDto.partial();
 
-export const addInstallmentDto = z.object({
-  newInstallment: z.object({
-    date: z.string(),
-    amount: z.number(),
-  }),
+export const addInstallmentsDto = z.object({
+  newInstallments: z
+    .array(
+      z.object({
+        date: z.string(),
+        amount: z.number(),
+      }),
+    )
+    .min(1),
 });
 
 export const updateStatusDto = z.object({

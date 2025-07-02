@@ -6,7 +6,7 @@ import { eq, and } from "drizzle-orm";
 import {
   createOrderDto,
   updateOrderDto,
-  addInstallmentDto,
+  addInstallmentsDto,
   updateStatusDto,
   updateOfferDto,
   toggleValidationDto,
@@ -152,15 +152,15 @@ export const getOrderByIdHandler = async (
   }
 };
 
-export async function addInstallmentHandler(
+export async function addInstallmentsHandler(
   request: FastifyRequest<{
     Params: z.infer<typeof orderIdParamDto>;
-    Body: z.infer<typeof addInstallmentDto>;
+    Body: z.infer<typeof addInstallmentsDto>;
   }>,
   reply: FastifyReply,
 ) {
   const { id } = orderIdParamDto.parse(request.params);
-  const { newInstallment } = addInstallmentDto.parse(request.body);
+  const { newInstallments } = addInstallmentsDto.parse(request.body);
 
   const order = await db.query.orders.findFirst({
     where: eq(orders.id, id),
@@ -187,7 +187,7 @@ export async function addInstallmentHandler(
     });
   }
 
-  updatedInstallments.push(newInstallment);
+  updatedInstallments.push(...newInstallments);
 
   await db
     .update(orders)

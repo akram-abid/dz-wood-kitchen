@@ -8,7 +8,7 @@ import {
   updateOrderStatusHandler,
   updateOfferHandler,
   toggleValidationHandler,
-  addInstallmentHandler,
+  addInstallmentsHandler,
   setOrderArticlesHandler,
   getUserOrders,
 } from "../controllers/order.controller";
@@ -124,8 +124,8 @@ export async function orderRoutes(server: FastifyInstance) {
 
   // Add new installment to order
   server.patch("/:id/installments", {
-    preHandler: [authenticate],
-    handler: addInstallmentHandler,
+    preHandler: [authenticate, authorize(["admin"])],
+    handler: addInstallmentsHandler,
   });
 
   // -------------------------
