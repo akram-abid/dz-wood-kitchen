@@ -10,6 +10,7 @@ import {
   toggleValidationHandler,
   addInstallmentHandler,
   setOrderArticlesHandler,
+  getUserOrders,
 } from "../controllers/order.controller";
 import { processFileUploads, orderImagesPath } from "../utils/uploader";
 
@@ -142,5 +143,13 @@ export async function orderRoutes(server: FastifyInstance) {
   server.post("/:id/articles", {
     preHandler: [server.authenticate],
     handler: setOrderArticlesHandler,
+  });
+
+  //------------------------
+  // GET : all orders of a user
+  // -----------------------
+  server.get("/client", {
+    preHandler: [server.authenticate],
+    handler: getUserOrders,
   });
 }

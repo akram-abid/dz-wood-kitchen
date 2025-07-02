@@ -314,6 +314,26 @@ export async function setOrderArticlesHandler(
 }
 
 /*
+ * GET /client
+ */
+
+export async function getUserOrders(req: FastifyRequest, reply: FastifyReply) {
+  const userId = req.ctx.user?.userId;
+
+  if (!userId) {
+    throw new APIError.UnauthorizedError("Unautherized");
+  }
+
+  const userOrders = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.userId, userId));
+
+  reply.status(200);
+  return userOrders;
+}
+
+/*
  * Patch /:orderId/articles
  */
 
