@@ -210,10 +210,40 @@ export async function updateOrderStatusHandler(
 ) {
   const { id } = request.params;
   const { status } = request.body;
+  const validStatuses = [
+    "waiting",
+    "inProgress",
+    "inShipping",
+    "delivered",
+  ] as const;
+  if (!validStatuses.includes(status as any)) {
+    reply.status(400);
+    throw new APIError.BadRequestError(
+      `Status must be one of: ${validStatuses.join(", ")}`,
+    );
+  }
+  const [updatedOrder] = await db
+    .update(orders)
+    .set({
+      status: status as (typeof validStatuses)[number],
+      updatedAt: new Date(), // Update the timestamp
+    })
+    .where(eq(orders.id, id))
+    .returning(); // This returns the updated record
 
-  await db.update(orders).set({ status }).where(eq(orders.id, id));
+  // Check if order was found and updated
+  if (!updatedOrder) {
+    return reply.status(404).send({
+      error: "Order not found",
+      message: `No order found with id: ${id}`,
+    });
+  }
 
-  return reply.status(200);
+  // Return the updated order
+  return reply.status(200).send({
+    message: "Order status updated successfully",
+    data: updatedOrder,
+  });
 }
 
 /**
@@ -257,29 +287,40 @@ export async function toggleValidationHandler(
 }
 
 /**
- * GET /orders?status=...&validated=true|false
+ * GET /orders?status=...
  */
 export async function getOrdersByFiltersHandler(
   request: FastifyRequest<{
-    Querystring: { status?: string; validated?: string };
+    Querystring: { status?: string };
   }>,
   reply: FastifyReply,
-) {
-  const { status, validated } = request.query;
-
+): Promise<(typeof orders.$inferSelect)[]> {
+  const { status } = request.query;
   const filters = [];
 
-  if (status) filters.push(eq(orders.status, status));
-  if (validated === "true") filters.push(eq(orders.isValidated, true));
-  if (validated === "false") filters.push(eq(orders.isValidated, false));
+  if (status) {
+    const validStatuses = ["waiting", "inProgress", "inShipping", "delivered"];
+    if (!validStatuses.includes(status)) {
+      reply.status(400);
+      throw new APIError.BadRequestError(
+        `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      );
+    }
+    filters.push(eq(orders.status, status as any));
+  }
 
-  const results = await db
-    .select()
-    .from(orders)
-    .where(and(...filters));
+  try {
+    const results = await db
+      .select()
+      .from(orders)
+      .where(filters.length > 0 ? and(...filters) : undefined);
 
-  reply.status(200);
-  return results;
+    reply.status(200);
+    return results;
+  } catch (error) {
+    reply.status(500);
+    throw new Error("Failed to fetch orders");
+  }
 }
 
 /**
