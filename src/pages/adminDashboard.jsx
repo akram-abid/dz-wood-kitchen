@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import {
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
   const [completedOrders, setCompletedOrders] = useState([]);
   const [waitingOrders, setWaitingOrders] = useState([]);
   const [orders, setOrders] = useState([]);
-  const { isAuthenticated, loading } = useAuth('admin');
+  const { isAuthenticated, loading } = useAuth("admin");
   const [showCompletionForm, setShowCompletionForm] = useState(false);
   const [completionForm, setCompletionForm] = useState({
     elements: [],
@@ -53,125 +53,72 @@ const AdminDashboard = () => {
     notes: "",
   });
 
-  if(!isAuthenticated) navigate("/login")
+  if (!isAuthenticated) navigate("/login");
 
-  // Sample data
-  // const [orders, setOrders] = useState([
-  //   {
-  //     id: "ORD-7890",
-  //     date: "2023-05-15",
-  //     status: "inProgress",
-  //     title: "Modern Oak Kitchen",
-  //     client: "John Smith",
-  //     email: "john.smith@example.com",
-  //     phone: "+1 (555) 123-4567",
-  //     woodType: "Oak",
-  //     images: [
-  //       "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
-  //       "https://images.unsplash.com/photo-1600585152220",
-  //     ],
-  //     progress: 1, // 0: waiting, 1: production, 2: shipping, 3: completed
-  //     estimatedTotal: 12500,
-  //     amountPaid: 5000,
-  //     payments: [
-  //       {
-  //         amount: 5000,
-  //         date: "2023-05-20",
-  //         method: "Credit Card",
-  //         notes: "Initial deposit",
-  //       },
-  //     ],
-  //     nextPaymentDate: "2023-06-15",
-  //   },
-  //   {
-  //     id: "ORD-7891",
-  //     date: "2023-06-01",
-  //     status: "inShipping", 
-  //     title: "Classic Walnut Kitchen",
-  //     client: "Sarah Johnson",
-  //     email: "sarah.j@example.com",
-  //     phone: "+1 (555) 987-6543",
-  //     woodType: "Walnut",
-  //     images: [
-  //       "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
-  //       "https://images.unsplash.com/photo-1600210492493-0946911123ea",
-  //     ],
-  //     progress: 0,
-  //     estimatedTotal: 9800,
-  //     amountPaid: 0,
-  //     payments: [],
-  //     nextPaymentDate: "2023-06-30",
-  //   },
-  // ]);
-
-  useEffect(() => { 
+  useEffect(() => {
     const fetchOrders = async () => {
-
       try {
-        const response = await apiFetch("/api/v1/orders?status=delivered", null);
-        console.log("the response i got is this ", response)
+        const response = await apiFetch(
+          "/api/v1/orders?status=delivered",
+          null
+        );
+        console.log("the response i got is this ", response);
         if (response.success) {
-          setCompletedOrders(response.data.data)
+          setCompletedOrders(response.data.data);
         } else {
           console.error("Failed to fetch orders:", response.error);
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
-
     };
     fetchOrders();
-   }, []);
+  }, []);
 
-   useEffect(() => { 
+  useEffect(() => {
     const fetchOrders = async () => {
-
       try {
-        const response = await apiFetch("/api/v1/orders?status=inProgress", null);
-        console.log("the response i got is this ", response)
+        const response = await apiFetch(
+          "/api/v1/orders?status=inProgress",
+          null
+        );
         if (response.success) {
-          setOrders(response.data.data)
-          console.log("this is cool 1, ", response.data.data)
+          setOrders(response.data.data);
         } else {
           console.error("Failed to fetch orders:", response.error);
         }
 
-        const response2 = await apiFetch("/api/v1/orders?status=inShipping", null);
-        console.log("the response i got is this ", response)
+        const response2 = await apiFetch(
+          "/api/v1/orders?status=inShipping",
+          null
+        );
         if (response2.success) {
-          setOrders([...response.data.data ,...response2.data.data])
-          console.log("this is cool 2, ", response2.data.data)
-
+          setOrders([...response.data.data, ...response2.data.data]);
         } else {
           console.error("Failed to fetch orders:", response.error);
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
-
     };
     fetchOrders();
-   }, []);
+  }, []);
 
-   useEffect(() => { 
+  useEffect(() => {
     const fetchOrders = async () => {
-
       try {
         const response = await apiFetch("/api/v1/orders?status=waiting", null);
-        console.log("the response i got is this ", response)
         if (response.success) {
-          setWaitingOrders(response.data.data)
-          console.log("this is amazing")
+          setWaitingOrders(response.data.data);
         } else {
           console.error("Failed to fetch orders:", response.error);
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
-
     };
     fetchOrders();
-   }, []);
+  }, []);
 
   // const [waitingOrders, setWaitingOrders] = useState([
   //   {
@@ -212,14 +159,6 @@ const AdminDashboard = () => {
     setCurrentOrder(orders.find((order) => order.id === orderId));
     setShowCompletionForm(true);
   };
-
-  const [newPost, setNewPost] = useState({
-    title: "",
-    description: "",
-    woodType: "",
-    images: [],
-    location: "",
-  });
 
   const [paymentData, setPaymentData] = useState({
     amount: "",
@@ -270,20 +209,6 @@ const AdminDashboard = () => {
     return steps;
   };
 
-  const handleCreatePost = () => {
-    // In a real app, you would send this to your backend
-    console.log("Creating new post:", newPost);
-    setShowCreatePostModal(false);
-    setNewPost({
-      title: "",
-      description: "",
-      woodType: "",
-      images: [],
-      location: "",
-    });
-    // Show success message
-  };
-
   const handleAddPayment = () => {
     if (!currentOrder || !paymentData.amount) return;
 
@@ -295,6 +220,8 @@ const AdminDashboard = () => {
           method: paymentData.method,
           notes: paymentData.notes,
         };
+
+        console.log("the paiiiiii ", newPayment);
 
         return {
           ...order,
@@ -347,7 +274,6 @@ const AdminDashboard = () => {
     setOrders(updatedOrders);
   };
 
-
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -359,6 +285,137 @@ const AdminDashboard = () => {
 
     return matchesSearch && matchesFilter;
   });
+
+  // Add these to your component state and refs
+  const fileInputRef = useRef(null);
+
+  const [newPost, setNewPost] = useState({
+    title: "",
+    description: "",
+    woodType: "",
+    location: "",
+    images: [],
+    items: [],
+    currentItem: "",
+  });
+
+  // Image upload handler
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+
+    files.forEach((file) => {
+      // Check if it's an image
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          const imageObj = {
+            file: file,
+            preview: event.target.result,
+            name: file.name,
+          };
+
+          setNewPost((prev) => ({
+            ...prev,
+            images: [...prev.images, imageObj],
+          }));
+        };
+
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Reset the file input
+    e.target.value = "";
+  };
+
+  // Remove image function
+  const removeImage = (index) => {
+    setNewPost((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddItem = () => {
+    if (newPost.currentItem.trim()) {
+      setNewPost((prev) => ({
+        ...prev,
+        items: [...prev.items, newPost.currentItem.trim()],
+        currentItem: "",
+      }));
+    }
+  };
+
+  const handleRemoveItem = (index) => {
+    setNewPost((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Update the handleCreatePost function in AdminDashboard.jsx
+  const handleCreatePost = async () => {
+    // Validate required fields
+    if (
+      !newPost.title ||
+      !newPost.description ||
+      !newPost.woodType ||
+      newPost.images.length === 0
+    ) {
+      alert("Please fill all required fields and upload at least one image");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+
+      formData.append("title", newPost.title);
+      formData.append("description", newPost.description);
+      formData.append("woodType", newPost.woodType);
+      console.log("these the items ", newPost.items)
+      formData.append("items", JSON.stringify(newPost.items));
+
+      if (newPost.location) {
+        formData.append("location", newPost.location);
+      }
+
+      newPost.images.forEach((image) => {
+        formData.append("media", image.file);
+      });
+
+      const response = await apiFetch(
+        "/api/v1/services/posts",
+        formData,
+        false,
+        "POST"
+      );
+
+      console.log("the response is that ", response);
+
+      if (response.success) {
+        console.log("Post created successfully:", response.data);
+        alert("Post created successfully!");
+
+        setNewPost({
+          title: "",
+          description: "",
+          woodType: "",
+          location: "",
+          images: [],
+          items: [],
+          currentItem: "",
+        });
+        setShowCreatePostModal(false);
+      } else {
+        console.error("Failed to create post:", response.error);
+        alert("Failed to create post: " + response.error);
+      }
+    } catch (error) {
+      console.error("Error creating post:", error);
+      alert("An error occurred while creating the post");
+    }
+  };
 
   return (
     <div
@@ -703,21 +760,22 @@ const AdminDashboard = () => {
                   <div className="mt-4 grid grid-cols-2 gap-4">
                     {order.offer && (
                       <div>
-                      <p
-                        className={`text-sm ${
-                          darkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
-                      >
-                        {t("amountPaid")}
-                      </p>
-                      <p
-                        className={`font-medium ${
-                          darkMode ? "text-green-400" : "text-green-600"
-                        }`}
-                      >
-                        {order.amountPaid.toLocaleString()+ ` ${t("algerianDinar")}`}
-                      </p>
-                    </div>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          {t("amountPaid")}
+                        </p>
+                        <p
+                          className={`font-medium ${
+                            darkMode ? "text-green-400" : "text-green-600"
+                          }`}
+                        >
+                          {(order.amountPaid || 0).toLocaleString() +
+                            ` ${t("algerianDinar")}`}
+                        </p>
+                      </div>
                     )}
                     <div>
                       <p
@@ -976,13 +1034,82 @@ const AdminDashboard = () => {
                         darkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
+                      {t("items")} (Optional)
+                    </label>
+                    <div className="flex mb-2">
+                      <input
+                        type="text"
+                        value={newPost.currentItem}
+                        onChange={(e) =>
+                          setNewPost({
+                            ...newPost,
+                            currentItem: e.target.value,
+                          })
+                        }
+                        className={`flex-1 px-4 py-2 rounded-l-lg border ${
+                          darkMode
+                            ? "bg-gray-700 border-gray-600 text-white"
+                            : "bg-white border-gray-300 text-gray-900"
+                        }`}
+                        placeholder={t("Add item (e.g. table, chair)")}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="px-4 py-2 rounded-r-lg bg-yellow-500 hover:bg-yellow-400 text-black"
+                      >
+                        {t("Add")}
+                      </button>
+                    </div>
+
+                    {/* Display added items */}
+                    {newPost.items.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {newPost.items.map((item, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1"
+                          >
+                            <span className="text-sm">{item}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveItem(index)}
+                              className="ml-2 text-gray-500 dark:text-gray-400 hover:text-red-500"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       {t("images")}
                     </label>
+
+                    {/* Hidden file input */}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                      multiple
+                      style={{ display: "none" }}
+                    />
+
+                    {/* Upload area */}
                     <div
-                      className={`border-2 border-dashed rounded-lg p-8 text-center ${
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
                         darkMode
-                          ? "border-gray-600 bg-gray-700/50"
-                          : "border-gray-300 bg-gray-100"
+                          ? "border-gray-600 bg-gray-700/50 hover:bg-gray-700/70"
+                          : "border-gray-300 bg-gray-100 hover:bg-gray-200"
                       }`}
                     >
                       <div className="flex flex-col items-center">
@@ -1001,6 +1128,27 @@ const AdminDashboard = () => {
                         </p>
                       </div>
                     </div>
+
+                    {/* Image preview */}
+                    {newPost.images && newPost.images.length > 0 && (
+                      <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {newPost.images.map((image, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={image.preview}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-32 object-cover rounded-lg"
+                            />
+                            <button
+                              onClick={() => removeImage(index)}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -1530,42 +1678,43 @@ const AdminDashboard = () => {
                       darkMode ? "border-gray-700" : "border-gray-200"
                     }`}
                   >
-                    {selectedOrder.payments.map((payment, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 border-b ${
-                          darkMode
-                            ? "border-gray-700 bg-gray-700/50"
-                            : "border-gray-200 bg-gray-50"
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p
-                              className={`font-medium ${
-                                darkMode ? "text-white" : "text-gray-900"
-                              }`}
-                            >
-                              ${payment.amount.toLocaleString() || 0}
-                            </p>
+                    {selectedOrder.payments &&
+                      selectedOrder.payments.map((payment, index) => (
+                        <div
+                          key={index}
+                          className={`p-3 border-b ${
+                            darkMode
+                              ? "border-gray-700 bg-gray-700/50"
+                              : "border-gray-200 bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p
+                                className={`font-medium ${
+                                  darkMode ? "text-white" : "text-gray-900"
+                                }`}
+                              >
+                                ${payment.amount.toLocaleString() || 0}
+                              </p>
+                              <p
+                                className={`text-xs ${
+                                  darkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                {payment.date} • {payment.method}
+                              </p>
+                            </div>
                             <p
                               className={`text-xs ${
                                 darkMode ? "text-gray-400" : "text-gray-500"
                               }`}
                             >
-                              {payment.date} • {payment.method}
+                              {payment.notes}
                             </p>
                           </div>
-                          <p
-                            className={`text-xs ${
-                              darkMode ? "text-gray-400" : "text-gray-500"
-                            }`}
-                          >
-                            {payment.notes}
-                          </p>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               </div>

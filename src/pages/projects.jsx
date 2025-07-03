@@ -16,6 +16,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import apiFetch from "../utils/api/apiFetch";
+import { useAuth } from "../utils/protectedRootesVerf";
 
 // Utility function to ensure array
 const ensureArray = (value) => {
@@ -132,8 +133,16 @@ const KitchenGallery = () => {
   const [totalKitchens, setTotalKitchens] = useState(
     savedState.totalKitchens || 0
   );
+
+  const { isAuthenticated, loadingL } = useAuth("admin");
   const [currentLanguage, setCurrentLanguage] = useState("en");
-  const [isAdmin, setIsAdmin] = useState(false);
+  console.log("am i an admin ", isAuthenticated);
+  const [isAdmin, setIsAdmin] = useState(false); // Initialize as false
+
+  // Add this useEffect to sync isAdmin with isAuthenticated
+  useEffect(() => {
+    setIsAdmin(isAuthenticated);
+  }, [isAuthenticated]);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [error, setError] = useState(null);
 
@@ -154,17 +163,18 @@ const KitchenGallery = () => {
         `/api/v1/services/posts?page=${pageNum}&limit=15`
       );
 
-      
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch kitchens");
       }
-      
+
       const apiData = response.data || {};
       console.log("the response is ", apiData.data.posts);
-      const newKitchens = ensureArray(apiData.data.posts || apiData.posts || []);
+      const newKitchens = ensureArray(
+        apiData.data.posts || apiData.posts || []
+      );
 
       const currentPageItems = newKitchens.length;
-      const hasMorePages = currentPageItems === 15; 
+      const hasMorePages = currentPageItems === 15;
 
       if (append) {
         setKitchens((prev) => {
@@ -260,15 +270,13 @@ const KitchenGallery = () => {
     setDeleteLoading(kitchenId);
 
     try {
-      const response = await apiFetch(`/api/v1/posts/${kitchenId}`, {
-        _method: "DELETE",
-      });
+      const response = await apiFetch(`/api/v1/services/posts/${kitchenId}`,null, false, "DELETE");
 
       if (!response.success) {
         throw new Error(response.error || "Failed to delete kitchen");
       }
 
-      // Remove from local state
+      console.log("the response of the delete is ", response)
       const kitchensArray = ensureArray(kitchens);
       const filteredArray = ensureArray(filteredKitchens);
 
@@ -538,7 +546,7 @@ const KitchenGallery = () => {
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-700 bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all z-10"
             >
-              <ChevronRight size={20} className="cursor-pointer"   />
+              <ChevronRight size={20} className="cursor-pointer" />
             </button>
 
             <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
@@ -779,9 +787,7 @@ const KitchenGallery = () => {
                     </div>
                   )}
 
-                  <KitchenCarousel
-                    images={kitchen.imageUrls}
-                  />
+                  <KitchenCarousel images={kitchen.imageUrls} />
 
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-black dark:text-white mb-2 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">

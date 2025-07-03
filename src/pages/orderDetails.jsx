@@ -62,10 +62,6 @@ const OrderDetails = () => {
         const response = await apiFetch(`/api/v1/orders/${id}`, null, true);
 
         if (response.success) {
-          console.log(
-            "the order is going to be like this ",
-            response.data.data.order
-          );
           setOrder(response.data.data.order);
         } else {
           setError(response.error || "Failed to fetch order");
@@ -107,33 +103,89 @@ const OrderDetails = () => {
     setOrder(updatedOrder);
     console.log("the order is now have this: ", order);
     setPriceProposal("");
+
+    try {
+      const body = { offer: priceProposal };
+      const response = apiFetch(
+        `/api/v1/orders/${order.id}/offer`,
+        body,
+        true,
+        "PATCH"
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Title updated successfully");
+    } catch (error) {
+      console.log("something went wrong: ", error);
+    }
   }
 
-  function handleAddPayment() {
+  async function handleAddPayment() {
     if (!paymentData.amount) return;
 
-    const newPayment = {
-      amount: parseFloat(paymentData.amount),
-      date: paymentData.date,
-      method: paymentData.method,
-      notes: paymentData.notes,
-    };
+    try {
+      const body = {
+        newInstallments: [
+          {
+            date: paymentData.date,
+            amount: parseFloat(paymentData.amount),
+            method: paymentData.method,
+            notes: paymentData.notes,
+          },
+        ],
+      };
 
-    const updatedOrder = {
-      ...order,
-      amountPaid: (order.amountPaid || 0) + parseFloat(paymentData.amount),
-      payments: [...(order.payments || []), newPayment],
-    };
+      const response = await apiFetch(
+        `/api/v1/orders/${order.id}/installments`,
+        body,
+        true,
+        "PATCH"
+      );
 
-    setOrder(updatedOrder);
-    setPaymentData({
-      amount: "",
-      date: new Date().toISOString().split("T")[0],
-      method: "Credit Card",
-      notes: "",
-    });
-    setShowPaymentForm(false);
+      if (response.success) {
+        // Update the local state with the new payment
+        const newPayment = {
+          amount: parseFloat(paymentData.amount),
+          date: paymentData.date,
+          method: paymentData.method,
+          notes: paymentData.notes,
+        };
+
+        const updatedOrder = {
+          ...order,
+          installments: [...(order.installments || []), newPayment],
+          amountPaid: (order.amountPaid || 0) + parseFloat(paymentData.amount),
+        };
+
+        setOrder(updatedOrder);
+        setPaymentData({
+          amount: "",
+          date: new Date().toISOString().split("T")[0],
+          method: "Credit Card",
+          notes: "",
+        });
+        setShowPaymentForm(false);
+      } else {
+        throw new Error(response.error || "Failed to add payment");
+      }
+    } catch (error) {
+      console.error("Error adding payment:", error);
+      // You might want to show an error message to the user here
+    }
   }
+
+  // Helper function to calculate total amount paid
+  const calculateAmountPaid = (installments) => {
+    if (!installments || installments.length === 0) return 0;
+    return installments.reduce((sum, payment) => sum + payment.amount, 0);
+  };
+
+  // Helper function to calculate remaining balance
+  const calculateRemainingBalance = (offer, amountPaid) => {
+    return (offer || 0) - (amountPaid || 0);
+  };
 
   function handleCompleteOrder() {
     if (completionForm.elements.length === 0) {
@@ -156,8 +208,27 @@ const OrderDetails = () => {
         completedAt: new Date().toISOString(),
       },
     };
+    console.log("the order is now this ", order)
+    try {
+      const body = { articles: completionForm.elements }
+      console.log("the body is this ", body)
+      const response = apiFetch(
+        `/api/v1/orders/${order.id}/articles`,
+        body,
+        true,
+        "Post"
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("articles updated successfully");
+    } catch (error) {
+      console.log("something went wrong: ", error);
+    }
 
     setOrder(completedOrder);
+    updateOrderStatus("delivered")
     setShowCompletionForm(false);
     setCompletionForm({
       elements: [],
@@ -179,9 +250,8 @@ const OrderDetails = () => {
     };
 
     try {
-      console.log("the new status is ",newStatus)
-      const body = { status: newStatus }
-      console.log("the body is this ", body)
+      console.log("the new status is ", newStatus);
+      const body = { status: newStatus };
       const response = apiFetch(
         `/api/v1/orders/${order.id}/status`,
         body,
@@ -624,14 +694,12 @@ const OrderDetails = () => {
                       "N/A"}
                   </p>
                 )}
-                {order.status === "delivered" && (
+                {
                   <p>
                     <span className="font-medium">{t("completed")}:</span>{" "}
-                    {new Date(
-                      order.completionDetails?.completedAt || order.date
-                    ).toLocaleDateString()}
+                    {order.completionDetails?.completedAt.split('T')[0]}
                   </p>
-                )}
+                }
               </div>
             </div>
           </div>
@@ -697,7 +765,7 @@ const OrderDetails = () => {
                         darkMode ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      ${order.offer.toLocaleString()}
+                      {order.offer.toLocaleString() + ` ${t("algerianDinar")}`}
                     </p>
                     <p
                       className={`text-sm ${
@@ -709,10 +777,10 @@ const OrderDetails = () => {
                   </div>
                   <button
                     onClick={() => {
-                      setPriceProposal(order.estimatedTotal.toString());
+                      setPriceProposal(order.offer.toString());
                       const updatedOrder = {
                         ...order,
-                        estimatedTotal: null,
+                        offer: null, // Reset offer to null to show input field
                       };
                       setOrder(updatedOrder);
                     }}
@@ -791,7 +859,7 @@ const OrderDetails = () => {
                       darkMode ? "text-green-400" : "text-green-600"
                     }`}
                   >
-                    {(order.amountPaid || 0).toLocaleString() +
+                    {calculateAmountPaid(order.installments).toLocaleString() +
                       ` ${t("algerianDinar")}`}
                   </p>
                 </div>
@@ -808,14 +876,15 @@ const OrderDetails = () => {
                       darkMode ? "text-amber-400" : "text-amber-600"
                     }`}
                   >
-                    {(
-                      (order.offer || 0) - (order.amountPaid || 0)
+                    {calculateRemainingBalance(
+                      order.offer,
+                      calculateAmountPaid(order.installments)
                     ).toLocaleString() + ` ${t("algerianDinar")}`}
                   </p>
                 </div>
               </div>
 
-              {order.payments?.length > 0 && (
+              {order.installments?.length > 0 && (
                 <div>
                   <h4
                     className={`text-sm font-medium mb-2 ${
@@ -829,7 +898,7 @@ const OrderDetails = () => {
                       darkMode ? "border-gray-600" : "border-gray-200"
                     }`}
                   >
-                    {order.payments.map((payment, index) => (
+                    {order.installments.map((payment, index) => (
                       <div
                         key={index}
                         className={`p-3 border-b last:border-b-0 ${
@@ -977,7 +1046,7 @@ const OrderDetails = () => {
                     } w-2 h-2 rounded-full mt-1.5 ${
                       order.status === "waiting" ||
                       order.status === "inProgress" ||
-                      order.status === "shipping" ||
+                      order.status === "inShipping" ||
                       order.status === "delivered"
                         ? darkMode
                           ? "bg-yellow-400"
@@ -993,7 +1062,7 @@ const OrderDetails = () => {
                         className={`mr-2 ${
                           order.status === "waiting" ||
                           order.status === "inProgress" ||
-                          order.status === "shipping" ||
+                          order.status === "inShipping" ||
                           order.status === "delivered"
                             ? darkMode
                               ? "text-yellow-400"
@@ -1008,7 +1077,7 @@ const OrderDetails = () => {
                         className={`font-medium ${
                           order.status === "waiting" ||
                           order.status === "inProgress" ||
-                          order.status === "shipping" ||
+                          order.status === "inShipping" ||
                           order.status === "delivered"
                             ? darkMode
                               ? "text-white"
@@ -1023,7 +1092,7 @@ const OrderDetails = () => {
                     </div>
                     {(order.status === "waiting" ||
                       order.status === "inProgress" ||
-                      order.status === "shipping" ||
+                      order.status === "inShipping" ||
                       order.status === "delivered") && (
                       <p
                         className={`mt-1 text-sm ${
@@ -1043,7 +1112,7 @@ const OrderDetails = () => {
                       isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
                     } w-2 h-2 rounded-full mt-1.5 ${
                       order.status === "inProgress" ||
-                      order.status === "shipping" ||
+                      order.status === "inShipping" ||
                       order.status === "delivered"
                         ? darkMode
                           ? "bg-blue-400"
@@ -1058,7 +1127,7 @@ const OrderDetails = () => {
                       <Hammer
                         className={`mr-2 ${
                           order.status === "inProgress" ||
-                          order.status === "shipping" ||
+                          order.status === "inShipping" ||
                           order.status === "delivered"
                             ? darkMode
                               ? "text-blue-400"
@@ -1072,7 +1141,7 @@ const OrderDetails = () => {
                       <h4
                         className={`font-medium ${
                           order.status === "inProgress" ||
-                          order.status === "shipping" ||
+                          order.status === "inShipping" ||
                           order.status === "delivered"
                             ? darkMode
                               ? "text-white"
@@ -1086,7 +1155,7 @@ const OrderDetails = () => {
                       </h4>
                     </div>
                     {(order.status === "inProgress" ||
-                      order.status === "shipping" ||
+                      order.status === "inShipping" ||
                       order.status === "delivered") && (
                       <p
                         className={`mt-1 text-sm ${
@@ -1105,7 +1174,7 @@ const OrderDetails = () => {
                     className={`absolute ${
                       isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
                     } w-2 h-2 rounded-full mt-1.5 ${
-                      order.status === "shipping" ||
+                      order.status === "inShipping" ||
                       order.status === "delivered"
                         ? darkMode
                           ? "bg-purple-400"
@@ -1119,7 +1188,7 @@ const OrderDetails = () => {
                     <div className="flex items-center">
                       <Truck
                         className={`mr-2 ${
-                          order.status === "shipping" ||
+                          order.status === "inShipping" ||
                           order.status === "delivered"
                             ? darkMode
                               ? "text-purple-400"
@@ -1132,7 +1201,7 @@ const OrderDetails = () => {
                       />
                       <h4
                         className={`font-medium ${
-                          order.status === "shipping" ||
+                          order.status === "inShipping" ||
                           order.status === "delivered"
                             ? darkMode
                               ? "text-white"
@@ -1145,7 +1214,7 @@ const OrderDetails = () => {
                         {t("shipping")}
                       </h4>
                     </div>
-                    {(order.status === "shipping" ||
+                    {(order.status === "inShipping" ||
                       order.status === "delivered") && (
                       <p
                         className={`mt-1 text-sm ${
@@ -1249,7 +1318,7 @@ const OrderDetails = () => {
                 )}
                 {order.status !== "shipping" && (
                   <button
-                    onClick={() => updateOrderStatus("shipping")}
+                    onClick={() => updateOrderStatus("inShipping")}
                     className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors ${
                       darkMode
                         ? "bg-purple-600 hover:bg-purple-500 text-white"
@@ -1626,6 +1695,7 @@ const OrderDetails = () => {
           }`}
         >
           {/* Main Invoice Container */}
+          {console.log("the order is now hldflsqdjflsdkfjsdlkfjsdlj ", order)}
           <div
             id="invoice-print-container"
             className={`relative rounded-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto ${
@@ -1651,7 +1721,6 @@ const OrderDetails = () => {
             {/* Invoice Header */}
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center">
-                {/* Company Logo - Replace with your actual logo */}
                 <div className="mx-4 w-16 h-16 flex items-center justify-center print-logo">
                   <img
                     src={WLogo}
@@ -1702,12 +1771,10 @@ const OrderDetails = () => {
                     <p className="text-sm">{t("orderID")}:</p>
                     <p className="text-sm font-medium">{order.id}</p>
                     <p className="text-sm">{t("orderDate")}:</p>
-                    <p className="text-sm font-medium">{order.date}</p>
+                    <p className="text-sm font-medium">{order.updatedAt.split('T')[0]}</p>
                     <p className="text-sm">{t("completionDate")}:</p>
                     <p className="text-sm font-medium">
-                      {new Date(
-                        order.completionDetails?.completedAt || order.date
-                      ).toLocaleDateString()}
+                      {order.completionDetails?.completedAt.split('T')[0]}
                     </p>
                     <p className="text-sm">{t("woodType")}:</p>
                     <p className="text-sm font-medium">{order.woodType}</p>
@@ -1724,7 +1791,7 @@ const OrderDetails = () => {
                   darkMode ? "border-gray-700" : "border-gray-200"
                 }`}
               >
-                {order.completionDetails?.elements.map((element, index) => (
+                {order.articles?.map((element, index) => (
                   <div
                     key={index}
                     className={`px-3 py-2 rounded border ${
@@ -1761,7 +1828,7 @@ const OrderDetails = () => {
                 </div>
 
                 {/* Payment Rows */}
-                {order.payments?.map((payment, index) => (
+                {order.installments?.map((payment, index) => (
                   <div
                     key={index}
                     className={`p-3 border-b last:border-b-0 grid grid-cols-3 gap-4 ${
@@ -1786,15 +1853,36 @@ const OrderDetails = () => {
                   </div>
                 ))}
 
-                {/* Total Row */}
+                {/* Totals Section - This is where your snippet goes */}
                 <div
                   className={`p-3 ${darkMode ? "bg-gray-700" : "bg-gray-100"}`}
                 >
                   <div className="grid grid-cols-3 gap-4">
+                    <p className="text-sm font-medium">{t("total")}</p>
+                    <p className="text-right text-sm font-medium">
+                      {order.offer?.toLocaleString() +
+                        ` ${t("algerianDinar")}` || "N/A"}
+                    </p>
+                    <p></p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
                     <p className="text-sm font-medium">{t("totalPaid")}</p>
                     <p className="text-right text-lg font-bold text-green-500">
-                      {order.amountPaid?.toLocaleString() +
-                        ` ${t("algerianDinar")}`}
+                      {calculateAmountPaid(
+                        order.installments
+                      ).toLocaleString() + ` ${t("algerianDinar")}`}
+                    </p>
+                    <p></p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
+                    <p className="text-sm font-medium">
+                      {t("remainingBalance")}
+                    </p>
+                    <p className="text-right text-sm font-medium text-amber-500">
+                      {calculateRemainingBalance(
+                        order.offer,
+                        calculateAmountPaid(order.installments)
+                      ).toLocaleString() + ` ${t("algerianDinar")}`}
                     </p>
                     <p></p>
                   </div>
@@ -1802,7 +1890,7 @@ const OrderDetails = () => {
               </div>
             </div>
 
-            {/* Action Buttons - Removed gradient background */}
+            {/* Action Buttons */}
             <div className="pt-4">
               <div className="flex justify-end space-x-3">
                 <button

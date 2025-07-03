@@ -220,5 +220,11 @@
   "noOrdersFound": "No orders found",
   "noWaitingOrders": "No waiting orders found",
   "enterLocation": "Enter location",
-  "setToInProgress": "Set to In Progress"
+  "setToInProgress": "Set to In Progress",
+  "priceProposal": "Price Proposal",
+  "priceProposalSubmitted": "Price proposal submitted successfully!",
+  "editPrice": "Edit Price",
+  "orderBeingShipped": "Order is being shipped",
+  "enterTitle": "Enter title",
+  "enterDescription": "Enter description"
 }

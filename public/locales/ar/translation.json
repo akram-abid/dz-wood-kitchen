@@ -224,5 +224,11 @@
   "noOrdersFound": "لم يتم العثور على طلبات",
   "noWaitingOrders": "لا توجد طلبات قيد الانتظار",
   "enterLocation": "أدخل موقع",
-  "setToInProgress": "تعيين كقيد التنفيذ"
+  "setToInProgress": "تعيين كقيد التنفيذ",
+  "priceProposal": "عرض السعر",
+  "priceProposalSubmitted": "تم إرسال عرض السعر بنجاح",
+  "editPrice": "تعديل السعر",
+  "orderBeingShipped": "الطلب قيد الشحن",
+  "enterTitle": "أدخل العنوان",
+  "enterDescription": "أدخل الوصف"
 }

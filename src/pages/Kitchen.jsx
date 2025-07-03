@@ -39,23 +39,6 @@ const KitchenDetails = () => {
   const [editedKitchen, setEditedKitchen] = useState(null);
   const [newImages, setNewImages] = useState([]);
 
-  // useEffect(() => {
-  //   // Check admin status from your API
-  //   const checkAdminStatus = async () => {
-  //     try {
-  //       // Replace with your actual API call
-  //       const response = await fetch('/api/user/role');
-  //       const data = await response.json();
-  //       setIsAdmin(data.role === 'admin');
-  //     } catch (error) {
-  //       console.error('Error checking admin status:', error);
-  //       setIsAdmin(true);
-  //     }
-  //   };
-
-  //   checkAdminStatus();
-  // }, []);
-
   useEffect(() => {
     const fetchKitchen = async () => {
       try {
