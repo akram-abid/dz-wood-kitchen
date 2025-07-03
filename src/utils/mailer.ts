@@ -108,9 +108,11 @@ class MailerService {
     const templates = {
       welcome: `
         <h2>Welcome {{name}}!</h2>
-        <p>Thank you for joining us. Your account has been created successfully.</p>
-        <p>Best regards,<br>{{company}}</p>
-      `,
+  	<p>Thank you for joining us. Your account has been created successfully.</p>
+  	<p>Verify your email please!</p>
+  	<a href="{{verifyLink}}">click_here_to_verify</a>
+  	<p>Best regards,<br>{{company}}</p>
+	`,
       reset: `
         <h2>Password Reset</h2>
         <p>Hi {{name}},</p>
