@@ -12,6 +12,7 @@ import {
 import * as APIError from "../utils/errors";
 import { handleControllerError } from "../utils/errors-handler";
 import jwt from "jsonwebtoken";
+import { generateUrl, generateToken } from "../utils/jwt-utils";
 
 export async function signupController(
   req: SignupRequest,
@@ -25,12 +26,31 @@ export async function signupController(
       userId: result.user.id,
     });
 
+    const token = generateToken(
+      result.user.email,
+      result.user.id,
+      "email_verification",
+    );
+    const verifyLink = generateUrl(token, "verify-email");
+
+    const messageResult = await req.server.mailer.sendTemplate(
+      "welcome",
+      result.user.email,
+      {
+        name: result.user.fullName,
+        verifyLink,
+        company: process.env.DOMAIN,
+      },
+      "verify your email",
+    );
+
     reply.status(201);
 
     return {
       user: result.user,
+      email: "verify email",
+      message: messageResult,
       accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
     };
   } catch (err: any) {
     handleControllerError(err, "sign up", req.log);

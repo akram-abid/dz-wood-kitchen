@@ -26,7 +26,6 @@ import responseFormatPlugin from "./plugins/response-format";
 import * as APIError from "./utils/errors";
 import docsPlug from "./plugins/docs-render";
 import mailerPlugin from "./utils/mailer";
-import { peekMailServer } from "./controllers/mail-services.controller";
 dotenv.config();
 const config = loadConfig();
 
@@ -252,11 +251,11 @@ const buildServer = async (): Promise<FastifyInstance> => {
     },
   );
 
-  console.log("=== DEBUG ENV VARS ===");
+  /*console.log("=== DEBUG ENV VARS ===");
   console.log("ZOHO_EMAIL:", config.MAIL);
   console.log("ZOHO_APP_PASSWORD:", config.MAIL_PASSWORD);
   console.log("the full config : ", config);
-  console.log("======================");
+  console.log("======================");*/
 
   // mailer plugin
   server.register(mailerPlugin, {

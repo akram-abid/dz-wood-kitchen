@@ -7,29 +7,12 @@ import { users } from "../database/schema";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { handleControllerError } from "../utils/errors-handler";
+import { generateUrl, generateToken } from "../utils/jwt-utils";
 
 // schema to validate email
 const resetPasswordReq = z.object({
   email: z.string().email(),
 });
-
-const generateResetToken = (email: string, userId: string): string => {
-  return jwt.sign(
-    {
-      email,
-      userId,
-      type: "password_reset",
-      timestamp: Date.now(),
-    },
-    process.env.JWT_SECRET!,
-    { expiresIn: "1h" },
-  );
-};
-
-const generateResetUrl = (token: string): string => {
-  const baseUrl = process.env.DOMAIN || "http://localhost:3000";
-  return `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
-};
 
 /**
  * 1. Request password reset (send email)
@@ -49,8 +32,8 @@ export const requestResetPassword = async (
     }
 
     const userId = user[0].id;
-    const token = generateResetToken(email, userId);
-    const resetUrl = generateResetUrl(token);
+    const token = generateToken(email, userId, "password-reset");
+    const resetUrl = generateUrl(token, "reset-password");
 
     // Send reset email
     const result = await request.server.mailer.sendTemplate(
