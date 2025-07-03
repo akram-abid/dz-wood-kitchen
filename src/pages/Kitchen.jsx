@@ -6,10 +6,11 @@ import {
   MapPin,
   Clock,
   Tag,
+  ShoppingCart,
   ChevronRight,
   ChevronLeft,
   Sun,
-  Moon, 
+  Moon,
   Globe,
   ChevronDown,
   Edit3,
@@ -23,9 +24,10 @@ import { useState, useEffect } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import i18next from "i18next";
+import apiFetch from "../utils/api/apiFetch";
 
 const KitchenDetails = () => {
-  const { id } = useParams();
+  const { kitchenId } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [kitchen, setKitchen] = useState(null);
@@ -37,52 +39,41 @@ const KitchenDetails = () => {
   const [editedKitchen, setEditedKitchen] = useState(null);
   const [newImages, setNewImages] = useState([]);
 
+  // useEffect(() => {
+  //   // Check admin status from your API
+  //   const checkAdminStatus = async () => {
+  //     try {
+  //       // Replace with your actual API call
+  //       const response = await fetch('/api/user/role');
+  //       const data = await response.json();
+  //       setIsAdmin(data.role === 'admin');
+  //     } catch (error) {
+  //       console.error('Error checking admin status:', error);
+  //       setIsAdmin(true);
+  //     }
+  //   };
+
+  //   checkAdminStatus();
+  // }, []);
+
   useEffect(() => {
-    // Check admin status from your API
-    const checkAdminStatus = async () => {
+    const fetchKitchen = async () => {
       try {
-        // Replace with your actual API call
-        const response = await fetch('/api/user/role');
-        const data = await response.json();
-        setIsAdmin(data.role === 'admin');
+        const response = await apiFetch(`/api/v1/services/posts/${kitchenId}`);
+        if (!response.success) {
+          throw new Error("Failed to fetch kitchen data");
+        }
+        console.log("Kitchen data fetched successfully:", response.data);
+        setKitchen(response.data.data);
       } catch (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(true);
+        console.log("we have encountred an error", error);
       }
     };
 
-    checkAdminStatus();
-  }, []);
-
-  useEffect(() => {
-    const fakeKitchen = {
-      id,
-      title: "Modern Oak Kitchen",
-      images: [
-        "https://source.unsplash.com/random/800x600/?kitchen,1",
-        "https://source.unsplash.com/random/800x600/?kitchen,2",
-        "https://source.unsplash.com/random/800x600/?kitchen,3",
-        "https://source.unsplash.com/random/800x600/?kitchen,4",
-      ],
-      description:
-        "A beautiful modern kitchen featuring oak cabinetry. Custom designed for contemporary living with premium appliances. The kitchen includes a large island with quartz countertops, professional-grade stainless steel appliances, and custom storage solutions.",
-      location: "Manhattan, NY",
-      client: "Client 1",
-      woodType: "Oak",
-      completedDate: "2023-05-15",
-      elements: [
-        "Custom oak cabinetry",
-        "Quartz countertops", 
-        "Stainless steel appliances",
-        "Under-cabinet LED lighting",
-        "Pull-out pantry drawers",
-        "Soft-close hinges",
-        "Brushed gold hardware",
-      ],
-    };
-    setKitchen(fakeKitchen);
-    setEditedKitchen(fakeKitchen);
-  }, [id]);
+    setKitchen(kitchen);
+    setEditedKitchen(kitchen);
+    fetchKitchen();
+  }, [kitchenId]);
 
   // Layout and direction effects
   useEffect(() => {
@@ -110,13 +101,13 @@ const KitchenDetails = () => {
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === kitchen?.images.length - 1 ? 0 : prev + 1
+      prev === kitchen?.imageUrls.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === 0 ? kitchen?.images.length - 1 : prev - 1
+      prev === 0 ? kitchen?.imageUrls.length - 1 : prev - 1
     );
   };
 
@@ -135,22 +126,22 @@ const KitchenDetails = () => {
     try {
       // Prepare form data for API call
       const formData = new FormData();
-      formData.append('title', editedKitchen.title);
-      formData.append('description', editedKitchen.description);
-      formData.append('location', editedKitchen.location);
-      formData.append('client', editedKitchen.client);
-      formData.append('woodType', editedKitchen.woodType);
-      formData.append('completedDate', editedKitchen.completedDate);
-      formData.append('elements', JSON.stringify(editedKitchen.elements));
-      
+      formData.append("title", editedKitchen.title);
+      formData.append("description", editedKitchen.description);
+      formData.append("location", editedKitchen.location);
+      formData.append("client", editedKitchen.client);
+      formData.append("woodType", editedKitchen.woodType);
+      formData.append("completedDate", editedKitchen.completedDate);
+      formData.append("elements", JSON.stringify(editedKitchen.elements));
+
       // Add new images if any
       newImages.forEach((image, index) => {
         formData.append(`images`, image);
       });
 
       // Replace with your actual API call
-      const response = await fetch(`/api/kitchens/${id}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/kitchens/${kitchenId}`, {
+        method: "PUT",
         body: formData,
       });
 
@@ -160,53 +151,54 @@ const KitchenDetails = () => {
         setIsEditing(false);
         setNewImages([]);
       } else {
-        console.error('Failed to update kitchen');
+        console.error("Failed to update kitchen");
+        setKitchen(null);
       }
     } catch (error) {
-      console.error('Error updating kitchen:', error);
+      console.error("Error updating kitchen:", error);
     }
   };
 
   const handleInputChange = (field, value) => {
-    setEditedKitchen(prev => ({
+    setEditedKitchen((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleElementChange = (index, value) => {
     const newElements = [...editedKitchen.elements];
     newElements[index] = value;
-    setEditedKitchen(prev => ({
+    setEditedKitchen((prev) => ({
       ...prev,
-      elements: newElements
+      elements: newElements,
     }));
   };
 
   const addElement = () => {
-    setEditedKitchen(prev => ({
+    setEditedKitchen((prev) => ({
       ...prev,
-      elements: [...prev.elements, '']
+      elements: [...prev.elements, ""],
     }));
   };
 
   const removeElement = (index) => {
     const newElements = editedKitchen.elements.filter((_, i) => i !== index);
-    setEditedKitchen(prev => ({
+    setEditedKitchen((prev) => ({
       ...prev,
-      elements: newElements
+      elements: newElements,
     }));
   };
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     setNewImages(files);
-    
+
     // Preview new images
-    const imageUrls = files.map(file => URL.createObjectURL(file));
-    setEditedKitchen(prev => ({
+    const imageUrls = files.map((file) => URL.createObjectURL(file));
+    setEditedKitchen((prev) => ({
       ...prev,
-      images: imageUrls
+      images: imageUrls,
     }));
     setCurrentImageIndex(0);
   };
@@ -241,10 +233,10 @@ const KitchenDetails = () => {
                 className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors shadow-md hover:shadow-lg"
               >
                 <Edit3 size={16} className="sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline text-sm">{t('edit')}</span>
+                <span className="hidden sm:inline text-sm">{t("edit")}</span>
               </button>
             )}
-            
+
             {isAdmin && isEditing && (
               <div className="flex space-x-2">
                 <button
@@ -358,7 +350,7 @@ const KitchenDetails = () => {
                 <div className="absolute top-4 right-4 z-10">
                   <label className="flex items-center space-x-2 bg-yellow-500 text-white px-3 py-2 rounded-lg cursor-pointer hover:bg-yellow-600 transition-colors">
                     <Upload size={16} />
-                    <span className="text-sm">{t('uploadImages')}</span>
+                    <span className="text-sm">{t("uploadImages")}</span>
                     <input
                       type="file"
                       multiple
@@ -371,7 +363,7 @@ const KitchenDetails = () => {
               )}
 
               <div className="relative h-full w-full">
-                {displayKitchen.images.map((image, index) => (
+                {displayKitchen.imageUrls.map((image, index) => (
                   <div
                     key={index}
                     className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
@@ -381,7 +373,7 @@ const KitchenDetails = () => {
                     }`}
                   >
                     <img
-                      src={image}
+                      src={`${import.meta.env.VITE_REACT_APP_ORIGIN}${image}`}
                       alt={displayKitchen.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -404,7 +396,7 @@ const KitchenDetails = () => {
               </button>
 
               <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 flex justify-center gap-2">
-                {displayKitchen.images.map((_, index) => (
+                {displayKitchen.imageUrls.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -424,7 +416,7 @@ const KitchenDetails = () => {
                 <input
                   type="text"
                   value={editedKitchen.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onChange={(e) => handleInputChange("title", e.target.value)}
                   className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4 w-full bg-transparent border-b-2 border-yellow-500 focus:outline-none"
                 />
               ) : (
@@ -436,7 +428,9 @@ const KitchenDetails = () => {
               {isEditing ? (
                 <textarea
                   value={editedKitchen.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base w-full h-24 bg-transparent border border-gray-300 dark:border-gray-600 rounded-lg p-2 focus:outline-none focus:border-yellow-500 resize-none"
                 />
               ) : (
@@ -451,22 +445,24 @@ const KitchenDetails = () => {
                   label={t("location")}
                   value={displayKitchen.location}
                   isEditing={isEditing}
-                  onChange={(value) => handleInputChange('location', value)}
+                  onChange={(value) => handleInputChange("location", value)}
                 />
                 <EditableDetailItem
                   icon={<Calendar className="text-yellow-500" />}
                   label={t("completedDate")}
-                  value={displayKitchen.completedDate}
+                  value={displayKitchen.createdAt.substring(0, 10)}
                   isEditing={isEditing}
                   type="date"
-                  onChange={(value) => handleInputChange('completedDate', value)}
+                  onChange={(value) =>
+                    handleInputChange("completedDate", value)
+                  }
                 />
                 <EditableDetailItem
                   icon={<Tag className="text-yellow-500" />}
                   label={t("woodType")}
                   value={displayKitchen.woodType}
                   isEditing={isEditing}
-                  onChange={(value) => handleInputChange('woodType', value)}
+                  onChange={(value) => handleInputChange("woodType", value)}
                 />
               </div>
 
@@ -475,7 +471,7 @@ const KitchenDetails = () => {
                   {t("elements")}
                 </h3>
                 <div className="space-y-2">
-                  {displayKitchen.elements.map((element, index) => (
+                  {displayKitchen.items.map((element, index) => (
                     <div key={index} className="flex items-center">
                       {isEditing ? (
                         <div className="flex items-center w-full space-x-2">
@@ -483,7 +479,9 @@ const KitchenDetails = () => {
                           <input
                             type="text"
                             value={element}
-                            onChange={(e) => handleElementChange(index, e.target.value)}
+                            onChange={(e) =>
+                              handleElementChange(index, e.target.value)
+                            }
                             className="flex-1 bg-transparent border-b border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm sm:text-base focus:outline-none focus:border-yellow-500"
                           />
                           <button
@@ -507,11 +505,39 @@ const KitchenDetails = () => {
                       className="flex items-center space-x-2 text-yellow-500 hover:text-yellow-600 mt-2"
                     >
                       <Plus size={16} />
-                      <span className="text-sm">{t('addElement')}</span>
+                      <span className="text-sm">{t("addElement")}</span>
                     </button>
                   )}
                 </div>
               </div>
+
+              {/* Order Similar Button - Only shown when not in edit mode */}
+              {!isEditing && (
+                <button
+                  onClick={() => {
+                    if (!displayKitchen) {
+                      console.error("Cannot proceed - kitchen data is missing");
+                      return;
+                    }
+
+                    console.log("Creating order from kitchen:", displayKitchen);
+
+                    navigate("/order", {
+                      replace: true,
+                      state: {
+                        kitchenTemplate: { ...displayKitchen }, // Spread to avoid reference issues
+                        source: "gallery",
+                        originalKitchenId: kitchenId,
+                        timestamp: new Date().toISOString(), // Useful for debugging
+                      },
+                    });
+                  }}
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 mt-4"
+                >
+                  <ShoppingCart size={18} />
+                  <span>{t("orderSimilar")}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -520,11 +546,20 @@ const KitchenDetails = () => {
   );
 };
 
-const EditableDetailItem = ({ icon, label, value, isEditing, onChange, type = "text" }) => (
+const EditableDetailItem = ({
+  icon,
+  label,
+  value,
+  isEditing,
+  onChange,
+  type = "text",
+}) => (
   <div className="flex items-center space-x-2">
     <span className="mr-2 sm:mr-3 flex-shrink-0">{icon}</span>
     <div className="min-w-0 flex-1">
-      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{label}</p>
+      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        {label}
+      </p>
       {isEditing ? (
         <input
           type={type}
@@ -533,7 +568,9 @@ const EditableDetailItem = ({ icon, label, value, isEditing, onChange, type = "t
           className="font-medium text-black dark:text-white text-sm sm:text-base w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:border-yellow-500"
         />
       ) : (
-        <p className="font-medium text-black dark:text-white text-sm sm:text-base truncate">{value}</p>
+        <p className="font-medium text-black dark:text-white text-sm sm:text-base truncate">
+          {value}
+        </p>
       )}
     </div>
   </div>

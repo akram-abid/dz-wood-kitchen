@@ -27,6 +27,8 @@ import {
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import apiFetch from "../utils/api/apiFetch";
+import { useAuth } from "../utils/protectedRootesVerf";
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
@@ -40,6 +42,10 @@ const AdminDashboard = () => {
   const [currentOrder, setCurrentOrder] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [completedOrders, setCompletedOrders] = useState([]);
+  const [waitingOrders, setWaitingOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const { isAuthenticated, loading } = useAuth('admin');
   const [showCompletionForm, setShowCompletionForm] = useState(false);
   const [completionForm, setCompletionForm] = useState({
     elements: [],
@@ -47,102 +53,141 @@ const AdminDashboard = () => {
     notes: "",
   });
 
-  // Sample data
-  const [orders, setOrders] = useState([
-    {
-      id: "ORD-7890",
-      date: "2023-05-15",
-      status: "inProgress",
-      title: "Modern Oak Kitchen",
-      client: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 (555) 123-4567",
-      woodType: "Oak",
-      images: [
-        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
-        "https://images.unsplash.com/photo-1600585152220",
-      ],
-      progress: 1, // 0: waiting, 1: production, 2: shipping, 3: completed
-      estimatedTotal: 12500,
-      amountPaid: 5000,
-      payments: [
-        {
-          amount: 5000,
-          date: "2023-05-20",
-          method: "Credit Card",
-          notes: "Initial deposit",
-        },
-      ],
-      nextPaymentDate: "2023-06-15",
-    },
-    {
-      id: "ORD-7891",
-      date: "2023-06-01",
-      status: "waiting",
-      title: "Classic Walnut Kitchen",
-      client: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 (555) 987-6543",
-      woodType: "Walnut",
-      images: [
-        "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
-        "https://images.unsplash.com/photo-1600210492493-0946911123ea",
-      ],
-      progress: 0,
-      estimatedTotal: 9800,
-      amountPaid: 0,
-      payments: [],
-      nextPaymentDate: "2023-06-30",
-    },
-  ]);
+  if(!isAuthenticated) navigate("/login")
 
-  const [completedOrders, setCompletedOrders] = useState([
-    {
-      id: "ORD-4567",
-      date: "2023-03-10",
-      status: "delivered",
-      title: "Classic Walnut Kitchen",
-      client: "Michael Brown",
-      email: "michael.b@example.com",
-      phone: "+1 (555) 456-7890",
-      woodType: "Walnut",
-      images: [
-        "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
-        "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
-      ],
-      totalPaid: 9800,
-      paymentMethod: "Bank Transfer",
-      payments: [
-        {
-          amount: 5000,
-          date: "2023-03-15",
-          method: "Bank Transfer",
-          notes: "First payment",
-        },
-        {
-          amount: 4800,
-          date: "2023-04-01",
-          method: "Bank Transfer",
-          notes: "Final payment",
-        },
-      ],
-    },
-  ]);
-  const [waitingOrders, setWaitingOrders] = useState([
-    {
-      id: "ORD-7892",
-      date: "2023-06-10",
-      status: "waiting",
-      title: "Custom Walnut Desk",
-      client: "Alex Johnson",
-      email: "alex.j@example.com",
-      phone: "+1 (555) 234-5678",
-      woodType: "Walnut",
-      images: ["https://images.unsplash.com/photo-1517705008128-361805f42e86"],
-      estimatedTotal: null, // Will be set by admin
-      clientValidated: false,
-    },
-  ]);
+  // Sample data
+  // const [orders, setOrders] = useState([
+  //   {
+  //     id: "ORD-7890",
+  //     date: "2023-05-15",
+  //     status: "inProgress",
+  //     title: "Modern Oak Kitchen",
+  //     client: "John Smith",
+  //     email: "john.smith@example.com",
+  //     phone: "+1 (555) 123-4567",
+  //     woodType: "Oak",
+  //     images: [
+  //       "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
+  //       "https://images.unsplash.com/photo-1600585152220",
+  //     ],
+  //     progress: 1, // 0: waiting, 1: production, 2: shipping, 3: completed
+  //     estimatedTotal: 12500,
+  //     amountPaid: 5000,
+  //     payments: [
+  //       {
+  //         amount: 5000,
+  //         date: "2023-05-20",
+  //         method: "Credit Card",
+  //         notes: "Initial deposit",
+  //       },
+  //     ],
+  //     nextPaymentDate: "2023-06-15",
+  //   },
+  //   {
+  //     id: "ORD-7891",
+  //     date: "2023-06-01",
+  //     status: "inShipping", 
+  //     title: "Classic Walnut Kitchen",
+  //     client: "Sarah Johnson",
+  //     email: "sarah.j@example.com",
+  //     phone: "+1 (555) 987-6543",
+  //     woodType: "Walnut",
+  //     images: [
+  //       "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
+  //       "https://images.unsplash.com/photo-1600210492493-0946911123ea",
+  //     ],
+  //     progress: 0,
+  //     estimatedTotal: 9800,
+  //     amountPaid: 0,
+  //     payments: [],
+  //     nextPaymentDate: "2023-06-30",
+  //   },
+  // ]);
+
+  useEffect(() => { 
+    const fetchOrders = async () => {
+
+      try {
+        const response = await apiFetch("/api/v1/orders?status=delivered", null);
+        console.log("the response i got is this ", response)
+        if (response.success) {
+          setCompletedOrders(response.data.data)
+        } else {
+          console.error("Failed to fetch orders:", response.error);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+
+    };
+    fetchOrders();
+   }, []);
+
+   useEffect(() => { 
+    const fetchOrders = async () => {
+
+      try {
+        const response = await apiFetch("/api/v1/orders?status=inProgress", null);
+        console.log("the response i got is this ", response)
+        if (response.success) {
+          setOrders(response.data.data)
+          console.log("this is cool 1, ", response.data.data)
+        } else {
+          console.error("Failed to fetch orders:", response.error);
+        }
+
+        const response2 = await apiFetch("/api/v1/orders?status=inShipping", null);
+        console.log("the response i got is this ", response)
+        if (response2.success) {
+          setOrders([...response.data.data ,...response2.data.data])
+          console.log("this is cool 2, ", response2.data.data)
+
+        } else {
+          console.error("Failed to fetch orders:", response.error);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+
+    };
+    fetchOrders();
+   }, []);
+
+   useEffect(() => { 
+    const fetchOrders = async () => {
+
+      try {
+        const response = await apiFetch("/api/v1/orders?status=waiting", null);
+        console.log("the response i got is this ", response)
+        if (response.success) {
+          setWaitingOrders(response.data.data)
+          console.log("this is amazing")
+        } else {
+          console.error("Failed to fetch orders:", response.error);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+
+    };
+    fetchOrders();
+   }, []);
+
+  // const [waitingOrders, setWaitingOrders] = useState([
+  //   {
+  //     id: "ORD-7892",
+  //     date: "2023-06-10",
+  //     status: "waiting",
+  //     title: "Custom Walnut Desk",
+  //     client: "Alex Johnson",
+  //     email: "alex.j@example.com",
+  //     phone: "+1 (555) 234-5678",
+  //     woodType: "Walnut",
+  //     images: ["https://images.unsplash.com/photo-1517705008128-361805f42e86"],
+  //     estimatedTotal: null, // Will be set by admin
+  //     clientValidated: false,
+  //   },
+  // ]);
 
   const handleAddElement = () => {
     if (completionForm.currentElement.trim()) {
@@ -301,6 +346,7 @@ const AdminDashboard = () => {
 
     setOrders(updatedOrders);
   };
+
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -655,7 +701,8 @@ const AdminDashboard = () => {
                     </span>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-4">
-                    <div>
+                    {order.offer && (
+                      <div>
                       <p
                         className={`text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-500"
@@ -671,6 +718,7 @@ const AdminDashboard = () => {
                         {order.amountPaid.toLocaleString()+ ` ${t("algerianDinar")}`}
                       </p>
                     </div>
+                    )}
                     <div>
                       <p
                         className={`text-sm ${
@@ -1498,7 +1546,7 @@ const AdminDashboard = () => {
                                 darkMode ? "text-white" : "text-gray-900"
                               }`}
                             >
-                              ${payment.amount.toLocaleString()}
+                              ${payment.amount.toLocaleString() || 0}
                             </p>
                             <p
                               className={`text-xs ${

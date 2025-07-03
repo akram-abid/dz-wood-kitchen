@@ -213,5 +213,12 @@
   "orderDate": "Order Date",
   "orderID": "Order ID",
   "loggingIn": "Logging in",
-  "selectBaladia": "Select commune"
+  "selectBaladia": "Select commune",
+  "noKitchensFound": "No kitchens found",
+  "noMoreKitchens": "No more kitchens for display",
+  "uploadedImages": "Uploaded Images",
+  "noOrdersFound": "No orders found",
+  "noWaitingOrders": "No waiting orders found",
+  "enterLocation": "Enter location",
+  "setToInProgress": "Set to In Progress"
 }

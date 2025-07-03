@@ -27,6 +27,8 @@ import {
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import apiFetch from "../utils/api/apiFetch";
+import { useAuth } from "../utils/protectedRootesVerf";
 
 const ProfilePage = () => {
   const [language, setLanguage] = useState("en");
@@ -37,92 +39,145 @@ const ProfilePage = () => {
   const [tempName, setTempName] = useState("John Doe");
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-  });
+  const [userData, setUserData] = useState({});
+  const [orders, setOrders] = useState([]);
+  const [currentOrders, setCurrentOrders] = useState([]);
+  const [completedOrders, setCompletedOrders] = useState([]);
+  const { isAuthenticated, loading } = useAuth();
 
-  const [currentOrders, setCurrentOrders] = useState([
-    {
-      id: "ORD-7890",
-      date: "2023-05-15",
-      status: "inProgress",
-      title: "Modern Oak Kitchen",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
-      progress: 1,
-      estimatedTotal: 12500,
-      amountPaid: 5000,
-      paymentMethod: "Credit Card",
-      payments: [
-        {
-          amount: 3000,
-          date: "2023-05-20",
-          method: "Credit Card",
-          notes: "Initial deposit",
-        },
-        {
-          amount: 2000,
-          date: "2023-06-15",
-          method: "Credit Card",
-          notes: "Final payment",
-        },
-      ],
-      nextPaymentDate: "2023-06-15",
-    },
-  ]);
-  const [completedOrders, setCompletedOrders] = useState([
-    {
-      id: "ORD-4567",
-      date: "2023-03-10",
-      status: "delivered",
-      title: "Classic Walnut Kitchen",
-      image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
-      totalPaid: 9800,
-      amountPaid: 9800, // Add this
-      paymentMethod: "Bank Transfer",
-      payments: [
-        // Add payments array
-        {
-          amount: 5000,
-          date: "2023-03-15",
-          method: "Bank Transfer",
-          notes: "Initial deposit",
-        },
-        {
-          amount: 4800,
-          date: "2023-03-25",
-          method: "Bank Transfer",
-          notes: "Final payment",
-        },
-        {
-          amount: 5000,
-          date: "2023-03-15",
-          method: "Bank Transfer",
-          notes: "Initial deposit",
-        },
-        {
-          amount: 4800,
-          date: "2023-03-25",
-          method: "Bank Transfer",
-          notes: "Final payment",
-        },{
-          amount: 5000,
-          date: "2023-03-15",
-          method: "Bank Transfer",
-          notes: "Initial deposit",
-        },
-      ],
-    },
-    {
-      id: "ORD-1234",
-      date: "2023-01-05",
-      status: "delivered",
-      title: "Rustic Pine Kitchen",
-      image: "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
-      totalPaid: 7500,
-      paymentMethod: "Credit Card",
-    },
-  ]);
+  if(!isAuthenticated) navigate("/login")
+
+  useEffect(() => {
+    const getOrders = async () => {
+      try {
+        const response = await apiFetch("/api/v1/orders/client", null, true);
+        if (response.success) {
+          console.log("Orders fetched successfully:", response.data.data);
+          setOrders(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    getOrders();
+  }, []);
+
+  const token = localStorage.getItem("accessToken");
+
+  function splitOrdersByStatusFunctional(orders) {
+    return {
+      completed: orders.filter((order) => order.status === "completed"),
+      others: orders.filter((order) => order.status !== "completed"),
+    };
+  }
+  useEffect(() => {
+    const { completed, others } = splitOrdersByStatusFunctional(orders);
+
+    setCurrentOrders(others);
+  }, [orders]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (token && token.split(".").length === 3) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+
+        setUserData({
+          name: payload.name,
+          role: payload.role,
+          email: payload.email,
+        });
+      } catch (e) {
+        console.error("Could not decode token payload", e);
+      }
+    } else {
+      console.log("No valid access token found in localStorage");
+    }
+  }, []);
+
+  // const [currentOrders, setCurrentOrders] = useState([
+  //   {
+  //     id: "ORD-7890",
+  //     date: "2023-05-15",
+  //     status: "inProgress",
+  //     title: "Modern Oak Kitchen",
+  //     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
+  //     progress: 1,
+  //     estimatedTotal: 12500,
+  //     amountPaid: 5000,
+  //     paymentMethod: "Credit Card",
+  //     payments: [
+  //       {
+  //         amount: 3000,
+  //         date: "2023-05-20",
+  //         method: "Credit Card",
+  //         notes: "Initial deposit",
+  //       },
+  //       {
+  //         amount: 2000,
+  //         date: "2023-06-15",
+  //         method: "Credit Card",
+  //         notes: "Final payment",
+  //       },
+  //     ],
+  //     nextPaymentDate: "2023-06-15",
+  //   },
+  // ]);
+  // const [completedOrders, setCompletedOrders] = useState([
+  //   {
+  //     id: "ORD-4567",
+  //     date: "2023-03-10",
+  //     status: "delivered",
+  //     title: "Classic Walnut Kitchen",
+  //     image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
+  //     totalPaid: 9800,
+  //     amountPaid: 9800, // Add this
+  //     paymentMethod: "Bank Transfer",
+  //     payments: [
+  //       {
+  //         amount: 5000,
+  //         date: "2023-03-15",
+  //         method: "Bank Transfer",
+  //         notes: "Initial deposit",
+  //       },
+  //       {
+  //         amount: 4800,
+  //         date: "2023-03-25",
+  //         method: "Bank Transfer",
+  //         notes: "Final payment",
+  //       },
+  //       {
+  //         amount: 5000,
+  //         date: "2023-03-15",
+  //         method: "Bank Transfer",
+  //         notes: "Initial deposit",
+  //       },
+  //       {
+  //         amount: 4800,
+  //         date: "2023-03-25",
+  //         method: "Bank Transfer",
+  //         notes: "Final payment",
+  //       },
+  //       {
+  //         amount: 5000,
+  //         date: "2023-03-15",
+  //         method: "Bank Transfer",
+  //         notes: "Initial deposit",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: "ORD-1234",
+  //     date: "2023-01-05",
+  //     status: "delivered",
+  //     title: "Rustic Pine Kitchen",
+  //     image: "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
+  //     totalPaid: 7500,
+  //     paymentMethod: "Credit Card",
+  //   },
+  // ]);
 
   useEffect(() => {
     const updateDirection = () => {
@@ -654,23 +709,25 @@ const ProfilePage = () => {
                           </h4>
 
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div>
-                              <p
-                                className={`text-sm ${
-                                  darkMode ? "text-gray-400" : "text-gray-500"
-                                }`}
-                              >
-                                {t("estimatedTotal")}
-                              </p>
-                              <p
-                                className={`font-medium ${
-                                  darkMode ? "text-white" : "text-gray-900"
-                                }`}
-                              >
-                                {order.estimatedTotal?.toLocaleString() +
-                                  ` ${t("algerianDinar")}` || "N/A"}
-                              </p>
-                            </div>
+                            {order.offer && (
+                              <div>
+                                <p
+                                  className={`text-sm ${
+                                    darkMode ? "text-gray-400" : "text-gray-500"
+                                  }`}
+                                >
+                                  {t("estimatedTotal")}
+                                </p>
+                                <p
+                                  className={`font-medium ${
+                                    darkMode ? "text-white" : "text-gray-900"
+                                  }`}
+                                >
+                                  {order.offre?.toLocaleString() +
+                                    ` ${t("algerianDinar")}` || "N/A"}
+                                </p>
+                              </div>
+                            )}
                             <div>
                               <p
                                 className={`text-sm ${

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import WLogo from "../assets/images/blackLogo.png";
 import {
@@ -19,6 +19,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Globe, Sun, Moon, ChevronDown } from "lucide-react";
 import i18next from "i18next";
+import apiFetch from "../utils/api/apiFetch";
 
 const OrderDetails = () => {
   const { t } = useTranslation();
@@ -29,119 +30,230 @@ const OrderDetails = () => {
   const currentLanguage = i18next.language;
   const isRTL = currentLanguage === "ar";
 
-  console.log("Order ID: ", id);
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Enhanced fake data with some orders missing titles
-  const [orders, setOrders] = useState([
-    {
-      id: "ORD-7890",
-      date: "2023-05-15",
-      status: "inProgress",
-      title: "Modern Oak Kitchen",
-      client: "John Smith",
-      email: "john.smith@example.com",
-      phone: "+1 (555) 123-4567",
-      address: "123 Main St, City, State 12345",
-      woodType: "Oak",
-      images: [
-        "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136",
-        "https://images.unsplash.com/photo-1600585152220",
-      ],
-      progress: 1,
-      estimatedTotal: 12500,
-      amountPaid: 5000,
-      payments: [
-        {
-          amount: 5000,
-          date: "2023-05-20",
-          method: "Credit Card",
-          notes: "Initial deposit",
-        },
-      ],
-      nextPaymentDate: "2023-06-15",
-    },
-    {
-      id: "ORD-7891",
-      date: "2023-06-01",
-      status: "waiting",
-      title: "", // Empty title to test editing
-      client: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      phone: "+1 (555) 987-6543",
-      address: "456 Oak Ave, City, State 67890",
-      woodType: "Walnut",
-      images: [
-        "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
-        "https://images.unsplash.com/photo-1600210492493-0946911123ea",
-      ],
-      progress: 0,
-      estimatedTotal: null,
-      amountPaid: 0,
-      payments: [],
-      nextPaymentDate: "2023-06-30",
-      clientValidated: false,
-    },
-  ]);
+  // State for forms and editing
+  const [priceProposal, setPriceProposal] = useState("");
+  const [showCompletionForm, setShowCompletionForm] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
 
-  const [completedOrders, setCompletedOrders] = useState([
-    {
-      id: "ORD-4567",
-      date: "2023-03-10",
+  const [completionForm, setCompletionForm] = useState({
+    elements: [],
+    currentElement: "",
+    notes: "",
+  });
+
+  const [paymentData, setPaymentData] = useState({
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    method: "Credit Card",
+    notes: "",
+  });
+
+  useEffect(() => {
+    const getOrder = async () => {
+      try {
+        setLoading(true);
+        const response = await apiFetch(`/api/v1/orders/${id}`, null, true);
+
+        if (response.success) {
+          console.log(
+            "the order is going to be like this ",
+            response.data.data.order
+          );
+          setOrder(response.data.data.order);
+        } else {
+          setError(response.error || "Failed to fetch order");
+        }
+      } catch (error) {
+        setError(error.message || "Error fetching order");
+      } finally {
+        setLoading(false);
+      }
+    };
+    getOrder();
+  }, [id]);
+
+  // Handler functions
+  function handleAddElement() {
+    if (completionForm.currentElement.trim()) {
+      setCompletionForm((prev) => ({
+        ...prev,
+        elements: [...prev.elements, prev.currentElement.trim()],
+        currentElement: "",
+      }));
+    }
+  }
+
+  function handleRemoveElement(index) {
+    const newElements = [...completionForm.elements];
+    newElements.splice(index, 1);
+    setCompletionForm((prev) => ({ ...prev, elements: newElements }));
+  }
+
+  function handleSubmitPriceProposal() {
+    if (!priceProposal) return;
+
+    const updatedOrder = {
+      ...order,
+      offer: parseFloat(priceProposal),
+    };
+    //console.log("the updated order is now this: ", updatedOrder)
+    setOrder(updatedOrder);
+    console.log("the order is now have this: ", order);
+    setPriceProposal("");
+  }
+
+  function handleAddPayment() {
+    if (!paymentData.amount) return;
+
+    const newPayment = {
+      amount: parseFloat(paymentData.amount),
+      date: paymentData.date,
+      method: paymentData.method,
+      notes: paymentData.notes,
+    };
+
+    const updatedOrder = {
+      ...order,
+      amountPaid: (order.amountPaid || 0) + parseFloat(paymentData.amount),
+      payments: [...(order.payments || []), newPayment],
+    };
+
+    setOrder(updatedOrder);
+    setPaymentData({
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      method: "Credit Card",
+      notes: "",
+    });
+    setShowPaymentForm(false);
+  }
+
+  function handleCompleteOrder() {
+    if (completionForm.elements.length === 0) {
+      alert("Please add at least one element to complete the order.");
+      return;
+    }
+
+    const completedOrder = {
+      ...order,
       status: "delivered",
-      title: "Classic Walnut Kitchen",
-      client: "Michael Brown",
-      email: "michael.b@example.com",
-      phone: "+1 (555) 456-7890",
-      address: "789 Pine St, City, State 54321",
-      woodType: "Walnut",
-      images: [
-        "https://images.unsplash.com/photo-1600585152220-90363fe7e115",
-        "https://images.unsplash.com/photo-1600121848594-d8644e57abab",
-      ],
-      totalPaid: 9800,
-      estimatedTotal: 9800,
-      amountPaid: 9800,
-      paymentMethod: "Bank Transfer",
-      payments: [
-        {
-          amount: 5000,
-          date: "2023-03-15",
-          method: "Bank Transfer",
-          notes: "First payment",
-        },
-        {
-          amount: 4800,
-          date: "2023-04-01",
-          method: "Bank Transfer",
-          notes: "Final payment",
-        },
-      ],
+      progress: 3,
+      totalPaid: order.amountPaid || 0,
+      paymentMethod:
+        order.payments && order.payments.length > 0
+          ? order.payments[0].method
+          : "Unknown",
       completionDetails: {
-        elements: ["Cabinet doors", "Drawer fronts", "Countertop"],
-        notes: "Client requested additional polishing",
-        completedAt: "2023-04-15T12:00:00Z",
+        elements: completionForm.elements,
+        notes: completionForm.notes,
+        completedAt: new Date().toISOString(),
       },
-    },
-  ]);
+    };
 
-  const [waitingOrders, setWaitingOrders] = useState([
-    {
-      id: "ORD-7892",
-      date: "2023-06-10",
-      status: "waiting",
-      title: "Custom Walnut Desk",
-      client: "Alex Johnson",
-      email: "alex.j@example.com",
-      phone: "+1 (555) 234-5678",
-      address: "321 Elm St, City, State 98765",
-      woodType: "Walnut",
-      images: ["https://images.unsplash.com/photo-1517705008128-361805f42e86"],
-      estimatedTotal: null,
-      clientValidated: false,
-      amountPaid: 0,
-      payments: [],
-    },
-  ]);
+    setOrder(completedOrder);
+    setShowCompletionForm(false);
+    setCompletionForm({
+      elements: [],
+      currentElement: "",
+      notes: "",
+    });
+  }
+
+  async function updateOrderStatus(newStatus) {
+    let newProgress = order.progress;
+    if (newStatus === "waiting") newProgress = 0;
+    if (newStatus === "inProgress") newProgress = 1;
+    if (newStatus === "shipping") newProgress = 2;
+
+    const updatedOrder = {
+      ...order,
+      status: newStatus,
+      progress: newProgress,
+    };
+
+    try {
+      console.log("the new status is ",newStatus)
+      const body = { status: newStatus }
+      console.log("the body is this ", body)
+      const response = apiFetch(
+        `/api/v1/orders/${order.id}/status`,
+        body,
+        true,
+        "PATCH"
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Title updated successfully");
+    } catch (error) {
+      console.log("something went wrong: ", error);
+    }
+
+    setOrder(updatedOrder);
+  }
+
+  function handleEditTitle() {
+    setEditedTitle(order.title || "");
+    setIsEditingTitle(true);
+  }
+
+  async function handleSaveTitle() {
+    if (!editedTitle.trim()) return;
+    const updatedOrder = {
+      ...order,
+      title: editedTitle.trim(),
+    };
+
+    try {
+      const formData = new FormData();
+      formData.append("title", editedTitle.trim());
+      const token = localStorage.getItem("accessToken");
+
+      const response = await fetch(
+        `${import.meta.env.VITE_REACT_APP_ORIGIN}/api/v1/orders/${order.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("Title updated successfully");
+    } catch (error) {
+      console.log("something went wrong: ", error);
+    }
+
+    setOrder(updatedOrder);
+    setIsEditingTitle(false);
+  }
+
+  function handleLanguageChange(languageCode) {
+    i18next.changeLanguage(languageCode);
+    setIsLanguageDropdownOpen(false);
+    document.documentElement.dir = languageCode === "ar" ? "rtl" : "ltr";
+  }
+
+  function toggleLanguageDropdown() {
+    setIsLanguageDropdownOpen((prev) => !prev);
+  }
+
+  function toggleDarkMode() {
+    setDarkMode((prev) => !prev);
+  }
 
   const handlePrintInvoice = () => {
     const printStyles = `
@@ -220,197 +332,30 @@ const OrderDetails = () => {
     }, 1000);
   };
 
-  // State for forms and editing
-  const [priceProposal, setPriceProposal] = useState("");
-  const [showCompletionForm, setShowCompletionForm] = useState(false);
-  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [editedTitle, setEditedTitle] = useState("");
-
-  const [completionForm, setCompletionForm] = useState({
-    elements: [],
-    currentElement: "",
-    notes: "",
-  });
-
-  const [paymentData, setPaymentData] = useState({
-    amount: "",
-    date: new Date().toISOString().split("T")[0],
-    method: "Credit Card",
-    notes: "",
-  });
-
-  const allOrders = [...orders, ...completedOrders, ...waitingOrders];
-  const order = allOrders.find((o) => o.id === id);
-
-  // Handler functions
-  function handleAddElement() {
-    if (completionForm.currentElement.trim()) {
-      setCompletionForm((prev) => ({
-        ...prev,
-        elements: [...prev.elements, prev.currentElement.trim()],
-        currentElement: "",
-      }));
-    }
-  }
-
-  function handleRemoveElement(index) {
-    const newElements = [...completionForm.elements];
-    newElements.splice(index, 1);
-    setCompletionForm((prev) => ({ ...prev, elements: newElements }));
-  }
-
-  function handleSubmitPriceProposal() {
-    if (!priceProposal) return;
-
-    // Update in orders array
-    const updatedOrders = orders.map((o) =>
-      o.id === order.id
-        ? {
-            ...o,
-            estimatedTotal: parseFloat(priceProposal),
-          }
-        : o
+  if (loading) {
+    return (
+      <div
+        className={`flex items-center justify-center h-screen ${
+          darkMode ? "bg-gray-900" : "bg-white"
+        }`}
+      >
+        <p className={darkMode ? "text-white" : "text-gray-900"}>
+          Loading order...
+        </p>
+      </div>
     );
-    setOrders(updatedOrders);
+  }
 
-    // Update in waitingOrders array
-    const updatedWaitingOrders = waitingOrders.map((o) =>
-      o.id === order.id
-        ? {
-            ...o,
-            estimatedTotal: parseFloat(priceProposal),
-          }
-        : o
+  if (error) {
+    return (
+      <div
+        className={`flex items-center justify-center h-screen ${
+          darkMode ? "bg-gray-900" : "bg-white"
+        }`}
+      >
+        <p className={darkMode ? "text-white" : "text-gray-900"}>{error}</p>
+      </div>
     );
-    setWaitingOrders(updatedWaitingOrders);
-
-    setPriceProposal("");
-  }
-
-  function handleAddPayment() {
-    if (!paymentData.amount) return;
-
-    const newPayment = {
-      amount: parseFloat(paymentData.amount),
-      date: paymentData.date,
-      method: paymentData.method,
-      notes: paymentData.notes,
-    };
-
-    const updatedOrders = orders.map((o) => {
-      if (o.id === order.id) {
-        return {
-          ...o,
-          amountPaid: (o.amountPaid || 0) + parseFloat(paymentData.amount),
-          payments: [...(o.payments || []), newPayment],
-        };
-      }
-      return o;
-    });
-
-    setOrders(updatedOrders);
-    setPaymentData({
-      amount: "",
-      date: new Date().toISOString().split("T")[0],
-      method: "Credit Card",
-      notes: "",
-    });
-    setShowPaymentForm(false);
-  }
-
-  function handleCompleteOrder() {
-    if (completionForm.elements.length === 0) {
-      alert("Please add at least one element to complete the order.");
-      return;
-    }
-
-    const completedOrder = {
-      ...order,
-      status: "delivered",
-      progress: 3,
-      totalPaid: order.amountPaid || 0,
-      paymentMethod:
-        order.payments && order.payments.length > 0
-          ? order.payments[0].method
-          : "Unknown",
-      completionDetails: {
-        elements: completionForm.elements,
-        notes: completionForm.notes,
-        completedAt: new Date().toISOString(),
-      },
-    };
-
-    setCompletedOrders([...completedOrders, completedOrder]);
-    setOrders(orders.filter((o) => o.id !== order.id));
-    setShowCompletionForm(false);
-    setCompletionForm({
-      elements: [],
-      currentElement: "",
-      notes: "",
-    });
-  }
-
-  function updateOrderStatus(orderId, newStatus) {
-    const updatedOrders = orders.map((order) => {
-      if (order.id === orderId) {
-        let newProgress = order.progress;
-        if (newStatus === "waiting") newProgress = 0;
-        if (newStatus === "inProgress") newProgress = 1;
-        if (newStatus === "shipping") newProgress = 2;
-
-        return {
-          ...order,
-          status: newStatus,
-          progress: newProgress,
-        };
-      }
-      return order;
-    });
-
-    setOrders(updatedOrders);
-  }
-
-  function handleEditTitle() {
-    setEditedTitle(order.title || "");
-    setIsEditingTitle(true);
-  }
-
-  function handleSaveTitle() {
-    if (!editedTitle.trim()) return;
-
-    // Update in all relevant arrays
-    const updatedOrders = orders.map((o) =>
-      o.id === order.id ? { ...o, title: editedTitle.trim() } : o
-    );
-    setOrders(updatedOrders);
-
-    const updatedWaitingOrders = waitingOrders.map((o) =>
-      o.id === order.id ? { ...o, title: editedTitle.trim() } : o
-    );
-    setWaitingOrders(updatedWaitingOrders);
-
-    const updatedCompletedOrders = completedOrders.map((o) =>
-      o.id === order.id ? { ...o, title: editedTitle.trim() } : o
-    );
-    setCompletedOrders(updatedCompletedOrders);
-
-    setIsEditingTitle(false);
-  }
-
-  function handleLanguageChange(languageCode) {
-    i18next.changeLanguage(languageCode);
-    setIsLanguageDropdownOpen(false);
-    document.documentElement.dir = languageCode === "ar" ? "rtl" : "ltr";
-  }
-
-  function toggleLanguageDropdown() {
-    setIsLanguageDropdownOpen((prev) => !prev);
-  }
-
-  function toggleDarkMode() {
-    setDarkMode((prev) => !prev);
   }
 
   if (!order) {
@@ -447,7 +392,7 @@ const OrderDetails = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <button
             onClick={() => navigate(-1)}
-            className={`p-2 rounded-full ${
+            className={`cursor-pointer p-2 rounded-full ${
               darkMode
                 ? "hover:bg-gray-700 text-white"
                 : "hover:bg-gray-100 text-gray-900"
@@ -611,22 +556,24 @@ const OrderDetails = () => {
           </div>
 
           {/* Order Images */}
-          <div className="mb-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {order.images.map((img, index) => (
-                <div
-                  key={index}
-                  className="relative h-48 rounded-xl overflow-hidden"
-                >
-                  <img
-                    src={img}
-                    alt={`${order.title} - ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+          {order.mediaUrls && order.mediaUrls.length > 0 && (
+            <div className="mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {order.mediaUrls.map((img, index) => (
+                  <div
+                    key={index}
+                    className="relative h-48 rounded-xl overflow-hidden"
+                  >
+                    <img
+                      src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${img}`}
+                      alt={`${order.title} - ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Order Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -643,10 +590,10 @@ const OrderDetails = () => {
                   darkMode ? "bg-gray-700 text-white" : "bg-gray-100"
                 }`}
               >
-                <p className="font-medium">{order.client}</p>
+                <p className="font-medium">{order.fullName}</p>
                 <p className="text-sm">{order.email}</p>
-                <p className="text-sm">{order.phone}</p>
-                <p className="text-sm">{order.address}</p>
+                <p className="text-sm">{order.phoneNumber}</p>
+                <p className="text-sm">{order.street}</p>
               </div>
             </div>
 
@@ -670,11 +617,11 @@ const OrderDetails = () => {
                   <span className="font-medium">{t("woodType")}:</span>{" "}
                   {order.woodType}
                 </p>
-                {order.estimatedTotal && (
+                {order.offer && (
                   <p>
                     <span className="font-medium">{t("estimatedTotal")}:</span>
-                    {order.estimatedTotal?.toLocaleString() +
-                      ` ${t("algerianDinar")}` || "N/A"}
+                    {order.offer?.toLocaleString() + ` ${t("algerianDinar")}` ||
+                      "N/A"}
                   </p>
                 )}
                 {order.status === "delivered" && (
@@ -704,7 +651,7 @@ const OrderDetails = () => {
                 {t("priceProposal")}
               </h3>
 
-              {!order.estimatedTotal ? (
+              {!order.offer ? (
                 <div className="flex items-center space-x-3">
                   <div className="relative flex-1">
                     <span
@@ -750,7 +697,7 @@ const OrderDetails = () => {
                         darkMode ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      ${order.estimatedTotal.toLocaleString()}
+                      ${order.offer.toLocaleString()}
                     </p>
                     <p
                       className={`text-sm ${
@@ -763,15 +710,11 @@ const OrderDetails = () => {
                   <button
                     onClick={() => {
                       setPriceProposal(order.estimatedTotal.toString());
-                      // Reset estimated total to allow editing
-                      const updatedOrders = orders.map((o) =>
-                        o.id === order.id ? { ...o, estimatedTotal: null } : o
-                      );
-                      setOrders(updatedOrders);
-                      const updatedWaitingOrders = waitingOrders.map((o) =>
-                        o.id === order.id ? { ...o, estimatedTotal: null } : o
-                      );
-                      setWaitingOrders(updatedWaitingOrders);
+                      const updatedOrder = {
+                        ...order,
+                        estimatedTotal: null,
+                      };
+                      setOrder(updatedOrder);
                     }}
                     className={`px-3 py-1 rounded-lg text-sm transition-colors ${
                       darkMode
@@ -831,8 +774,8 @@ const OrderDetails = () => {
                       darkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {order.estimatedTotal?.toLocaleString() +
-                      ` ${t("algerianDinar")}` || "N/A"}
+                    {order.offer?.toLocaleString() + ` ${t("algerianDinar")}` ||
+                      "N/A"}
                   </p>
                 </div>
                 <div>
@@ -866,7 +809,7 @@ const OrderDetails = () => {
                     }`}
                   >
                     {(
-                      (order.estimatedTotal || 0) - (order.amountPaid || 0)
+                      (order.offer || 0) - (order.amountPaid || 0)
                     ).toLocaleString() + ` ${t("algerianDinar")}`}
                   </p>
                 </div>
@@ -1032,7 +975,10 @@ const OrderDetails = () => {
                     className={`absolute ${
                       isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
                     } w-2 h-2 rounded-full mt-1.5 ${
-                      order.progress >= 0
+                      order.status === "waiting" ||
+                      order.status === "inProgress" ||
+                      order.status === "shipping" ||
+                      order.status === "delivered"
                         ? darkMode
                           ? "bg-yellow-400"
                           : "bg-yellow-500"
@@ -1045,7 +991,10 @@ const OrderDetails = () => {
                     <div className="flex items-center">
                       <Clock
                         className={`mr-2 ${
-                          order.progress >= 0
+                          order.status === "waiting" ||
+                          order.status === "inProgress" ||
+                          order.status === "shipping" ||
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-yellow-400"
                               : "text-yellow-500"
@@ -1057,7 +1006,10 @@ const OrderDetails = () => {
                       />
                       <h4
                         className={`font-medium ${
-                          order.progress >= 0
+                          order.status === "waiting" ||
+                          order.status === "inProgress" ||
+                          order.status === "shipping" ||
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-white"
                               : "text-gray-900"
@@ -1069,7 +1021,10 @@ const OrderDetails = () => {
                         {t("waiting")}
                       </h4>
                     </div>
-                    {order.progress >= 0 && (
+                    {(order.status === "waiting" ||
+                      order.status === "inProgress" ||
+                      order.status === "shipping" ||
+                      order.status === "delivered") && (
                       <p
                         className={`mt-1 text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-600"
@@ -1087,7 +1042,9 @@ const OrderDetails = () => {
                     className={`absolute ${
                       isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
                     } w-2 h-2 rounded-full mt-1.5 ${
-                      order.progress >= 1
+                      order.status === "inProgress" ||
+                      order.status === "shipping" ||
+                      order.status === "delivered"
                         ? darkMode
                           ? "bg-blue-400"
                           : "bg-blue-500"
@@ -1100,7 +1057,9 @@ const OrderDetails = () => {
                     <div className="flex items-center">
                       <Hammer
                         className={`mr-2 ${
-                          order.progress >= 1
+                          order.status === "inProgress" ||
+                          order.status === "shipping" ||
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-blue-400"
                               : "text-blue-500"
@@ -1112,7 +1071,9 @@ const OrderDetails = () => {
                       />
                       <h4
                         className={`font-medium ${
-                          order.progress >= 1
+                          order.status === "inProgress" ||
+                          order.status === "shipping" ||
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-white"
                               : "text-gray-900"
@@ -1124,7 +1085,9 @@ const OrderDetails = () => {
                         {t("inProgress")}
                       </h4>
                     </div>
-                    {order.progress >= 1 && (
+                    {(order.status === "inProgress" ||
+                      order.status === "shipping" ||
+                      order.status === "delivered") && (
                       <p
                         className={`mt-1 text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-600"
@@ -1142,7 +1105,8 @@ const OrderDetails = () => {
                     className={`absolute ${
                       isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
                     } w-2 h-2 rounded-full mt-1.5 ${
-                      order.progress >= 2
+                      order.status === "shipping" ||
+                      order.status === "delivered"
                         ? darkMode
                           ? "bg-purple-400"
                           : "bg-purple-500"
@@ -1155,7 +1119,8 @@ const OrderDetails = () => {
                     <div className="flex items-center">
                       <Truck
                         className={`mr-2 ${
-                          order.progress >= 2
+                          order.status === "shipping" ||
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-purple-400"
                               : "text-purple-500"
@@ -1167,7 +1132,8 @@ const OrderDetails = () => {
                       />
                       <h4
                         className={`font-medium ${
-                          order.progress >= 2
+                          order.status === "shipping" ||
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-white"
                               : "text-gray-900"
@@ -1179,7 +1145,8 @@ const OrderDetails = () => {
                         {t("shipping")}
                       </h4>
                     </div>
-                    {order.progress >= 2 && (
+                    {(order.status === "shipping" ||
+                      order.status === "delivered") && (
                       <p
                         className={`mt-1 text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-600"
@@ -1197,7 +1164,7 @@ const OrderDetails = () => {
                     className={`absolute ${
                       isRTL ? "right-4 -mr-0.5" : "left-4 -ml-0.5"
                     } w-2 h-2 rounded-full mt-1.5 ${
-                      order.progress >= 3
+                      order.status === "delivered"
                         ? darkMode
                           ? "bg-green-400"
                           : "bg-green-500"
@@ -1210,7 +1177,7 @@ const OrderDetails = () => {
                     <div className="flex items-center">
                       <CheckCircle
                         className={`mr-2 ${
-                          order.progress >= 3
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-green-400"
                               : "text-green-500"
@@ -1222,7 +1189,7 @@ const OrderDetails = () => {
                       />
                       <h4
                         className={`font-medium ${
-                          order.progress >= 3
+                          order.status === "delivered"
                             ? darkMode
                               ? "text-white"
                               : "text-gray-900"
@@ -1234,7 +1201,7 @@ const OrderDetails = () => {
                         {t("delivered")}
                       </h4>
                     </div>
-                    {order.progress >= 3 && (
+                    {order.status === "delivered" && (
                       <p
                         className={`mt-1 text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-600"
@@ -1256,7 +1223,7 @@ const OrderDetails = () => {
               <>
                 {order.status !== "waiting" && (
                   <button
-                    onClick={() => updateOrderStatus(order.id, "waiting")}
+                    onClick={() => updateOrderStatus("waiting")}
                     className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors ${
                       darkMode
                         ? "bg-gray-600 hover:bg-gray-500 text-white"
@@ -1269,7 +1236,7 @@ const OrderDetails = () => {
                 )}
                 {order.status !== "inProgress" && (
                   <button
-                    onClick={() => updateOrderStatus(order.id, "inProgress")}
+                    onClick={() => updateOrderStatus("inProgress")}
                     className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors ${
                       darkMode
                         ? "bg-blue-600 hover:bg-blue-500 text-white"
@@ -1282,7 +1249,7 @@ const OrderDetails = () => {
                 )}
                 {order.status !== "shipping" && (
                   <button
-                    onClick={() => updateOrderStatus(order.id, "shipping")}
+                    onClick={() => updateOrderStatus("shipping")}
                     className={`px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors ${
                       darkMode
                         ? "bg-purple-600 hover:bg-purple-500 text-white"
@@ -1716,10 +1683,10 @@ const OrderDetails = () => {
                     darkMode ? "bg-gray-700" : "bg-gray-100"
                   }`}
                 >
-                  <p className="font-medium">{order.client}</p>
+                  <p className="font-medium">{order.fullName}</p>
                   <p className="text-sm">{order.email}</p>
-                  <p className="text-sm">{order.phone}</p>
-                  <p className="text-sm">{order.address}</p>
+                  <p className="text-sm">{order.phoneNumber}</p>
+                  <p className="text-sm">{order.street}</p>
                 </div>
               </div>
 

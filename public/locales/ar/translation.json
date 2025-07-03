@@ -217,5 +217,12 @@
   "orderDate": "تاريخ الطلب",
   "orderID": "معرّف الطلب",
   "loggingIn": "جارٍ تسجيل الدخول" ,
-  "selectBaladia": "اختر البلدية"
+  "selectBaladia": "اختر البلدية",
+  "noKitchensFound": "لم يتم العثور على مطابخ",
+  "noMoreKitchens": "لا توجد مطابخ أخرى للعرض",
+  "uploadedImages": "الصور المرفوعة",
+  "noOrdersFound": "لم يتم العثور على طلبات",
+  "noWaitingOrders": "لا توجد طلبات قيد الانتظار",
+  "enterLocation": "أدخل موقع",
+  "setToInProgress": "تعيين كقيد التنفيذ"
 }
