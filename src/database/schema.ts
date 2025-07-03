@@ -34,6 +34,7 @@ export const users = pgTable("users", {
   phoneNumber: text("phoneNumber"),
   oauthprovider: text("oauthprovider"),
   oauthId: text("oauthId"),
+  isEmailVerified: pgBoolean("is_email_verified").$default(() => false),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
