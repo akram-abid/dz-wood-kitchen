@@ -25,7 +25,7 @@ const ensureArray = (value) => {
   return [];
 };
 
-// State preservation manager
+// Enhanced state preservation manager with data freshness tracking
 const stateManager = {
   state: {
     scrollPosition: 0,
@@ -35,12 +35,13 @@ const stateManager = {
     page: 1,
     hasMore: true,
     totalKitchens: 0,
+    lastFetch: null, // Track when data was last fetched
+    dataVersion: 0, // Version to track data changes
   },
 
   save(newState) {
     this.state = { ...this.state, ...newState };
     try {
-      // Only save to sessionStorage if browser supports it
       if (typeof Storage !== "undefined") {
         sessionStorage.setItem(
           "kitchenGalleryState",
@@ -58,7 +59,6 @@ const stateManager = {
         const saved = sessionStorage.getItem("kitchenGalleryState");
         if (saved) {
           const parsedState = JSON.parse(saved);
-          // Ensure arrays are always arrays
           this.state = {
             ...this.state,
             ...parsedState,
@@ -69,7 +69,6 @@ const stateManager = {
       }
     } catch (error) {
       console.error("Failed to load state:", error);
-      // Reset to default state on error
       this.state = {
         scrollPosition: 0,
         kitchens: [],
@@ -78,6 +77,8 @@ const stateManager = {
         page: 1,
         hasMore: true,
         totalKitchens: 0,
+        lastFetch: null,
+        dataVersion: 0,
       };
     }
     return this.state;
@@ -92,6 +93,8 @@ const stateManager = {
       page: 1,
       hasMore: true,
       totalKitchens: 0,
+      lastFetch: null,
+      dataVersion: 0,
     };
     try {
       if (typeof Storage !== "undefined") {
@@ -101,11 +104,27 @@ const stateManager = {
       console.error("Failed to clear state:", error);
     }
   },
+
+  // Check if data is stale (older than 5 minutes)
+  isDataStale() {
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+    return !this.state.lastFetch || this.state.lastFetch < fiveMinutesAgo;
+  },
+
+  // Increment data version to indicate changes
+  incrementVersion() {
+    this.state.dataVersion += 1;
+    this.save({ dataVersion: this.state.dataVersion });
+  },
 };
 
 const KitchenGallery = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Check if we're returning from an edit page
+  const isReturningFromEdit = location.state?.fromEdit || false;
+  const editedKitchenId = location.state?.editedKitchenId || null;
 
   // Load saved state
   const savedState = stateManager.load();
@@ -122,7 +141,7 @@ const KitchenGallery = () => {
   );
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(
-    savedState.kitchens.length === 0
+    savedState.kitchens.length === 0 || isReturningFromEdit || stateManager.isDataStale()
   );
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
@@ -133,16 +152,16 @@ const KitchenGallery = () => {
   const [totalKitchens, setTotalKitchens] = useState(
     savedState.totalKitchens || 0
   );
+  const [dataVersion, setDataVersion] = useState(savedState.dataVersion || 0);
 
   const { isAuthenticated, loadingL } = useAuth("admin");
   const [currentLanguage, setCurrentLanguage] = useState("en");
-  console.log("am i an admin ", isAuthenticated);
-  const [isAdmin, setIsAdmin] = useState(false); // Initialize as false
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Add this useEffect to sync isAdmin with isAuthenticated
   useEffect(() => {
     setIsAdmin(isAuthenticated);
   }, [isAuthenticated]);
+
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [error, setError] = useState(null);
 
@@ -151,7 +170,6 @@ const KitchenGallery = () => {
   const hasRestored = useRef(false);
 
   const isRTL = currentLanguage === "ar";
-
   const { t } = useTranslation();
 
   const fetchKitchens = useCallback(async (pageNum = 1, append = false) => {
@@ -168,7 +186,6 @@ const KitchenGallery = () => {
       }
 
       const apiData = response.data || {};
-      console.log("the response is ", apiData.data.posts);
       const newKitchens = ensureArray(
         apiData.data.posts || apiData.posts || []
       );
@@ -180,12 +197,18 @@ const KitchenGallery = () => {
         setKitchens((prev) => {
           const prevArray = ensureArray(prev);
           const updated = [...prevArray, ...newKitchens];
-          saveCurrentState({ kitchens: updated });
+          saveCurrentState({ 
+            kitchens: updated, 
+            lastFetch: Date.now() 
+          });
           return updated;
         });
       } else {
         setKitchens(newKitchens);
-        saveCurrentState({ kitchens: newKitchens });
+        saveCurrentState({ 
+          kitchens: newKitchens, 
+          lastFetch: Date.now() 
+        });
       }
 
       setPage(pageNum);
@@ -195,7 +218,6 @@ const KitchenGallery = () => {
       console.error("Error fetching kitchens:", error);
       setError(error.message || "Failed to load kitchens. Please try again.");
 
-      // Ensure state remains consistent on error
       if (!append) {
         setKitchens([]);
         setFilteredKitchens([]);
@@ -205,6 +227,49 @@ const KitchenGallery = () => {
       setInitialLoading(false);
     }
   }, []);
+
+  // Function to refresh a specific kitchen's data
+  const refreshKitchenData = useCallback(async (kitchenId) => {
+    try {
+      const response = await apiFetch(`/api/v1/services/posts/${kitchenId}`);
+      
+      if (response.success && response.data) {
+        const updatedKitchen = response.data;
+        
+        // Update the kitchen in both kitchens and filteredKitchens arrays
+        setKitchens(prevKitchens => {
+          const updated = prevKitchens.map(kitchen => 
+            kitchen.id === kitchenId ? updatedKitchen : kitchen
+          );
+          saveCurrentState({ kitchens: updated, lastFetch: Date.now() });
+          return updated;
+        });
+
+        setFilteredKitchens(prevFiltered => {
+          return prevFiltered.map(kitchen => 
+            kitchen.id === kitchenId ? updatedKitchen : kitchen
+          );
+        });
+
+        console.log(`Kitchen ${kitchenId} data refreshed successfully`);
+      }
+    } catch (error) {
+      console.error(`Error refreshing kitchen ${kitchenId}:`, error);
+    }
+  }, []);
+
+  // Function to force refresh all data
+  const forceRefresh = useCallback(() => {
+    console.log("Force refreshing gallery data...");
+    stateManager.clear();
+    setKitchens([]);
+    setFilteredKitchens([]);
+    setPage(1);
+    setHasMore(true);
+    setInitialLoading(true);
+    fetchKitchens(1, false);
+  }, [fetchKitchens]);
+
 
   // Load more kitchens for infinite scroll
   const loadMoreKitchens = useCallback(() => {
@@ -226,10 +291,11 @@ const KitchenGallery = () => {
         page,
         hasMore,
         totalKitchens,
+        dataVersion,
         ...additionalState,
       });
     },
-    [kitchens, filteredKitchens, selectedWoodType, page, hasMore, totalKitchens]
+    [kitchens, filteredKitchens, selectedWoodType, page, hasMore, totalKitchens, dataVersion]
   );
 
   // Restore scroll position
@@ -256,6 +322,24 @@ const KitchenGallery = () => {
     }
   }, [savedState.scrollPosition]);
 
+  // Handle returning from edit page
+  useEffect(() => {
+    if (isReturningFromEdit) {
+      console.log("Returning from edit page, refreshing data...");
+      
+      if (editedKitchenId) {
+        // Refresh specific kitchen data
+        refreshKitchenData(editedKitchenId);
+      } else {
+        // Force refresh all data
+        forceRefresh();
+      }
+      
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [isReturningFromEdit, editedKitchenId, refreshKitchenData, forceRefresh, navigate, location.pathname]);
+
   // Delete kitchen function
   const handleDeleteKitchen = async (kitchenId) => {
     if (
@@ -270,13 +354,12 @@ const KitchenGallery = () => {
     setDeleteLoading(kitchenId);
 
     try {
-      const response = await apiFetch(`/api/v1/services/posts/${kitchenId}`,null, false, "DELETE");
+      const response = await apiFetch(`/api/v1/services/posts/${kitchenId}`, null, false, "DELETE");
 
       if (!response.success) {
         throw new Error(response.error || "Failed to delete kitchen");
       }
 
-      console.log("the response of the delete is ", response)
       const kitchensArray = ensureArray(kitchens);
       const filteredArray = ensureArray(filteredKitchens);
 
@@ -290,10 +373,12 @@ const KitchenGallery = () => {
       setKitchens(updatedKitchens);
       setFilteredKitchens(updatedFilteredKitchens);
 
-      // Update saved state
+      // Update saved state with incremented version
+      stateManager.incrementVersion();
       saveCurrentState({
         kitchens: updatedKitchens,
         filteredKitchens: updatedFilteredKitchens,
+        dataVersion: stateManager.state.dataVersion,
       });
 
       console.log(`Kitchen ${kitchenId} deleted successfully`);
@@ -307,30 +392,16 @@ const KitchenGallery = () => {
     }
   };
 
-  // Check admin status
-  // useEffect(() => {
-  //   const checkAdminStatus = async () => {
-  //     try {
-  //       const response = await apiFetch("/api/user/role");
-  //       if (response.success) {
-  //         setIsAdmin(response.data?.role === "admin");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error checking admin status:", error);
-  //       setIsAdmin(false);
-  //     }
-  //   };
-
-  //   checkAdminStatus();
-  // }, []);
-
-  // Initial data load
+  // Initial data load with freshness check
   useEffect(() => {
     const savedKitchens = ensureArray(savedState.kitchens);
-    if (savedKitchens.length === 0) {
+    const needsRefresh = savedKitchens.length === 0 || stateManager.isDataStale() || isReturningFromEdit;
+    
+    if (needsRefresh) {
+      console.log("Data needs refresh, fetching fresh data...");
       fetchKitchens(1, false);
     } else {
-      // Data exists, restore scroll position
+      console.log("Using cached data");
       setTimeout(restoreScrollPosition, 50);
     }
   }, []);
@@ -384,7 +455,9 @@ const KitchenGallery = () => {
   const handleKitchenClick = (kitchenId) => {
     // Save current state before navigation
     saveCurrentState();
-    navigate(`/gallery/${kitchenId}`);
+    navigate(`/gallery/${kitchenId}`, {
+      state: { fromGallery: true }
+    });
   };
 
   // RTL direction handling
@@ -430,7 +503,6 @@ const KitchenGallery = () => {
   };
 
   const handleLanguageChange = (languageCode) => {
-    console.log("Selected language:", languageCode);
     i18next.changeLanguage(languageCode);
     setCurrentLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
@@ -440,8 +512,6 @@ const KitchenGallery = () => {
   const getUniqueWoodTypes = useCallback(() => {
     try {
       const kitchenArray = ensureArray(kitchens);
-
-      // Use Set to ensure uniqueness
       const uniqueTypes = new Set();
 
       kitchenArray.forEach((kitchen) => {
@@ -453,7 +523,6 @@ const KitchenGallery = () => {
         }
       });
 
-      // Convert Set to array and sort alphabetically
       const sortedTypes = Array.from(uniqueTypes).sort();
 
       return [
@@ -471,7 +540,6 @@ const KitchenGallery = () => {
   const KitchenCarousel = ({ images = [] }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // Handle case where images might be a string or array
     const imageArray = React.useMemo(() => {
       if (Array.isArray(images)) return images;
       if (typeof images === "string" && images.trim()) return [images];
@@ -578,7 +646,7 @@ const KitchenGallery = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-400 border-t-transparent mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-400">
-            Loading kitchens...
+            {isReturningFromEdit ? "Updating gallery..." : "Loading kitchens..."}
           </p>
         </div>
       </div>
@@ -591,18 +659,25 @@ const KitchenGallery = () => {
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <button
-            onClick={() => fetchKitchens(1, false)}
-            className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg font-semibold"
-          >
-            Try Again
-          </button>
+          <div className="space-x-4">
+            <button
+              onClick={() => fetchKitchens(1, false)}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-lg font-semibold"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={forceRefresh}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold"
+            >
+              Force Refresh
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Ensure filteredKitchens is always an array before rendering
   const safeFilteredKitchens = ensureArray(filteredKitchens);
 
   return (
@@ -624,6 +699,17 @@ const KitchenGallery = () => {
               <div className="px-2 py-1 bg-red-500 text-white text-xs rounded-full font-semibold">
                 Admin
               </div>
+            )}
+
+            {/* Manual refresh button for debugging */}
+            {isAdmin && (
+              <button
+                onClick={forceRefresh}
+                className="px-3 py-1 bg-blue-500 text-white text-xs rounded-full font-semibold hover:bg-blue-600"
+                title="Force refresh gallery data"
+              >
+                Refresh
+              </button>
             )}
 
             <div className="relative">

@@ -51,6 +51,8 @@ const KitchenOrderPage = () => {
     key: kitchenData?.id,
   });
 
+  console.log("this is what i got ok ", kitchenData)
+
   const [wilayaSearch, setWilayaSearch] = useState("");
   const [dairaSearch, setDairaSearch] = useState("");
   const [baladiaSearch, setBaladiaSearch] = useState("");
@@ -142,67 +144,70 @@ const KitchenOrderPage = () => {
   };
 
   const token = localStorage.getItem("accessToken");
-    const handleSeeOrder = () => {
+  const handleSeeOrder = () => {
     console.log("Navigate to order details", orderData);
     navigate("/profile");
   };
 
   const handleSubmitOrder = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) {
-    console.log("Form is not valid");
-    return;
-  }
-
-  setOrderSubmitted(true);
-
-  try {
-    // Create FormData object
-    const formData = new FormData();
-    
-    // Append all fields to FormData (matches testing.html structure)
-    formData.append("title", kitchenData?.title || null);
-    formData.append("description", orderData.description);
-    formData.append("woodType", orderData.woodType);
-    formData.append("baladia", orderData.baladia);
-    formData.append("email", orderData.email);
-    formData.append("fullName", orderData.fullName);
-    formData.append("street", orderData.street);
-    formData.append("daira", orderData.daira);
-    formData.append("wilaya", orderData.wilaya);
-    formData.append("phoneNumber", orderData.phoneNumber);
-
-    console.log("Order data before just some of them submission:", Object.fromEntries(formData.entries()));
-
-    // Append files
-    orderData.media.forEach((file) => {
-      formData.append("media", file);
-    });
-
-    console.log("Submitting order with fucking FormData:", formData);
-
-    // Debug: Log FormData contents
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
+    if (!validateForm()) {
+      console.log("Form is not valid");
+      return;
     }
 
-    const response = await fetch("https://dzwoodkitchen.com/api/v1/orders", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    setOrderSubmitted(true);
 
-    const result = await response.json();
-    console.log("✅ Response:", result);
-    alert("Order created successfully!");
-  } catch (err) {
-    console.error("❌ Error:", err);
-    alert("Failed to create order.");
-  }
-};
+    try {
+      // Create FormData object
+      const formData = new FormData();
+
+      // Append all fields to FormData (matches testing.html structure)
+      formData.append("title", "");
+      formData.append("description", orderData.description);
+      formData.append("woodType", orderData.woodType);
+      formData.append("baladia", orderData.baladia);
+      formData.append("email", orderData.email);
+      formData.append("fullName", orderData.fullName);
+      formData.append("street", orderData.street);
+      formData.append("daira", orderData.daira);
+      formData.append("wilaya", orderData.wilaya);
+      formData.append("phoneNumber", orderData.phoneNumber);
+
+      console.log(
+        "Order data before just some of them submission:",
+        Object.fromEntries(formData.entries())
+      );
+
+      // Append files
+      orderData.media.forEach((file) => {
+        formData.append("media", file);
+      });
+
+      console.log("Submitting order with fucking FormData:", formData);
+
+      // Debug: Log FormData contents
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
+
+      const response = await fetch("https://dzwoodkitchen.com/api/v1/orders", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+      console.log("✅ Response:", result);
+      alert("Order created successfully!");
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Failed to create order.");
+    }
+  };
 
   useEffect(() => {
     const updateDirection = () => {
@@ -354,7 +359,6 @@ const KitchenOrderPage = () => {
             {t("customKitchenSubtitle")}
           </p>
         </div>
-
         {!orderSubmitted ? (
           <form onSubmit={handleSubmitOrder}>
             <div className="space-y-8">
@@ -377,13 +381,15 @@ const KitchenOrderPage = () => {
                   </h2>
                   <div className="flex items-center space-x-4">
                     <div className="w-24 h-24 rounded-xl overflow-hidden">
-                      <img
-                        src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${
-                          kitchenData.imageUrls[0]
-                        }`}
-                        alt={kitchenData.title}
-                        className="w-full h-full object-cover"
-                      />
+                      {kitchenData.images && (
+                        <img
+                          src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${
+                            kitchenData.images[0].url
+                          }`}
+                          alt={kitchenData.title}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                     <div>
                       <h3
@@ -436,6 +442,7 @@ const KitchenOrderPage = () => {
                         }`}
                         size={20}
                       />
+
                       <input
                         type="text"
                         value={orderData.fullName}
@@ -526,6 +533,7 @@ const KitchenOrderPage = () => {
                         } ${errors.phone ? "border-red-500" : ""}`}
                       />
                     </div>
+
                     {errors.phone && (
                       <p className="text-red-500 text-sm mt-1">
                         {errors.phone}

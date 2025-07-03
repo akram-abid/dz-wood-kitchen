@@ -33,146 +33,108 @@ import { useAuth } from "../utils/protectedRootesVerf";
 const AdminDashboard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated, loading: authLoading } = useAuth("admin");
-
-  // State for orders and loading states
-  const [orders, setOrders] = useState([]);
-  const [completedOrders, setCompletedOrders] = useState([]);
-  const [waitingOrders, setWaitingOrders] = useState([]);
-  const [loadingOrders, setLoadingOrders] = useState({
-    completed: false,
-    inProgress: false,
-    waiting: false,
-  });
-
-  // UI state
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("orders");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showCompletionForm, setShowCompletionForm] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
-  const [creatingPost, setCreatingPost] = useState(false);
-
-  // Form states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [completedOrders, setCompletedOrders] = useState([]);
+  const [waitingOrders, setWaitingOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const { isAuthenticated, loading } = useAuth("admin");
+  const [showCompletionForm, setShowCompletionForm] = useState(false);
   const [completionForm, setCompletionForm] = useState({
     elements: [],
     currentElement: "",
     notes: "",
   });
-  const [paymentData, setPaymentData] = useState({
-    amount: "",
-    date: new Date().toISOString().split("T")[0],
-    method: "Credit Card",
-    notes: "",
-  });
-  const [newPost, setNewPost] = useState({
-    title: "",
-    description: "",
-    woodType: "",
-    location: "",
-    images: [],
-    items: [],
-    currentItem: "",
-  });
 
-  const fileInputRef = useRef(null);
+  if (!isAuthenticated) navigate("/login");
 
-  if (!isAuthenticated && !authLoading) navigate("/login");
-
-  // Fetch completed orders
   useEffect(() => {
-    const fetchCompletedOrders = async () => {
-      setLoadingOrders((prev) => ({ ...prev, completed: true }));
+    const fetchOrders = async () => {
       try {
         const response = await apiFetch(
           "/api/v1/orders?status=delivered",
           null
         );
+        console.log("the response i got is this ", response);
         if (response.success) {
           setCompletedOrders(response.data.data);
         } else {
-          console.error("Failed to fetch completed orders:", response.error);
+          console.error("Failed to fetch orders:", response.error);
         }
       } catch (error) {
-        console.error("Error fetching completed orders:", error);
-      } finally {
-        setLoadingOrders((prev) => ({ ...prev, completed: false }));
+        console.error("Error fetching orders:", error);
       }
     };
-    fetchCompletedOrders();
+    fetchOrders();
   }, []);
 
-  // Fetch in-progress and shipping orders
   useEffect(() => {
-    const fetchInProgressOrders = async () => {
-      setLoadingOrders((prev) => ({ ...prev, inProgress: true }));
+    const fetchOrders = async () => {
       try {
         const response = await apiFetch(
           "/api/v1/orders?status=inProgress",
           null
         );
+        if (response.success) {
+          setOrders(response.data.data);
+        } else {
+          console.error("Failed to fetch orders:", response.error);
+        }
+
         const response2 = await apiFetch(
           "/api/v1/orders?status=inShipping",
           null
         );
-
-        const combinedOrders = [];
-        if (response.success) combinedOrders.push(...response.data.data);
-        if (response2.success) combinedOrders.push(...response2.data.data);
-
-        setOrders(combinedOrders);
+        if (response2.success) {
+          setOrders([...response.data.data, ...response2.data.data]);
+        } else {
+          console.error("Failed to fetch orders:", response.error);
+        }
       } catch (error) {
-        console.error("Error fetching in-progress orders:", error);
-      } finally {
-        setLoadingOrders((prev) => ({ ...prev, inProgress: false }));
+        console.error("Error fetching orders:", error);
       }
     };
-    fetchInProgressOrders();
+    fetchOrders();
   }, []);
 
-  // Fetch waiting orders
   useEffect(() => {
-    const fetchWaitingOrders = async () => {
-      setLoadingOrders((prev) => ({ ...prev, waiting: true }));
+    const fetchOrders = async () => {
       try {
         const response = await apiFetch("/api/v1/orders?status=waiting", null);
         if (response.success) {
           setWaitingOrders(response.data.data);
         } else {
-          console.error("Failed to fetch waiting orders:", response.error);
+          console.error("Failed to fetch orders:", response.error);
         }
       } catch (error) {
-        console.error("Error fetching waiting orders:", error);
-      } finally {
-        setLoadingOrders((prev) => ({ ...prev, waiting: false }));
+        console.error("Error fetching orders:", error);
       }
     };
-    fetchWaitingOrders();
+    fetchOrders();
   }, []);
 
-  // Layout and direction effects
-  useEffect(() => {
-    const updateDirection = () => {
-      document.documentElement.dir = i18next.dir();
-    };
-    updateDirection();
-    i18next.on("languageChanged", updateDirection);
-    return () => i18next.off("languageChanged", updateDirection);
-  }, []);
-
-  // Helper functions
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-  const toggleLanguageDropdown = () =>
-    setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
-  const handleLanguageChange = (languageCode) => {
-    i18next.changeLanguage(languageCode);
-    setIsLanguageDropdownOpen(false);
-  };
+  // const [waitingOrders, setWaitingOrders] = useState([
+  //   {
+  //     id: "ORD-7892",
+  //     date: "2023-06-10",
+  //     status: "waiting",
+  //     title: "Custom Walnut Desk",
+  //     client: "Alex Johnson",
+  //     email: "alex.j@example.com",
+  //     phone: "+1 (555) 234-5678",
+  //     woodType: "Walnut",
+  //     images: ["https://images.unsplash.com/photo-1517705008128-361805f42e86"],
+  //     estimatedTotal: null, // Will be set by admin
+  //     clientValidated: false,
+  //   },
+  // ]);
 
   const handleAddElement = () => {
     if (completionForm.currentElement.trim()) {
@@ -198,28 +160,176 @@ const AdminDashboard = () => {
     setShowCompletionForm(true);
   };
 
+  const [paymentData, setPaymentData] = useState({
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    method: "Credit Card",
+    notes: "",
+  });
+
+  // Layout and direction effects
+  useEffect(() => {
+    const updateDirection = () => {
+      document.documentElement.dir = i18next.dir();
+    };
+    updateDirection();
+    i18next.on("languageChanged", updateDirection);
+    return () => i18next.off("languageChanged", updateDirection);
+  }, []);
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const toggleLanguageDropdown = () => {
+    setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
+  };
+
+  const handleLanguageChange = (languageCode) => {
+    i18next.changeLanguage(languageCode);
+    setIsLanguageDropdownOpen(false);
+  };
+
+  const getProgressSteps = (progress) => {
+    const steps = [
+      { icon: <Clock size={16} />, label: t("waiting"), active: progress >= 0 },
+      {
+        icon: <Hammer size={16} />,
+        label: t("production"),
+        active: progress >= 1,
+      },
+      {
+        icon: <Truck size={16} />,
+        label: t("shipping"),
+        active: progress >= 2,
+      },
+      {
+        icon: <CheckCircle size={16} />,
+        label: t("completed"),
+        active: progress >= 3,
+      },
+    ];
+    return steps;
+  };
+
+  const handleAddPayment = () => {
+    if (!currentOrder || !paymentData.amount) return;
+
+    const updatedOrders = orders.map((order) => {
+      if (order.id === currentOrder.id) {
+        const newPayment = {
+          amount: parseFloat(paymentData.amount),
+          date: paymentData.date,
+          method: paymentData.method,
+          notes: paymentData.notes,
+        };
+
+        console.log("the paiiiiii ", newPayment);
+
+        return {
+          ...order,
+          amountPaid: order.amountPaid + parseFloat(paymentData.amount),
+          payments: [...order.payments, newPayment],
+        };
+      }
+      return order;
+    });
+
+    setOrders(updatedOrders);
+    setShowPaymentModal(false);
+    setPaymentData({
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      method: "Credit Card",
+      notes: "",
+    });
+  };
+
+  const updateOrderStatus = (orderId, newStatus) => {
+    const updatedOrders = orders
+      .map((order) => {
+        if (order.id === orderId) {
+          let newProgress = order.progress;
+          if (newStatus === "inProgress") newProgress = 1;
+          if (newStatus === "shipping") newProgress = 2;
+          if (newStatus === "completed") {
+            newProgress = 3;
+            // Move to completed orders with all required properties
+            const completedOrder = {
+              ...order,
+              status: "delivered",
+              progress: 3,
+              totalPaid: order.amountPaid, // Ensure totalPaid is set
+              paymentMethod:
+                order.payments.length > 0
+                  ? order.payments[0].method
+                  : "Unknown", // Set payment method
+            };
+            setCompletedOrders([...completedOrders, completedOrder]);
+            return null; // Remove from current orders
+          }
+          return { ...order, status: newStatus, progress: newProgress };
+        }
+        return order;
+      })
+      .filter(Boolean);
+
+    setOrders(updatedOrders);
+  };
+
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch =
+      order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesFilter =
+      filterStatus === "all" || order.status === filterStatus;
+
+    return matchesSearch && matchesFilter;
+  });
+
+  // Add these to your component state and refs
+  const fileInputRef = useRef(null);
+
+  const [newPost, setNewPost] = useState({
+    title: "",
+    description: "",
+    woodType: "",
+    location: "",
+    images: [],
+    items: [],
+    currentItem: "",
+  });
+
+  // Image upload handler
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
+
     files.forEach((file) => {
+      // Check if it's an image
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
+
         reader.onload = (event) => {
           const imageObj = {
             file: file,
             preview: event.target.result,
             name: file.name,
           };
+
           setNewPost((prev) => ({
             ...prev,
             images: [...prev.images, imageObj],
           }));
         };
+
         reader.readAsDataURL(file);
       }
     });
+
+    // Reset the file input
     e.target.value = "";
   };
 
+  // Remove image function
   const removeImage = (index) => {
     setNewPost((prev) => ({
       ...prev,
@@ -244,7 +354,9 @@ const AdminDashboard = () => {
     }));
   };
 
+  // Update the handleCreatePost function in AdminDashboard.jsx
   const handleCreatePost = async () => {
+    // Validate required fields
     if (
       !newPost.title ||
       !newPost.description ||
@@ -255,16 +367,22 @@ const AdminDashboard = () => {
       return;
     }
 
-    setCreatingPost(true);
     try {
       const formData = new FormData();
+
       formData.append("title", newPost.title);
       formData.append("description", newPost.description);
       formData.append("woodType", newPost.woodType);
+      console.log("these the items ", newPost.items)
       formData.append("items", JSON.stringify(newPost.items));
 
-      if (newPost.location) formData.append("location", newPost.location);
-      newPost.images.forEach((image) => formData.append("media", image.file));
+      if (newPost.location) {
+        formData.append("location", newPost.location);
+      }
+
+      newPost.images.forEach((image) => {
+        formData.append("media", image.file);
+      });
 
       const response = await apiFetch(
         "/api/v1/services/posts",
@@ -273,8 +391,12 @@ const AdminDashboard = () => {
         "POST"
       );
 
+      console.log("the response is that ", response);
+
       if (response.success) {
+        console.log("Post created successfully:", response.data);
         alert("Post created successfully!");
+
         setNewPost({
           title: "",
           description: "",
@@ -292,110 +414,8 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Error creating post:", error);
       alert("An error occurred while creating the post");
-    } finally {
-      setCreatingPost(false);
     }
   };
-
-  const handleAddPayment = async () => {
-    if (!currentOrder || !paymentData.amount) return;
-
-    try {
-      const updatedOrders = orders.map((order) => {
-        if (order.id === currentOrder.id) {
-          const newPayment = {
-            amount: parseFloat(paymentData.amount),
-            date: paymentData.date,
-            method: paymentData.method,
-            notes: paymentData.notes,
-          };
-
-          return {
-            ...order,
-            amountPaid: order.amountPaid + parseFloat(paymentData.amount),
-            payments: [...order.payments, newPayment],
-          };
-        }
-        return order;
-      });
-
-      setOrders(updatedOrders);
-      setShowPaymentModal(false);
-      setPaymentData({
-        amount: "",
-        date: new Date().toISOString().split("T")[0],
-        method: "Credit Card",
-        notes: "",
-      });
-    } catch (error) {
-      console.error("Error adding payment:", error);
-    }
-  };
-
-  const updateOrderStatus = (orderId, newStatus) => {
-    const updatedOrders = orders
-      .map((order) => {
-        if (order.id === orderId) {
-          let newProgress = order.progress;
-          if (newStatus === "inProgress") newProgress = 1;
-          if (newStatus === "shipping") newProgress = 2;
-          if (newStatus === "completed") {
-            newProgress = 3;
-            const completedOrder = {
-              ...order,
-              status: "delivered",
-              progress: 3,
-              totalPaid: order.amountPaid,
-              paymentMethod:
-                order.payments.length > 0
-                  ? order.payments[0].method
-                  : "Unknown",
-            };
-            setCompletedOrders([...completedOrders, completedOrder]);
-            return null;
-          }
-          return { ...order, status: newStatus, progress: newProgress };
-        }
-        return order;
-      })
-      .filter(Boolean);
-
-    setOrders(updatedOrders);
-  };
-
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesFilter =
-      filterStatus === "all" || order.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
-
-  // Loading spinner component
-  const Spinner = ({
-    size = 24,
-    color = darkMode ? "text-yellow-400" : "text-yellow-600",
-  }) => (
-    <div
-      className={`animate-spin rounded-full border-2 border-solid border-current border-r-transparent ${color}`}
-      style={{ width: size, height: size }}
-    />
-  );
-
-  if (authLoading) {
-    return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${
-          darkMode ? "bg-gray-900" : "bg-white"
-        }`}
-      >
-        <Spinner size={48} />
-      </div>
-    );
-  }
 
   return (
     <div
@@ -459,7 +479,7 @@ const AdminDashboard = () => {
                         darkMode
                           ? "hover:bg-gray-700 text-white"
                           : "hover:bg-gray-50 text-gray-900"
-                      }`}
+                      } `}
                     >
                       <span className="text-lg">{lang.flag}</span>
                       <span className="font-medium">{lang.name}</span>
@@ -509,7 +529,6 @@ const AdminDashboard = () => {
             </button>
           </div>
         </div>
-
         {/* Tabs */}
         <div className="flex border-b mb-6">
           <button
@@ -555,7 +574,6 @@ const AdminDashboard = () => {
             {t("completedOrders")}
           </button>
         </div>
-
         {/* Search and Filter */}
         <div
           className={`p-4 rounded-xl mb-6 ${
@@ -616,7 +634,7 @@ const AdminDashboard = () => {
                   <option value="shipping">{t("shipping")}</option>
                 </select>
                 <ChevronDown
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none ${
+                  className={`absolute right-3 top-1/2  transform -translate-y-1/2 pointer-events-none ${
                     darkMode ? "text-gray-400" : "text-gray-500"
                   }`}
                   size={16}
@@ -625,16 +643,11 @@ const AdminDashboard = () => {
             )}
           </div>
         </div>
-
         {/* Orders Content */}
         {activeTab === "waiting" ? (
-          loadingOrders.waiting ? (
-            <div className="flex justify-center items-center py-12">
-              <Spinner size={48} />
-            </div>
-          ) : waitingOrders.length > 0 ? (
-            <div className="space-y-6">
-              {waitingOrders.map((order) => (
+          <div className="space-y-6">
+            {waitingOrders.length > 0 ? (
+              waitingOrders.map((order) => (
                 <div
                   key={order.id}
                   className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
@@ -677,39 +690,35 @@ const AdminDashboard = () => {
                     </div>
                   )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              className={`rounded-2xl p-12 text-center ${
-                darkMode
-                  ? "bg-gray-800/50 border-gray-700/50"
-                  : "bg-white/80 border-gray-200/50"
-              }`}
-            >
-              <Clock
-                size={48}
-                className={`mx-auto mb-4 ${
-                  darkMode ? "text-gray-500" : "text-gray-400"
-                }`}
-              />
-              <h3
-                className={`text-xl font-medium mb-2 ${
-                  darkMode ? "text-white" : "text-gray-900"
+              ))
+            ) : (
+              <div
+                className={`rounded-2xl p-12 text-center ${
+                  darkMode
+                    ? "bg-gray-800/50 border-gray-700/50"
+                    : "bg-white/80 border-gray-200/50"
                 }`}
               >
-                {t("noWaitingOrders")}
-              </h3>
-            </div>
-          )
+                <Clock
+                  size={48}
+                  className={`mx-auto mb-4 ${
+                    darkMode ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
+                <h3
+                  className={`text-xl font-medium mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("noWaitingOrders")}
+                </h3>
+              </div>
+            )}
+          </div>
         ) : activeTab === "orders" ? (
-          loadingOrders.inProgress ? (
-            <div className="flex justify-center items-center py-12">
-              <Spinner size={48} />
-            </div>
-          ) : filteredOrders.length > 0 ? (
-            <div className="space-y-6">
-              {filteredOrders.map((order) => (
+          <div className="space-y-6">
+            {filteredOrders.length > 0 ? (
+              filteredOrders.map((order) => (
                 <div
                   key={order.id}
                   className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
@@ -748,114 +757,150 @@ const AdminDashboard = () => {
                         : t("shipping")}
                     </span>
                   </div>
+                  <div className="mt-4 grid grid-cols-2 gap-4">
+                    {order.offer && (
+                      <div>
+                        <p
+                          className={`text-sm ${
+                            darkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          {t("amountPaid")}
+                        </p>
+                        <p
+                          className={`font-medium ${
+                            darkMode ? "text-green-400" : "text-green-600"
+                          }`}
+                        >
+                          {(order.amountPaid || 0).toLocaleString() +
+                            ` ${t("algerianDinar")}`}
+                        </p>
+                      </div>
+                    )}
+                    <div>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("status")}
+                      </p>
+                      <p
+                        className={`font-medium ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.status === "inProgress"
+                          ? t("inProduction")
+                          : t("inShipping")}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              className={`rounded-2xl p-12 text-center ${
-                darkMode
-                  ? "bg-gray-800/50 border-gray-700/50"
-                  : "bg-white/80 border-gray-200/50"
-              }`}
-            >
-              <Package
-                size={48}
-                className={`mx-auto mb-4 ${
-                  darkMode ? "text-gray-500" : "text-gray-400"
-                }`}
-              />
-              <h3
-                className={`text-xl font-medium mb-2 ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {t("noOrdersFound")}
-              </h3>
-            </div>
-          )
-        ) : loadingOrders.completed ? (
-          <div className="flex justify-center items-center py-12">
-            <Spinner size={48} />
-          </div>
-        ) : completedOrders.length > 0 ? (
-          <div className="space-y-6">
-            {completedOrders.map((order) => (
+              ))
+            ) : (
               <div
-                key={order.id}
-                className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
+                className={`rounded-2xl p-12 text-center ${
                   darkMode
-                    ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
-                    : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
+                    ? "bg-gray-800/50 border-gray-700/50"
+                    : "bg-white/80 border-gray-200/50"
                 }`}
-                onClick={() => navigate(`/orders/${order.id}`)}
               >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3
-                      className={`text-xl font-bold ${
+                <Package
+                  size={48}
+                  className={`mx-auto mb-4 ${
+                    darkMode ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
+                <h3
+                  className={`text-xl font-medium mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("noOrdersFound")}
+                </h3>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {completedOrders.length > 0 ? (
+              completedOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className={`rounded-2xl p-6 border transition-all duration-300 cursor-pointer ${
+                    darkMode
+                      ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:bg-gray-700/50"
+                      : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm hover:bg-gray-100/50"
+                  }`}
+                  onClick={() => navigate(`/orders/${order.id}`)}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3
+                        className={`text-xl font-bold ${
+                          darkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {order.title}
+                      </h3>
+                      <p
+                        className={`text-sm ${
+                          darkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {order.id} • {order.client}
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {t("delivered")}
+                    </span>
+                  </div>
+                  <div className="mt-4">
+                    <p
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("completedOn")}
+                    </p>
+                    <p
+                      className={`font-medium ${
                         darkMode ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      {order.title}
-                    </h3>
-                    <p
-                      className={`text-sm ${
-                        darkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      {order.id} • {order.client}
+                      {new Date(
+                        order.completionDetails?.completedAt || order.date
+                      ).toLocaleDateString()}
                     </p>
                   </div>
-                  <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {t("delivered")}
-                  </span>
                 </div>
-                <div className="mt-4">
-                  <p
-                    className={`text-sm ${
-                      darkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    {t("completedOn")}
-                  </p>
-                  <p
-                    className={`font-medium ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {new Date(
-                      order.completionDetails?.completedAt || order.date
-                    ).toLocaleDateString()}
-                  </p>
-                </div>
+              ))
+            ) : (
+              <div
+                className={`rounded-2xl p-12 text-center ${
+                  darkMode
+                    ? "bg-gray-800/50 border-gray-700/50"
+                    : "bg-white/80 border-gray-200/50"
+                }`}
+              >
+                <CheckCircle
+                  size={48}
+                  className={`mx-auto mb-4 ${
+                    darkMode ? "text-gray-500" : "text-gray-400"
+                  }`}
+                />
+                <h3
+                  className={`text-xl font-medium mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("noCompletedOrders")}
+                </h3>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div
-            className={`rounded-2xl p-12 text-center ${
-              darkMode
-                ? "bg-gray-800/50 border-gray-700/50"
-                : "bg-white/80 border-gray-200/50"
-            }`}
-          >
-            <CheckCircle
-              size={48}
-              className={`mx-auto mb-4 ${
-                darkMode ? "text-gray-500" : "text-gray-400"
-              }`}
-            />
-            <h3
-              className={`text-xl font-medium mb-2 ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              {t("noCompletedOrders")}
-            </h3>
+            )}
           </div>
         )}
-
         {/* Create Post Modal */}
         {showCreatePostModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1120,21 +1165,15 @@ const AdminDashboard = () => {
                   </button>
                   <button
                     onClick={handleCreatePost}
-                    disabled={creatingPost}
-                    className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black flex items-center justify-center min-w-[120px]"
+                    className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black"
                   >
-                    {creatingPost ? (
-                      <Spinner size={20} color="text-black" />
-                    ) : (
-                      t("createPost")
-                    )}
+                    {t("createPost")}
                   </button>
                 </div>
               </div>
             </div>
           </div>
         )}
-
         {/* Add Payment Modal */}
         {showPaymentModal && currentOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1164,7 +1203,139 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {/* Payment form fields remain the same */}
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <p
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("order")}
+                    </p>
+                    <p
+                      className={`font-medium ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {currentOrder.title} ({currentOrder.id})
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {t("amount")}
+                    </label>
+                    <div className="relative">
+                      <span
+                        className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                          darkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        $
+                      </span>
+                      <input
+                        type="number"
+                        value={paymentData.amount}
+                        onChange={(e) =>
+                          setPaymentData({
+                            ...paymentData,
+                            amount: e.target.value,
+                          })
+                        }
+                        className={`w-full pl-8 pr-4 py-2 rounded-lg border ${
+                          darkMode
+                            ? "bg-gray-700 border-gray-600 text-white"
+                            : "bg-white border-gray-300 text-gray-900"
+                        }`}
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {t("date")}
+                    </label>
+                    <input
+                      type="date"
+                      value={paymentData.date}
+                      onChange={(e) =>
+                        setPaymentData({
+                          ...paymentData,
+                          date: e.target.value,
+                        })
+                      }
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        darkMode
+                          ? "bg-gray-700 border-gray-600 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {t("paymentMethod")}
+                    </label>
+                    <select
+                      value={paymentData.method}
+                      onChange={(e) =>
+                        setPaymentData({
+                          ...paymentData,
+                          method: e.target.value,
+                        })
+                      }
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        darkMode
+                          ? "bg-gray-700 border-gray-600 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      }`}
+                    >
+                      <option value="Credit Card">{t("creditCard")}</option>
+                      <option value="Bank Transfer">{t("bankTransfer")}</option>
+                      <option value="Cash">{t("cash")}</option>
+                      <option value="Check">{t("check")}</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {t("notes")}
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={paymentData.notes}
+                      onChange={(e) =>
+                        setPaymentData({
+                          ...paymentData,
+                          notes: e.target.value,
+                        })
+                      }
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        darkMode
+                          ? "bg-gray-700 border-gray-600 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      }`}
+                      placeholder={t("optionalNotes")}
+                    ></textarea>
+                  </div>
+                </div>
 
                 <div className="flex justify-end space-x-3">
                   <button
@@ -1193,8 +1364,6 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
-
-        {/* Completion Form Modal */}
         {showCompletionForm && currentOrder && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div
@@ -1223,7 +1392,101 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {/* Completion form fields remain the same */}
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <p
+                      className={`text-sm ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("order")}
+                    </p>
+                    <p
+                      className={`font-medium ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {currentOrder.title} ({currentOrder.id})
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {t("articlesUsed")}
+                    </label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        value={completionForm.currentElement}
+                        onChange={(e) =>
+                          setCompletionForm({
+                            ...completionForm,
+                            currentElement: e.target.value,
+                          })
+                        }
+                        className={`flex-1 px-4 py-2 rounded-l-lg border ${
+                          darkMode
+                            ? "bg-gray-700 border-gray-600 text-white"
+                            : "bg-white border-gray-300 text-gray-900"
+                        }`}
+                        placeholder={t("addArticle")}
+                      />
+                      <button
+                        onClick={handleAddElement}
+                        className="px-4 py-2 rounded-r-lg bg-yellow-500 hover:bg-yellow-400 text-black"
+                      >
+                        {t("add")}
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {completionForm.elements.map((element, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1"
+                        >
+                          <span className="text-sm">{element}</span>
+                          <button
+                            onClick={() => handleRemoveElement(index)}
+                            className="ml-2 text-gray-500 dark:text-gray-400 hover:text-red-500"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        darkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
+                      {t("completionNotes")}
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={completionForm.notes}
+                      onChange={(e) =>
+                        setCompletionForm({
+                          ...completionForm,
+                          notes: e.target.value,
+                        })
+                      }
+                      className={`w-full px-4 py-2 rounded-lg border ${
+                        darkMode
+                          ? "bg-gray-700 border-gray-600 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      }`}
+                      placeholder={t("anySpecialNotes")}
+                    ></textarea>
+                  </div>
+                </div>
 
                 <div className="flex justify-end space-x-3">
                   <button
@@ -1274,7 +1537,6 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
-
         {/* Order Details Modal */}
         {selectedOrder && (
           <div className="fixed inset-0 bg-black dark:text-gray-50 bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1304,7 +1566,157 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {/* Order details content remains the same */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3
+                      className={`font-bold mb-4 ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {t("clientInformation")}
+                    </h3>
+                    <div
+                      className={`p-4 rounded-lg ${
+                        darkMode ? "bg-gray-700 text-amber-50" : "bg-gray-100"
+                      }`}
+                    >
+                      <p className="font-medium">{selectedOrder.client}</p>
+                      <p className="text-sm">{selectedOrder.email}</p>
+                      <p className="text-sm">{selectedOrder.phone}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3
+                      className={`font-bold mb-4 ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {t("orderInformation")}
+                    </h3>
+                    <div
+                      className={`p-4 rounded-lg ${
+                        darkMode ? "bg-gray-700  text-amber-50" : "bg-gray-100"
+                      }`}
+                    >
+                      <p>
+                        <span className="font-medium">ID:</span>{" "}
+                        {selectedOrder.id}
+                      </p>
+                      <p>
+                        <span className="font-medium">Date:</span>{" "}
+                        {selectedOrder.date}
+                      </p>
+                      <p>
+                        <span className="font-medium">Wood Type:</span>{" "}
+                        {selectedOrder.woodType}
+                      </p>
+                      {selectedOrder.completionDetails && (
+                        <p>
+                          <span className="font-medium">Completed:</span>{" "}
+                          {new Date(
+                            selectedOrder.completionDetails.completedAt
+                          ).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {selectedOrder.completionDetails && (
+                  <div className="mt-6">
+                    <h3
+                      className={`font-bold mb-4 ${
+                        darkMode ? "text-white " : "text-gray-900"
+                      }`}
+                    >
+                      {t("completionDetails")}
+                    </h3>
+                    <div
+                      className={`p-4 rounded-lg ${
+                        darkMode ? "bg-gray-700  text-amber-50" : "bg-gray-100"
+                      }`}
+                    >
+                      <h4 className="font-medium mb-2">{t("articlesUsed")}:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedOrder.completionDetails.elements.map(
+                          (element, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-gray-900 dark:bg-gray-900 rounded-full text-sm"
+                            >
+                              {element}
+                            </span>
+                          )
+                        )}
+                      </div>
+
+                      {selectedOrder.completionDetails.notes && (
+                        <>
+                          <h4 className="font-medium mt-4 mb-2">
+                            {t("notes")}:
+                          </h4>
+                          <p className="text-sm">
+                            {selectedOrder.completionDetails.notes}
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-6">
+                  <h3
+                    className={`font-bold mb-4 ${
+                      darkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {t("paymentHistory")}
+                  </h3>
+                  <div
+                    className={`rounded-lg overflow-hidden border ${
+                      darkMode ? "border-gray-700" : "border-gray-200"
+                    }`}
+                  >
+                    {selectedOrder.payments &&
+                      selectedOrder.payments.map((payment, index) => (
+                        <div
+                          key={index}
+                          className={`p-3 border-b ${
+                            darkMode
+                              ? "border-gray-700 bg-gray-700/50"
+                              : "border-gray-200 bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p
+                                className={`font-medium ${
+                                  darkMode ? "text-white" : "text-gray-900"
+                                }`}
+                              >
+                                ${payment.amount.toLocaleString() || 0}
+                              </p>
+                              <p
+                                className={`text-xs ${
+                                  darkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                {payment.date} • {payment.method}
+                              </p>
+                            </div>
+                            <p
+                              className={`text-xs ${
+                                darkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              {payment.notes}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>

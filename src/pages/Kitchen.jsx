@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -20,42 +20,74 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import i18next from "i18next";
 import apiFetch from "../utils/api/apiFetch";
+import { useAuth } from "../utils/protectedRootesVerf";
 
 const KitchenDetails = () => {
   const { kitchenId } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [kitchen, setKitchen] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [darkMode, setDarkMode] = useState(true);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [editedKitchen, setEditedKitchen] = useState(null);
-  const [newImages, setNewImages] = useState([]);
+  const { isAuthenticated } = useAuth("admin");
+  const fileInputRef = useRef(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Store original post data for canceling edits
+  const [originalPost, setOriginalPost] = useState(null);
+
+  // Post data state
+  const [post, setPost] = useState({
+    title: "",
+    description: "",
+    woodType: "",
+    location: "",
+    images: [],
+    items: [],
+    currentItem: "",
+  });
+
+  // Fetch post data
   useEffect(() => {
-    const fetchKitchen = async () => {
+    const fetchPost = async () => {
       try {
+        setIsLoading(true);
         const response = await apiFetch(`/api/v1/services/posts/${kitchenId}`);
-        if (!response.success) {
-          throw new Error("Failed to fetch kitchen data");
+        if (response.success) {
+          const postData = response.data.data;
+          const formattedPost = {
+            title: postData.title || "",
+            description: postData.description || "",
+            woodType: postData.woodType || "",
+            location: postData.location || "",
+            images:
+              postData.imageUrls?.map((url) => ({
+                url,
+                isExisting: true,
+              })) || [],
+            items: postData.items || [],
+            currentItem: "",
+          };
+          setPost(formattedPost);
+          setOriginalPost(formattedPost); // Store original data
+        } else {
+          throw new Error(response.error || "Failed to fetch post");
         }
-        console.log("Kitchen data fetched successfully:", response.data);
-        setKitchen(response.data.data);
       } catch (error) {
-        console.log("we have encountred an error", error);
+        console.error("Error fetching post:", error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    setKitchen(kitchen);
-    setEditedKitchen(kitchen);
-    fetchKitchen();
+    fetchPost();
   }, [kitchenId]);
 
   // Layout and direction effects
@@ -77,124 +109,168 @@ const KitchenDetails = () => {
     setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
 
   const handleLanguageChange = (languageCode) => {
-    console.log("Selected language:", languageCode);
     i18next.changeLanguage(languageCode);
     setIsLanguageDropdownOpen(false);
   };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === kitchen?.imageUrls.length - 1 ? 0 : prev + 1
+      prev === post.images.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prev) =>
-      prev === 0 ? kitchen?.imageUrls.length - 1 : prev - 1
+      prev === 0 ? post.images.length - 1 : prev - 1
     );
   };
 
   const handleEdit = () => {
     setIsEditing(true);
-    setEditedKitchen({ ...kitchen });
   };
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditedKitchen({ ...kitchen });
-    setNewImages([]);
-  };
-
-  const handleSave = async () => {
-    try {
-      // Prepare form data for API call
-      const formData = new FormData();
-      formData.append("title", editedKitchen.title);
-      formData.append("description", editedKitchen.description);
-      formData.append("location", editedKitchen.location);
-      formData.append("client", editedKitchen.client);
-      formData.append("woodType", editedKitchen.woodType);
-      formData.append("completedDate", editedKitchen.completedDate);
-      formData.append("elements", JSON.stringify(editedKitchen.elements));
-
-      // Add new images if any
-      newImages.forEach((image, index) => {
-        formData.append(`images`, image);
-      });
-
-      // Replace with your actual API call
-      const response = await fetch(`/api/kitchens/${kitchenId}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const updatedKitchen = await response.json();
-        setKitchen(updatedKitchen);
-        setIsEditing(false);
-        setNewImages([]);
-      } else {
-        console.error("Failed to update kitchen");
-        setKitchen(null);
-      }
-    } catch (error) {
-      console.error("Error updating kitchen:", error);
+    // Reset to original post data without fetching
+    if (originalPost) {
+      setPost({ ...originalPost });
     }
   };
 
+  // Image upload handler
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const newImageFiles = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      name: file.name,
+      isExisting: false,
+    }));
+
+    setPost((prev) => ({
+      ...prev,
+      images: [...prev.images, ...newImageFiles],
+    }));
+
+    // Reset the file input
+    e.target.value = "";
+  };
+
+  // Remove image function
+  const removeImage = (index) => {
+    setPost((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddItem = () => {
+    if (post.currentItem.trim()) {
+      setPost((prev) => ({
+        ...prev,
+        items: [...prev.items, post.currentItem.trim()],
+        currentItem: "",
+      }));
+    }
+  };
+
+  const handleRemoveItem = (index) => {
+    setPost((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleInputChange = (field, value) => {
-    setEditedKitchen((prev) => ({
+    setPost((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleElementChange = (index, value) => {
-    const newElements = [...editedKitchen.elements];
-    newElements[index] = value;
-    setEditedKitchen((prev) => ({
-      ...prev,
-      elements: newElements,
-    }));
+  const handleUpdatePost = async () => {
+    // Validate required fields
+    if (
+      !post.title ||
+      !post.description ||
+      !post.woodType ||
+      post.images.length === 0
+    ) {
+      alert("Please fill all required fields and keep at least one image");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("title", post.title);
+      formData.append("description", post.description);
+      formData.append("woodType", post.woodType);
+      formData.append("items", JSON.stringify(post.items));
+
+      if (post.location) {
+        formData.append("location", post.location);
+      }
+
+      // Add new images (files)
+      post.images.forEach((image) => {
+        if (!image.isExisting) {
+          formData.append("media", image.file);
+        }
+      });
+
+      // Send PUT request for update
+      const response = await apiFetch(
+        `/api/v1/services/posts/${kitchenId}`,
+        formData,
+        false,
+        "PATCH"
+      );
+
+      if (response.success) {
+        alert("Post updated successfully!");
+        setIsEditing(false);
+        // Update both the current post and original post with the new data
+        const updatedPost = response.data.data;
+        const formattedUpdatedPost = {
+          title: updatedPost.title,
+          description: updatedPost.description,
+          woodType: updatedPost.woodType,
+          location: updatedPost.location,
+          images: updatedPost.imageUrls.map((url) => ({
+            url,
+            isExisting: true,
+          })),
+          items: updatedPost.items || [],
+          currentItem: "",
+        };
+        setPost(formattedUpdatedPost);
+        setOriginalPost(formattedUpdatedPost); // Update original post too
+      } else {
+        console.error("Failed to update post:", response.error);
+        alert("Failed to update post: " + response.error);
+      }
+    } catch (error) {
+      console.error("Error updating post:", error);
+      alert("An error occurred while updating the post");
+    }
   };
 
-  const addElement = () => {
-    setEditedKitchen((prev) => ({
-      ...prev,
-      elements: [...prev.elements, ""],
-    }));
-  };
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen dark:bg-gray-900">
+        <div className="text-red-500 text-lg">{error}</div>
+      </div>
+    );
+  }
 
-  const removeElement = (index) => {
-    const newElements = editedKitchen.elements.filter((_, i) => i !== index);
-    setEditedKitchen((prev) => ({
-      ...prev,
-      elements: newElements,
-    }));
-  };
-
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setNewImages(files);
-
-    // Preview new images
-    const imageUrls = files.map((file) => URL.createObjectURL(file));
-    setEditedKitchen((prev) => ({
-      ...prev,
-      images: imageUrls,
-    }));
-    setCurrentImageIndex(0);
-  };
-
-  if (!kitchen) {
+  // Only show loading spinner on initial load, not during editing
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-yellow-400 border-t-transparent"></div>
       </div>
     );
   }
-
-  const displayKitchen = isEditing ? editedKitchen : kitchen;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black transition-colors duration-300">
@@ -210,7 +286,7 @@ const KitchenDetails = () => {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
-            {isAdmin && !isEditing && (
+            {isAuthenticated && !isEditing && (
               <button
                 onClick={handleEdit}
                 className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 md:p-3 rounded-lg bg-yellow-500 text-white hover:bg-yellow-600 transition-colors shadow-md hover:shadow-lg"
@@ -220,10 +296,10 @@ const KitchenDetails = () => {
               </button>
             )}
 
-            {isAdmin && isEditing && (
+            {isAuthenticated && isEditing && (
               <div className="flex space-x-2">
                 <button
-                  onClick={handleSave}
+                  onClick={handleUpdatePost}
                   className="flex items-center space-x-1 p-1.5 sm:p-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
                 >
                   <Save size={16} className="sm:w-5 sm:h-5" />
@@ -327,7 +403,7 @@ const KitchenDetails = () => {
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 lg:h-[calc(100vh-180px)]">
-            {/* Image Gallery - Full height on desktop */}
+            {/* Image Gallery */}
             <div className="relative rounded-xl overflow-hidden shadow-lg h-full min-h-[300px] sm:min-h-[400px] lg:min-h-full">
               {isEditing && (
                 <div className="absolute top-4 right-4 z-10">
@@ -336,6 +412,7 @@ const KitchenDetails = () => {
                     <span className="text-sm">{t("uploadImages")}</span>
                     <input
                       type="file"
+                      ref={fileInputRef}
                       multiple
                       accept="image/*"
                       onChange={handleImageUpload}
@@ -346,7 +423,7 @@ const KitchenDetails = () => {
               )}
 
               <div className="relative h-full w-full">
-                {displayKitchen.imageUrls.map((image, index) => (
+                {post.images.map((image, index) => (
                   <div
                     key={index}
                     className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
@@ -356,11 +433,25 @@ const KitchenDetails = () => {
                     }`}
                   >
                     <img
-                      src={`${import.meta.env.VITE_REACT_APP_ORIGIN}${image}`}
-                      alt={displayKitchen.title}
+                      src={
+                        image.isExisting
+                          ? `${import.meta.env.VITE_REACT_APP_ORIGIN}${
+                              image.url
+                            }`
+                          : image.preview
+                      }
+                      alt={post.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
+                    {isEditing && (
+                      <button
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-70 hover:opacity-100 transition-opacity"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -379,7 +470,7 @@ const KitchenDetails = () => {
               </button>
 
               <div className="absolute bottom-3 sm:bottom-4 left-0 right-0 flex justify-center gap-2">
-                {displayKitchen.imageUrls.map((_, index) => (
+                {post.images.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
@@ -393,24 +484,24 @@ const KitchenDetails = () => {
               </div>
             </div>
 
-            {/* Details Section - Scrollable on desktop */}
+            {/* Details Section */}
             <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 lg:overflow-y-auto lg:h-full">
               {isEditing ? (
                 <input
                   type="text"
-                  value={editedKitchen.title}
+                  value={post.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
                   className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4 w-full bg-transparent border-b-2 border-yellow-500 focus:outline-none"
                 />
               ) : (
                 <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white mb-3 sm:mb-4">
-                  {displayKitchen.title}
+                  {post.title}
                 </h1>
               )}
 
               {isEditing ? (
                 <textarea
-                  value={editedKitchen.description}
+                  value={post.description}
                   onChange={(e) =>
                     handleInputChange("description", e.target.value)
                   }
@@ -418,7 +509,7 @@ const KitchenDetails = () => {
                 />
               ) : (
                 <p className="text-gray-700 dark:text-gray-300 mb-4 sm:mb-6 text-sm sm:text-base">
-                  {displayKitchen.description}
+                  {post.description}
                 </p>
               )}
 
@@ -426,24 +517,14 @@ const KitchenDetails = () => {
                 <EditableDetailItem
                   icon={<MapPin className="text-yellow-500" />}
                   label={t("location")}
-                  value={displayKitchen.location}
+                  value={post.location}
                   isEditing={isEditing}
                   onChange={(value) => handleInputChange("location", value)}
                 />
                 <EditableDetailItem
-                  icon={<Calendar className="text-yellow-500" />}
-                  label={t("completedDate")}
-                  value={displayKitchen.createdAt.substring(0, 10)}
-                  isEditing={isEditing}
-                  type="date"
-                  onChange={(value) =>
-                    handleInputChange("completedDate", value)
-                  }
-                />
-                <EditableDetailItem
                   icon={<Tag className="text-yellow-500" />}
                   label={t("woodType")}
-                  value={displayKitchen.woodType}
+                  value={post.woodType}
                   isEditing={isEditing}
                   onChange={(value) => handleInputChange("woodType", value)}
                 />
@@ -454,21 +535,23 @@ const KitchenDetails = () => {
                   {t("elements")}
                 </h3>
                 <div className="space-y-2">
-                  {displayKitchen.items.map((element, index) => (
+                  {post.items.map((item, index) => (
                     <div key={index} className="flex items-center">
                       {isEditing ? (
                         <div className="flex items-center w-full space-x-2">
                           <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></span>
                           <input
                             type="text"
-                            value={element}
-                            onChange={(e) =>
-                              handleElementChange(index, e.target.value)
-                            }
+                            value={item}
+                            onChange={(e) => {
+                              const newItems = [...post.items];
+                              newItems[index] = e.target.value;
+                              setPost((prev) => ({ ...prev, items: newItems }));
+                            }}
                             className="flex-1 bg-transparent border-b border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm sm:text-base focus:outline-none focus:border-yellow-500"
                           />
                           <button
-                            onClick={() => removeElement(index)}
+                            onClick={() => handleRemoveItem(index)}
                             className="text-red-500 hover:text-red-700 p-1"
                           >
                             <Trash2 size={16} />
@@ -477,19 +560,29 @@ const KitchenDetails = () => {
                       ) : (
                         <div className="flex items-center text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                           <span className="w-2 h-2 bg-yellow-400 rounded-full mx-2 flex-shrink-0"></span>
-                          {element}
+                          {item}
                         </div>
                       )}
                     </div>
                   ))}
                   {isEditing && (
-                    <button
-                      onClick={addElement}
-                      className="flex items-center space-x-2 text-yellow-500 hover:text-yellow-600 mt-2"
-                    >
-                      <Plus size={16} />
-                      <span className="text-sm">{t("addElement")}</span>
-                    </button>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <input
+                        type="text"
+                        value={post.currentItem}
+                        onChange={(e) =>
+                          handleInputChange("currentItem", e.target.value)
+                        }
+                        placeholder={t("Add new item")}
+                        className="flex-1 bg-transparent border-b border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm sm:text-base focus:outline-none focus:border-yellow-500"
+                      />
+                      <button
+                        onClick={handleAddItem}
+                        className="text-yellow-500 hover:text-yellow-600 p-1"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -498,20 +591,11 @@ const KitchenDetails = () => {
               {!isEditing && (
                 <button
                   onClick={() => {
-                    if (!displayKitchen) {
-                      console.error("Cannot proceed - kitchen data is missing");
-                      return;
-                    }
-
-                    console.log("Creating order from kitchen:", displayKitchen);
-
                     navigate("/order", {
-                      replace: true,
                       state: {
-                        kitchenTemplate: { ...displayKitchen }, // Spread to avoid reference issues
+                        kitchenTemplate: { ...post },
                         source: "gallery",
                         originalKitchenId: kitchenId,
-                        timestamp: new Date().toISOString(), // Useful for debugging
                       },
                     });
                   }}
