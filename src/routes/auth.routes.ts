@@ -7,6 +7,12 @@ import {
   updateUserInfoHandler,
 } from "../controllers/auth.controller";
 
+import {
+  verifyResetToken,
+  requestResetPassword,
+  resetPassword,
+} from "../controllers/resetpass.controller";
+
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post("/signup", signupController);
   app.post("/login", loginController);
@@ -18,4 +24,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     preHandler: [app.authenticate],
     handler: updateUserInfoHandler,
   });
+
+  app.post("/request-reset-password", requestResetPassword);
+  app.get("/verify-reset-token", verifyResetToken);
+  app.post("/reset-password", resetPassword);
 }
