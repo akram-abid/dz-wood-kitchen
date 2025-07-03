@@ -25,7 +25,8 @@ import { orderRoutes } from "./routes/order.routes";
 import responseFormatPlugin from "./plugins/response-format";
 import * as APIError from "./utils/errors";
 import docsPlug from "./plugins/docs-render";
-
+import mailerPlugin from "./utils/mailer";
+import { peekMailServer } from "./controllers/mail-services.controller";
 dotenv.config();
 const config = loadConfig();
 
@@ -233,19 +234,41 @@ const buildServer = async (): Promise<FastifyInstance> => {
             timestamp: Type.String(),
             uptime: Type.Number(),
             version: Type.String(),
+            mail_server: Type.String(),
           }),
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      // testing mail service
+      const isConnected = await request.server.mailer.verifyConnection();
       return {
         status: "ok",
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         version: config.API_VERSION,
+        mail_server: isConnected ? "connected" : "disconnected",
       };
     },
   );
+
+  console.log("=== DEBUG ENV VARS ===");
+  console.log("ZOHO_EMAIL:", config.MAIL);
+  console.log("ZOHO_APP_PASSWORD:", config.MAIL_PASSWORD);
+  console.log("the full config : ", config);
+  console.log("======================");
+
+  // mailer plugin
+  server.register(mailerPlugin, {
+    host: "smtp.zoho.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: config.MAIL!,
+      pass: config.MAIL_PASSWORD!,
+    },
+    from: config.MAIL,
+  });
 
   // Graceful shutdown
   const gracefulShutdown = async (signal: string) => {

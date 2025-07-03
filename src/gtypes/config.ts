@@ -18,4 +18,6 @@ export interface ServerConfig {
   GOOGLE_CLIENT_SECRET: string;
   FACEBOOK_CLIENT_SECRET: string;
   FACEBOOK_CLIENT_ID: string;
+  MAIL: string;
+  MAIL_PASSWORD: string;
 }

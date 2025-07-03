@@ -30,6 +30,8 @@ export function loadConfig(): ServerConfig {
     FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID || "",
     FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET || "",
     APP_URL: process.env.APP_URL || "http://localhost:3000",
+    MAIL: process.env.ZOHOMAIL || "",
+    MAIL_PASSWORD: process.env.ZOHOMAIL_PASSWORD || "",
   };
 
   //console.log(config);
