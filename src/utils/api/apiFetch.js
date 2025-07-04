@@ -28,6 +28,8 @@ const apiFetch = async (link, body = null, addContentType = true, method = null)
       headers: headers,
     };
 
+    console.log("i got this body ", body)
+
     // Add body for methods that support it
     if (body && ['POST', 'PUT', 'PATCH'].includes(httpMethod)) {
       if (body instanceof FormData) {

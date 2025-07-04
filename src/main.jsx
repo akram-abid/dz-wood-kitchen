@@ -10,6 +10,8 @@ import SignupPage from "./pages/signup";
 import LoginPage from "./pages/login";
 import AdminDashboard from "./pages/adminDashboard";
 import OrderDetails from "./pages/orderDetails";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
   {
     path: "/orders/:id",
     element: <OrderDetails />
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />
   }
 ]);
 

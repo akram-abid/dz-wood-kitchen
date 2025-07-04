@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import i18next from "i18next";
@@ -19,12 +19,12 @@ import {
   Phone,
   Image,
   Upload,
+  AlertCircle,
 } from "lucide-react";
 import processLocationData from "../utils/algeriaLocationData";
 import rawLocationData from "../assets/addresses.json";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
-import apiFetch from "../utils/api/apiFetch";
 
 const KitchenOrderPage = () => {
   const { wilayas, dairas, communes } = processLocationData(rawLocationData);
@@ -51,16 +51,15 @@ const KitchenOrderPage = () => {
     key: kitchenData?.id,
   });
 
-  console.log("this is what i got ok ", kitchenData)
-
   const [wilayaSearch, setWilayaSearch] = useState("");
   const [dairaSearch, setDairaSearch] = useState("");
   const [baladiaSearch, setBaladiaSearch] = useState("");
   const [showWilayaSuggestions, setShowWilayaSuggestions] = useState(false);
   const [showDairaSuggestions, setShowDairaSuggestions] = useState(false);
   const [showBaladiaSuggestions, setShowBaladiaSuggestions] = useState(false);
-  const [orderSubmitted, setOrderSubmitted] = useState(false);
+  const [orderStatus, setOrderStatus] = useState(null); // null, 'loading', 'success', 'error'
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState(null);
 
   const { t } = useTranslation();
 
@@ -76,8 +75,7 @@ const KitchenOrderPage = () => {
               wilayas.find((w) => w.name === orderData.wilaya)?.id &&
             (d.name.toLowerCase().includes(dairaSearch.toLowerCase()) ||
               d.name_ar.includes(dairaSearch))
-        )
-        .sort((a, b) => a.name.localeCompare(b.name))
+).sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
   const filteredCommunes = orderData.daira
@@ -131,8 +129,6 @@ const KitchenOrderPage = () => {
     else if (!/\S+@\S+\.\S+/.test(orderData.email))
       newErrors.email = t("invalidEmail");
     if (!orderData.phoneNumber.trim()) newErrors.phone = t("fillAllFields");
-    // else if (!/^(\+)?[\d\s-]{10,}$/.test(orderData.phone))
-    // newErrors.phone = t("invalidPhone");
     if (!orderData.wilaya) newErrors.wilaya = t("fillAllFields");
     if (!orderData.daira) newErrors.daira = t("fillAllFields");
     if (!orderData.baladia) newErrors.baladia = t("fillAllFields");
@@ -145,7 +141,6 @@ const KitchenOrderPage = () => {
 
   const token = localStorage.getItem("accessToken");
   const handleSeeOrder = () => {
-    console.log("Navigate to order details", orderData);
     navigate("/profile");
   };
 
@@ -157,14 +152,14 @@ const KitchenOrderPage = () => {
       return;
     }
 
-    setOrderSubmitted(true);
+    setOrderStatus("loading");
+    setApiError(null);
 
     try {
-      // Create FormData object
       const formData = new FormData();
 
-      // Append all fields to FormData (matches testing.html structure)
       formData.append("title", "");
+      formData.append("postId", kitchenData.id);
       formData.append("description", orderData.description);
       formData.append("woodType", orderData.woodType);
       formData.append("baladia", orderData.baladia);
@@ -175,22 +170,10 @@ const KitchenOrderPage = () => {
       formData.append("wilaya", orderData.wilaya);
       formData.append("phoneNumber", orderData.phoneNumber);
 
-      console.log(
-        "Order data before just some of them submission:",
-        Object.fromEntries(formData.entries())
-      );
-
       // Append files
       orderData.media.forEach((file) => {
         formData.append("media", file);
       });
-
-      console.log("Submitting order with fucking FormData:", formData);
-
-      // Debug: Log FormData contents
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
 
       const response = await fetch("https://dzwoodkitchen.com/api/v1/orders", {
         method: "POST",
@@ -200,12 +183,18 @@ const KitchenOrderPage = () => {
         body: formData,
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create order");
+      }
+
       const result = await response.json();
       console.log("✅ Response:", result);
-      alert("Order created successfully!");
+      setOrderStatus("success");
     } catch (err) {
       console.error("❌ Error:", err);
-      alert("Failed to create order.");
+      setOrderStatus("error");
+      setApiError(err.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -234,7 +223,7 @@ const KitchenOrderPage = () => {
   };
 
   // Close dropdowns when clicking outside
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = () => {
       setShowWilayaSuggestions(false);
       setShowDairaSuggestions(false);
@@ -342,6 +331,50 @@ const KitchenOrderPage = () => {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-12">
+        {/* Error Popup */}
+        {apiError && (
+          <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/30">
+            <div
+              className={`max-w-md w-full mx-4 p-6 rounded-2xl shadow-xl ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              }`}
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                  <AlertCircle
+                    size={32}
+                    className="text-red-500 dark:text-red-400"
+                  />
+                </div>
+                <h3
+                  className={`text-xl font-bold mb-2 ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("error")}
+                </h3>
+                <p
+                  className={`mb-6 ${
+                    darkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {apiError}
+                </p>
+                <button
+                  onClick={() => setApiError(null)}
+                  className={`px-6 py-2 rounded-lg font-medium ${
+                    darkMode
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "bg-red-500 hover:bg-red-600 text-white"
+                  }`}
+                >
+                  {t("tryAgain")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1
@@ -359,7 +392,248 @@ const KitchenOrderPage = () => {
             {t("customKitchenSubtitle")}
           </p>
         </div>
-        {!orderSubmitted ? (
+
+        {orderStatus === "success" ? (
+          /* Order Submitted View */
+          <div
+            className={`rounded-2xl p-8 border text-center transition-all duration-300 ${
+              darkMode
+                ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm"
+                : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
+            }`}
+          >
+            <div className="mb-6">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <CheckCircle
+                  size={40}
+                  className="text-green-600 dark:text-green-400"
+                />
+              </div>
+              <h2
+                className={`text-3xl font-bold mb-2 ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {t("thankYou")}
+              </h2>
+              <p
+                className={`text-lg ${
+                  darkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                {t("contactSoon")}
+              </p>
+            </div>
+
+            {/* Order Summary */}
+            <div
+              className={`mb-8 p-6 rounded-xl text-left ${
+                darkMode ? "bg-gray-700/50" : "bg-gray-50"
+              }`}
+            >
+              <h3
+                className={`text-xl font-bold mb-4 ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {t("orderDetails")}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("fullName")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.fullName}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("email")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.email}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("phone")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.phoneNumber}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("woodType")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {t(orderData.woodType)}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("wilaya")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.wilaya}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("daira")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.daira}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("baladia")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.baladia}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className={`text-sm font-medium ${
+                        darkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("street")}
+                    </span>
+                    <p
+                      className={`font-semibold ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {orderData.street}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {orderData.description && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <span
+                    className={`text-sm font-medium ${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    {t("description")}
+                  </span>
+                  <p
+                    className={`font-semibold mt-1 ${
+                      darkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {orderData.description}
+                  </p>
+                </div>
+              )}
+              {orderData.media.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <span
+                    className={`text-sm font-medium ${
+                      darkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    {t("uploadedImages")}
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                    {orderData.media.map((file, index) => (
+                      <div
+                        key={index}
+                        className="relative rounded-lg overflow-hidden"
+                      >
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Upload ${index + 1}`}
+                          className="w-full h-24 object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate">
+                          {file.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={handleSeeOrder}
+              className={`cursor-pointer px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 focus:scale-105 flex items-center justify-center space-x-2 mx-auto ${
+                darkMode
+                  ? "bg-gradient-to-r bg-yellow-500  text-gray-900 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25"
+                  : "bg-gradient-to-r bg-blue-600  text-white hover:from-blue-500 hover:to-purple-500 shadow-lg hover:shadow-blue-500/25"
+              }`}
+            >
+              <span>{t("seeOrder")}</span>
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        ) : (
+          /* Order Form */
           <form onSubmit={handleSubmitOrder}>
             <div className="space-y-8">
               {/* Selected Kitchen Card */}
@@ -1044,257 +1318,19 @@ const KitchenOrderPage = () => {
               {/* Submit Button */}
               <div className="flex justify-center">
                 <button
-                  // onClick={handleSubmitOrder}
+                  type="submit"
+                  disabled={orderStatus === "loading"}
                   className={`cursor-pointer px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 focus:scale-105 ${
                     darkMode
-                      ? "bg-gradient-to-r bg-yellow-500 text-gray-900 hover:from-yellow-400  shadow-lg hover:shadow-amber-500/25"
-                      : "bg-gradient-to-r bg-yellow-500  text-white hover:from-yellow-400 shadow-lg hover:shadow-blue-500/25"
-                  }`}
+                      ? "bg-gradient-to-r bg-yellow-500 text-gray-900 hover:from-yellow-400 shadow-lg hover:shadow-amber-500/25"
+                      : "bg-gradient-to-r bg-yellow-500 text-white hover:from-yellow-400 shadow-lg hover:shadow-blue-500/25"
+                  } ${orderStatus === "loading" ? "opacity-70" : ""}`}
                 >
-                  {t("submitOrder")}
+                  {orderStatus === "loading" ? t("submitting") : t("submitOrder")}
                 </button>
               </div>
             </div>
           </form>
-        ) : (
-          /* Order Submitted View */
-          <div
-            className={`rounded-2xl p-8 border text-center transition-all duration-300 ${
-              darkMode
-                ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm"
-                : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
-            }`}
-          >
-            <div className="mb-6">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                <CheckCircle
-                  size={40}
-                  className="text-green-600 dark:text-green-400"
-                />
-              </div>
-              <h2
-                className={`text-3xl font-bold mb-2 ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {t("thankYou")}
-              </h2>
-              <p
-                className={`text-lg ${
-                  darkMode ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
-                {t("contactSoon")}
-              </p>
-            </div>
-
-            {/* Order Summary */}
-            <div
-              className={`mb-8 p-6 rounded-xl text-left ${
-                darkMode ? "bg-gray-700/50" : "bg-gray-50"
-              }`}
-            >
-              <h3
-                className={`text-xl font-bold mb-4 ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {t("orderDetails")}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("fullName")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.fullName}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("email")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.email}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("phone")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.phone}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("woodType")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {t(orderData.woodType)}
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("wilaya")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.wilaya}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("daira")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.daira}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("baladia")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.baladia}
-                    </p>
-                  </div>
-                  <div>
-                    <span
-                      className={`text-sm font-medium ${
-                        darkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("street")}
-                    </span>
-                    <p
-                      className={`font-semibold ${
-                        darkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {orderData.street}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {orderData.description && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                  <span
-                    className={`text-sm font-medium ${
-                      darkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    {t("description")}
-                  </span>
-                  <p
-                    className={`font-semibold mt-1 ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {orderData.description}
-                  </p>
-                </div>
-              )}
-              {orderData.media.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                  <span
-                    className={`text-sm font-medium ${
-                      darkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
-                  >
-                    {t("uploadedImages")}
-                  </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-                    {orderData.media.map((file, index) => (
-                      <div
-                        key={index}
-                        className="relative rounded-lg overflow-hidden"
-                      >
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Upload ${index + 1}`}
-                          className="w-full h-24 object-cover"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate">
-                          {file.name}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={handleSeeOrder}
-              className={`cursor-pointer px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 focus:scale-105 flex items-center justify-center space-x-2 mx-auto ${
-                darkMode
-                  ? "bg-gradient-to-r bg-yellow-500  text-gray-900 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25"
-                  : "bg-gradient-to-r bg-blue-600  text-white hover:from-blue-500 hover:to-purple-500 shadow-lg hover:shadow-blue-500/25"
-              }`}
-            >
-              <span>{t("seeOrder")}</span>
-              <ChevronRight size={20} />
-            </button>
-          </div>
         )}
       </main>
     </div>
