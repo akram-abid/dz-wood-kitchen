@@ -1,4 +1,9 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import {
+  FastifyInstance,
+  FastifyRequest,
+  FastifyReply,
+  FastifyPluginAsync,
+} from "fastify";
 import {
   createOrderHandler,
   updateOrderHandler,
@@ -15,13 +20,13 @@ import {
 import { processFileUploads, orderImagesPath } from "../utils/uploader";
 import { handleControllerError } from "../utils/errors-handler";
 
-export async function orderRoutes(server: FastifyInstance) {
+export const orderRoutes: FastifyPluginAsync = async (server) => {
   const { authenticate, authorize } = server;
 
   // Create Order
   server.post("/", {
     preHandler: [authenticate],
-    handler: async (req: FastifyRequest, reply: FastifyReply) => {
+    handler: async (req, reply) => {
       try {
         const uploadResult = await processFileUploads(
           req.parts(),
@@ -31,13 +36,17 @@ export async function orderRoutes(server: FastifyInstance) {
         if (!uploadResult) return;
 
         const { fields, mediaFilenames } = uploadResult;
-        const body = {
+        req.body = {
           ...fields,
           mediaFilenames: mediaFilenames,
           userId: req.ctx.user?.userId,
         };
 
-        return createOrderHandler({ ...req, body }, reply);
+        /*server.log.info("🔥 mailer exists in orderRoutes?");
+        server.log.info(!!server.mailer);
+        req.server.log.info(!!req.server.mailer);
+        req.server.log.info(!!server.mailer);*/
+        return createOrderHandler(req, reply);
       } catch (error) {
         handleControllerError(error, "add order", server.log);
       }
@@ -145,4 +154,4 @@ export async function orderRoutes(server: FastifyInstance) {
     preHandler: [server.authenticate],
     handler: getUserOrders,
   });
-}
+};

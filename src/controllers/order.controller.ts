@@ -17,6 +17,7 @@ import { handleControllerError } from "../utils/errors-handler";
 import * as APIError from "../utils/errors";
 import { cleanupFiles } from "../utils/uploader";
 import path from "path";
+import "../utils/mailer";
 
 export const createOrderHandler = async (
   req: FastifyRequest,
@@ -47,7 +48,11 @@ export const createOrderHandler = async (
 
     const orderLink = `${process.env.DOMAIN}/order/${newOrder[0].id}`;
 
-    const messageResult = await req.server.mailer.sendTemplate(
+    const mailer = req.server.mailer;
+
+    req.log.info(mailer);
+
+    const messageResult = await mailer.sendTemplate(
       "orderCreated",
       process.env.ORDERS_EMAIL! || "dzwoodkitchens@dzwoodkitchen.com",
       {

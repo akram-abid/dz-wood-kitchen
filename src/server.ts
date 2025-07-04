@@ -287,14 +287,20 @@ const buildServer = async (): Promise<FastifyInstance> => {
     }
   };
 
-  server.register(
-    async (api) => {
-      await api.register(authRoutes, { prefix: "/auth" });
-      await api.register(postRoutes, { prefix: "/services" });
-      await api.register(orderRoutes, { prefix: "/orders" });
-    },
-    { prefix: "/api/v1" },
-  );
+  server.after(() => {
+    server.register(
+      async (api) => {
+        await api.register(authRoutes, { prefix: "/auth" });
+        await api.register(postRoutes, { prefix: "/services" });
+        await api.register(orderRoutes, { prefix: "/orders" });
+      },
+      { prefix: "/api/v1" },
+    );
+  });
+  /*
+  await server.register(authRoutes, { prefix: "/api/v1/auth" });
+  await server.register(postRoutes, { prefix: "/api/v1/services" });
+  await server.register(orderRoutes, { prefix: "/api/v1/orders" });*/
 
   process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
   process.on("SIGINT", () => gracefulShutdown("SIGINT"));
