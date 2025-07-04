@@ -45,9 +45,22 @@ export const createOrderHandler = async (
       })
       .returning();
 
+    const orderLink = `${process.env.DOMAIN}/order/${newOrder[0].id}`;
+
+    const messageResult = await req.server.mailer.sendTemplate(
+      "orderCreated",
+      process.env.ORDERS_EMAIL! || "dzwoodkitchens@dzwoodkitchen.com",
+      {
+        order: newOrder[0].description,
+        orderLink,
+        company: process.env.DOMAIN,
+      },
+      "New Order",
+    );
+
     reply.code(201);
 
-    return { order: newOrder[0] };
+    return { order: newOrder[0], messageResult };
   } catch (error: any) {
     handleControllerError(error, "create order", req.log);
   }
