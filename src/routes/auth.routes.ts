@@ -12,10 +12,7 @@ import {
   requestResetPassword,
   resetPassword,
 } from "../controllers/resetpass.controller";
-import {
-  verifyEmail,
-  resendVerifyEmail,
-} from "../controllers/email.controllers";
+import { verifyEmail } from "../controllers/email.controllers";
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post("/signup", signupController);
@@ -34,8 +31,8 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.post("/reset-password", resetPassword);
 
   app.post("/verify-email", verifyEmail);
-  app.get("/resend-email-verification", {
+  /* app.get("/resend-email-verification", {
     preHandler: app.authenticate,
     handler: resendVerifyEmail,
-  });
+  });*/
 }

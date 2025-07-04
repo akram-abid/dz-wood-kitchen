@@ -6,15 +6,10 @@ import { dbDrizzle as db } from "../database/db";
 import { users } from "../database/schema";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { generateUrl, generateToken } from "../utils/jwt-utils";
 
 // Interface for verify email request
 const VerifyEmailRequest = z.object({
   token: z.string(),
-});
-
-const resendEmail = z.object({
-  email: z.string().email(),
 });
 
 // Verify email with token
@@ -26,7 +21,6 @@ export const verifyEmail = async (
     const { token } = VerifyEmailRequest.parse(request.body);
 
     if (!token) {
-      reply.code(400);
       throw new APIError.BadRequestError("Token is required");
     }
 
@@ -34,17 +28,15 @@ export const verifyEmail = async (
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET!);
     } catch (jwtError) {
-      reply.code(400);
       throw new APIError.BadRequestError(
         "Invalid or expired verification token",
       );
     }
 
-    request.log.info("========== DEBUG TYPE ============");
-    request.log.info(decoded);
+    /*request.log.info("========== DEBUG TYPE ============");
+    request.log.info(decoded);*/
 
     if (decoded.type !== "email_verification") {
-      reply.code(400);
       throw new APIError.BadRequestError("Invalid token type");
     }
 
@@ -52,7 +44,6 @@ export const verifyEmail = async (
     const maxAge = 24 * 60 * 60 * 1000;
 
     if (tokenAge > maxAge) {
-      reply.code(400);
       throw new APIError.BadRequestError("Verification token has expired");
     }
 
@@ -82,7 +73,7 @@ export const verifyEmail = async (
   }
 };
 
-export const resendVerifyEmail = async (
+/*export const resendVerifyEmail = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
@@ -117,4 +108,4 @@ export const resendVerifyEmail = async (
   } catch (error) {
     handleControllerError(error, "email verification", request.log);
   }
-};
+};*/

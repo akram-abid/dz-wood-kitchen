@@ -8,6 +8,7 @@ import {
   getPostsById,
 } from "../controllers/services.controller";
 import { serviceImagesPath, processFileUploads } from "../utils/uploader";
+import { handleControllerError } from "../utils/errors-handler";
 
 export async function postRoutes(server: FastifyInstance) {
   // Create Post
@@ -33,11 +34,7 @@ export async function postRoutes(server: FastifyInstance) {
 
         return addPostHandler({ ...req, body }, reply);
       } catch (error) {
-        req.log.error(error, "Error processing post upload");
-        return reply.code(500).send({
-          success: false,
-          message: "Internal server error",
-        });
+        handleControllerError(error, "add post route", server.log);
       }
     },
   });
@@ -71,11 +68,7 @@ export async function postRoutes(server: FastifyInstance) {
           reply,
         );
       } catch (error) {
-        req.log.error(error, "Error processing post update");
-        return reply.code(500).send({
-          success: false,
-          message: "Internal server error",
-        });
+        handleControllerError(error, "update post route", server.log);
       }
     },
   });

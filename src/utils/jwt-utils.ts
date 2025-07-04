@@ -5,16 +5,15 @@ export const generateToken = (
   userId: string,
   type: string,
 ): string => {
-  return jwt.sign(
-    {
-      email,
-      userId,
-      type,
-      timestamp: Date.now(),
-    },
-    process.env.JWT_SECRET!,
-    { expiresIn: "1h" },
-  );
+  const expiresIn = type === "email_verification" ? "3h" : "1h";
+  const payload: jwt.JwtPayload = {
+    email,
+    userId,
+    type,
+    timestamp: Date.now(),
+  };
+
+  return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn });
 };
 
 export const generateUrl = (token: string, path: string): string => {

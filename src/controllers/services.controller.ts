@@ -12,7 +12,6 @@ import {
   updatePostSchema,
 } from "../dtos/services.dtos";
 import { handleControllerError } from "../utils/errors-handler";
-import * as APIError from "../utils/errors";
 
 export const addPostHandler = async (
   req: FastifyRequest,

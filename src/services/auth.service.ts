@@ -157,6 +157,7 @@ export class AuthService {
             fullName: `${profile.firstName} ${profile.lastName}`,
             password: "",
             role: "user",
+            isEmailVerified: true,
             oauthprovider: profile.provider,
             oauthId: profile.id,
           })
@@ -176,6 +177,7 @@ export class AuthService {
             .set({
               oauthprovider: profile.provider,
               oauthId: profile.id,
+              isEmailVerified: true,
               updatedAt: new Date(),
             })
             .where(eq(users.id, user.id))

@@ -15,7 +15,7 @@ import {
 } from "../dtos/order.dtos";
 import { handleControllerError } from "../utils/errors-handler";
 import * as APIError from "../utils/errors";
-import { orderImagesPath, cleanupFiles } from "../utils/uploader";
+import { cleanupFiles } from "../utils/uploader";
 import path from "path";
 
 export const createOrderHandler = async (
@@ -127,8 +127,7 @@ export const deleteOrderHandler = async (
     reply.status(200);
     return { order: deleted[0] };
   } catch (error: any) {
-    req.log.error("Delete error", error);
-    return reply.code(500).send({ success: false, message: error.message });
+    handleControllerError(error, "delete order handler", req.log);
   }
 };
 
@@ -246,10 +245,9 @@ export async function updateOrderStatusHandler(
   }
 
   // Return the updated order
-  return reply.status(200).send({
-    message: "Order status updated successfully",
-    data: updatedOrder,
-  });
+  reply.status(200);
+
+  return { updatedOrder };
 }
 
 /**
@@ -270,7 +268,7 @@ export async function updateOfferHandler(
   await db.update(orders).set({ offer }).where(eq(orders.id, id));
 
   reply.status(200);
-  return "offer updated";
+  return { offer: "offer updated" };
 }
 
 /**
@@ -303,7 +301,7 @@ export async function getOrdersByFiltersHandler(
     Querystring: { status?: string };
   }>,
   reply: FastifyReply,
-): Promise<(typeof orders.$inferSelect)[]> {
+) {
   const { status } = request.query;
   const filters = [];
 
@@ -327,8 +325,7 @@ export async function getOrdersByFiltersHandler(
     reply.status(200);
     return results;
   } catch (error) {
-    reply.status(500);
-    throw new Error("Failed to fetch orders");
+    handleControllerError(error, "get order by filter", request.log);
   }
 }
 

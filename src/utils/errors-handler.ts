@@ -18,6 +18,7 @@ export const SERVICE_ERRORS = {
   LOGIN_FAILED: "LOGIN_FAILED",
   INVALID_TOKEN: "INVALID_TOKEN",
   TOKEN_EXPIRED: "TOKEN_EXPIRED",
+  UNSPORTED_FILE_TYPE: "UNSPORTED_FILE_TYPE",
 } as const;
 
 const SERVICE_ERROR_MAP = {
@@ -35,6 +36,8 @@ const SERVICE_ERROR_MAP = {
     new NotFoundError("Post not found or maybe deleted"),
   [SERVICE_ERRORS.MAX_IMAGES]: () =>
     new BadRequestError("Maximum allowed messages is 15"),
+  [SERVICE_ERRORS.UNSPORTED_FILE_TYPE]: () =>
+    new UnauthorizedError("Unsported File Types"),
 };
 
 function mapServiceError(error: Error): HttpError {

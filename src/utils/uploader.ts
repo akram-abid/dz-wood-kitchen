@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { pipeline } from "stream/promises";
 import { FastifyReply } from "fastify";
+import { SERVICE_ERRORS } from "./errors-handler";
 
 export const orderImagesPath = path.join(process.cwd(), "pictures/orders");
 if (!fs.existsSync(orderImagesPath)) {
@@ -39,21 +40,18 @@ export async function processFileUploads(
 
   try {
     for await (const part of parts) {
-      console.log("Processing part:", {
+      /*console.log("Processing part:", {
         type: part.type,
         fieldname: part.fieldname,
         filename: part.filename,
         mimetype: part.mimetype,
-      });
+      });*/
 
       if (part.type === "file") {
         if (mediaFilenames.length >= MAX_FILES_LIMIT) {
           await cleanupFiles(savedFiles);
           if (!reply.sent) {
-            reply.code(400).send({
-              success: false,
-              message: `Max ${MAX_FILES_LIMIT} files allowed`,
-            });
+            throw new Error(SERVICE_ERRORS.MAX_IMAGES);
           }
           return null;
         }
@@ -61,10 +59,7 @@ export async function processFileUploads(
         if (!ALLOWED_MIME_TYPES.includes(part.mimetype || "")) {
           await cleanupFiles(savedFiles);
           if (!reply.sent) {
-            reply.code(400).send({
-              success: false,
-              message: "Unsupported file type",
-            });
+            throw new Error(SERVICE_ERRORS.UNSPORTED_FILE_TYPE);
           }
           return null;
         }
@@ -77,7 +72,7 @@ export async function processFileUploads(
         mediaFilenames.push(filename);
         savedFiles.push(filepath);
       } else if (part.type === "field") {
-        console.log("Field:", part.fieldname, "=", part.value);
+        //console.log("Field:", part.fieldname, "=", part.value);
 
         // Handle the field value - await it if it's a promise
         let fieldValue = part.value;
@@ -117,13 +112,7 @@ export async function processFileUploads(
   } catch (error) {
     console.error("Error in processFileUploads:", error);
     await cleanupFiles(savedFiles);
-    if (!reply.sent) {
-      reply.code(500).send({
-        success: false,
-        message: "Error processing file upload",
-      });
-    }
-    return null;
+    throw error;
   }
 }
 

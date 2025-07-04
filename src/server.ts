@@ -169,11 +169,14 @@ const buildServer = async (): Promise<FastifyInstance> => {
       try {
         const payload = (await request.jwtVerify()) as JwtPayload;
 
+        request.log.info(payload);
+
         if (!payload) {
           throw new APIError.UnauthorizedError("Authentication required");
         }
         request.ctx.user = payload;
       } catch (error) {
+        request.log.error(error);
         throw new APIError.UnauthorizedError("Invalid or expired token");
       }
     },

@@ -26,8 +26,7 @@ export const requestResetPassword = async (
 
     const user = await db.select().from(users).where(eq(users.email, email));
 
-    if (!user) {
-      reply.code(404);
+    if (!user.length) {
       throw new APIError.NotFoundError("User not found");
     }
 
@@ -49,7 +48,7 @@ export const requestResetPassword = async (
     request.server.log.info(`Password reset email sent to ${email}`);
 
     reply.status(200);
-    return userId;
+    return { userId };
   } catch (err) {
     handleControllerError(err, "request reset password", request.log);
   }
@@ -74,7 +73,7 @@ export const verifyResetToken = async (
     }
 
     reply.status(200);
-    return { email: decoded.email, userId: decoded.userId };
+    return { validated: true, email: decoded.email, userId: decoded.userId };
   } catch (err) {
     handleControllerError(err, "verify token", request.log);
   }

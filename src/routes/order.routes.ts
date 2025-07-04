@@ -13,6 +13,7 @@ import {
   getUserOrders,
 } from "../controllers/order.controller";
 import { processFileUploads, orderImagesPath } from "../utils/uploader";
+import { handleControllerError } from "../utils/errors-handler";
 
 export async function orderRoutes(server: FastifyInstance) {
   const { authenticate, authorize } = server;
@@ -38,11 +39,7 @@ export async function orderRoutes(server: FastifyInstance) {
 
         return createOrderHandler({ ...req, body }, reply);
       } catch (error) {
-        req.log.error(error, "Error processing order creation");
-        return reply.code(500).send({
-          success: false,
-          message: "Internal server error",
-        });
+        handleControllerError(error, "add order", server.log);
       }
     },
   });
@@ -75,11 +72,7 @@ export async function orderRoutes(server: FastifyInstance) {
           reply,
         );
       } catch (error) {
-        req.log.error(error, "Error processing order update");
-        return reply.code(500).send({
-          success: false,
-          message: "Internal server error",
-        });
+        handleControllerError(error, "update order", server.log);
       }
     },
   });
@@ -133,7 +126,7 @@ export async function orderRoutes(server: FastifyInstance) {
   // -------------------------
 
   server.delete("/:id", {
-    preHandler: [authenticate],
+    preHandler: [authenticate, authorize(["admin"])],
     handler: deleteOrderHandler,
   });
 
@@ -141,7 +134,7 @@ export async function orderRoutes(server: FastifyInstance) {
   // POST : add articles to the compilted order
   //
   server.post("/:id/articles", {
-    preHandler: [server.authenticate],
+    preHandler: [server.authenticate, authorize(["admin"])],
     handler: setOrderArticlesHandler,
   });
 

@@ -31,7 +31,7 @@ export class ServicePostService {
 
       const items = data.items?.map((item) => item.trim());
 
-      console.log("💬 insert debug", {
+      /*console.log("💬 insert debug", {
         title: data.title,
         imageUrls,
         items,
@@ -39,14 +39,14 @@ export class ServicePostService {
         typeofItems: typeof items,
         isImageUrlsArray: Array.isArray(imageUrls),
         isItemsArray: Array.isArray(items),
-      });
+      });*/
 
-      console.log("🔥 About to insert:", {
+      /*console.log("🔥 About to insert:", {
         imageUrls: data.mediaFilenames.map(
           (filename) => `/pictures/services/${filename}`,
         ),
         items: data.items?.map((item) => item.trim()),
-      });
+      });*/
 
       const newPost = await db
         .insert(posts)
