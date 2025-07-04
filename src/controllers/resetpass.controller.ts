@@ -32,7 +32,7 @@ export const requestResetPassword = async (
     }
 
     const userId = user[0].id;
-    const token = generateToken(email, userId, "password-reset");
+    const token = generateToken(email, userId, "password_reset");
     const resetUrl = generateUrl(token, "reset-password");
 
     // Send reset email
@@ -49,7 +49,7 @@ export const requestResetPassword = async (
     request.server.log.info(`Password reset email sent to ${email}`);
 
     reply.status(200);
-    return "Reset password email sent";
+    return userId;
   } catch (err) {
     handleControllerError(err, "request reset password", request.log);
   }
@@ -117,15 +117,9 @@ export const resetPassword = async (
       timestamp: new Date().toISOString(),
     });
 
-    return reply.send({
-      success: true,
-      message: "Password reset successfully",
-    });
+    reply.status(200);
+    return { reset: "done" };
   } catch (err) {
-    request.server.log.error("Reset password failed:", err);
-    return reply.code(400).send({
-      success: false,
-      error: "Invalid or expired token",
-    });
+    handleControllerError(err, "reset password", request.log);
   }
 };
