@@ -28,6 +28,7 @@ import docsPlug from "./plugins/docs-render";
 import mailerPlugin from "./utils/mailer";
 dotenv.config();
 const config = loadConfig();
+import "./utils/cleanup";
 
 interface RequestContext {
   user?: JwtPayload;
