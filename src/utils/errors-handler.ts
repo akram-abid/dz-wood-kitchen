@@ -8,6 +8,8 @@ import {
   InternalServerError,
 } from "./errors";
 
+import { ZodError } from "zod";
+
 export const SERVICE_ERRORS = {
   MAX_IMAGES: "MAX_IMAGES",
   POST_NOT_FOUND: "POST_NOT_FOUND",
@@ -60,6 +62,24 @@ export function handleControllerError(
       statusCode: error.statusCode,
     });
     throw error;
+  }
+
+  if (error instanceof ZodError) {
+    const issues = error.errors.map((issue) => ({
+      path: issue.path.join("."),
+      message: issue.message,
+    }));
+
+    logger.warn({
+      context,
+      error: "Validation failed",
+      validationErrors: issues,
+    });
+
+    if (error instanceof ZodError)
+      throw new BadRequestError(
+        `Validation failed, details: ${JSON.stringify(error.errors)}`,
+      );
   }
 
   logger.error({ error: error.message, context, stack: error.stack });

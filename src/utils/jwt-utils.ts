@@ -5,7 +5,7 @@ export const generateToken = (
   userId: string,
   type: string,
 ): string => {
-  const expiresIn = type === "email_verification" ? "3h" : "1h";
+  const expiresIn = type === "email_verification" ? "7h" : "1h";
   const payload: jwt.JwtPayload = {
     email,
     userId,

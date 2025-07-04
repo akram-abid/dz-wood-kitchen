@@ -125,6 +125,12 @@ class MailerService {
         <p>{{message}}</p>
         <p>{{footer}}</p>
       `,
+      orderCreated: `
+        <h2>New Order!</h2>
+  	<p>Description : {{order}}</p>
+  	<a href="{{orderLink}}">Check Order!</a>
+  	<p>Best regards,<br>{{company}}</p>
+	`,
     };
 
     const template = templates[templateName as keyof typeof templates];
