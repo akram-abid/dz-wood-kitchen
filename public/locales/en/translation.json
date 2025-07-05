@@ -244,5 +244,8 @@
   "fillAllFields": "Please fill in this field",
   "backToLogin": "Back to Login",
   "enterEmailToReset": "Enter your email to reset your password",
-  "resetPasswordEmailSent": "If an account with that email exists, a password reset link has been sent."
+  "resetPasswordEmailSent": "If an account with that email exists, a password reset link has been sent.",
+  "confirmDelete": "Confirm Deletion",
+  "areYouSureDeleteOrder": "Are you sure you want to delete the order",
+  "delete": "Delete"
 }

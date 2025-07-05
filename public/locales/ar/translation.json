@@ -216,7 +216,7 @@
   "completionDate": "تاريخ الإكمال",
   "orderDate": "تاريخ الطلب",
   "orderID": "معرّف الطلب",
-  "loggingIn": "جارٍ تسجيل الدخول" ,
+  "loggingIn": "جارٍ تسجيل الدخول",
   "selectBaladia": "اختر البلدية",
   "noKitchensFound": "لم يتم العثور على مطابخ",
   "noMoreKitchens": "لا توجد مطابخ أخرى للعرض",
@@ -248,5 +248,8 @@
   "fillAllFields": "يرجى ملء هذا الحقل",
   "backToLogin": "العودة لتسجيل الدخول",
   "enterEmailToReset": "أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور",
-  "resetPasswordEmailSent": "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور. يرجى التحقق من بريدك الإلكتروني."
+  "resetPasswordEmailSent": "تم إرسال بريد إلكتروني لإعادة تعيين كلمة المرور. يرجى التحقق من بريدك الإلكتروني.",
+  "confirmDelete": "تأكيد الحذف",
+  "areYouSureDeleteOrder": "هل أنت متأكد أنك تريد حذف الطلب؟",
+  "delete": "حذف"
 }

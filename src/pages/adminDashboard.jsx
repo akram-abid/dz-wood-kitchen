@@ -58,6 +58,8 @@ const AdminDashboard = () => {
   const [showCompletionForm, setShowCompletionForm] = useState(false);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [creatingPost, setCreatingPost] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   // Form states
   const [completionForm, setCompletionForm] = useState({
@@ -192,6 +194,37 @@ const AdminDashboard = () => {
     const newElements = [...completionForm.elements];
     newElements.splice(index, 1);
     setCompletionForm({ ...completionForm, elements: newElements });
+  };
+
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      const response = await apiFetch(
+        `/api/v1/orders/${orderToDelete.id}`,
+        null,
+        false,
+        "DELETE"
+      );
+
+      if (response.success) {
+        if (orderToDelete.status === "waiting") {
+          setWaitingOrders(
+            waitingOrders.filter((order) => order.id !== orderToDelete.id)
+          );
+        } else {
+          setOrders(orders.filter((order) => order.id !== orderToDelete.id));
+        }
+        setShowDeleteConfirmation(false);
+        setOrderToDelete(null);
+      } else {
+        console.error("Failed to delete order:", response.error);
+        alert("Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      alert("An error occurred while deleting the order");
+    }
   };
 
   const handleCompleteOrder = (orderId) => {
@@ -495,8 +528,6 @@ const AdminDashboard = () => {
           }`}
         >
           <div className="flex flex-col md:flex-row gap-4">
-            
-
             {activeTab === "orders" && (
               <div className="relative">
                 <Filter
@@ -565,9 +596,21 @@ const AdminDashboard = () => {
                         {order.id} • {order.client}
                       </p>
                     </div>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      {t("waiting")}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        {t("waiting")}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOrderToDelete(order);
+                          setShowDeleteConfirmation(true);
+                        }}
+                        className="p-2 text-red-500 hover:text-red-600"
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
                   </div>
                   {order.estimatedTotal && !order.clientValidated && (
                     <div className="mt-4">
@@ -640,17 +683,29 @@ const AdminDashboard = () => {
                         {order.id} • {order.client}
                       </p>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        order.status === "inProgress"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {order.status === "inProgress"
-                        ? t("inProgress")
-                        : t("shipping")}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          order.status === "inProgress"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                      >
+                        {order.status === "inProgress"
+                          ? t("inProgress")
+                          : t("shipping")}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOrderToDelete(order);
+                          setShowDeleteConfirmation(true);
+                        }}
+                        className="p-2 text-red-500 hover:text-red-600"
+                      >
+                        <Trash size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -895,7 +950,7 @@ const AdminDashboard = () => {
                     >
                       {t("items")} (Optional)
                     </label>
-                    <div className="flex mb-2">
+                    <div className="flex flex-col sm:flex-row gap-2 mb-2">
                       <input
                         type="text"
                         value={newPost.currentItem}
@@ -905,7 +960,7 @@ const AdminDashboard = () => {
                             currentItem: e.target.value,
                           })
                         }
-                        className={`flex-1 px-4 py-2 rounded-l-lg border ${
+                        className={`flex-1 px-4 py-2 rounded-lg border ${
                           darkMode
                             ? "bg-gray-700 border-gray-600 text-white"
                             : "bg-white border-gray-300 text-gray-900"
@@ -915,7 +970,7 @@ const AdminDashboard = () => {
                       <button
                         type="button"
                         onClick={handleAddItem}
-                        className="px-4 py-2 rounded-r-lg bg-yellow-500 hover:bg-yellow-400 text-black"
+                        className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black whitespace-nowrap"
                       >
                         {t("Add")}
                       </button>
@@ -1172,6 +1227,71 @@ const AdminDashboard = () => {
                     className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"
                   >
                     {t("completeOrder")}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDeleteConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div
+              className={`rounded-2xl w-full max-w-md ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              }`}
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2
+                    className={`text-xl font-bold ${
+                      darkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {t("confirmDelete")}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setShowDeleteConfirmation(false);
+                      setOrderToDelete(null);
+                    }}
+                    className={`p-2 rounded-full ${
+                      darkMode
+                        ? "hover:bg-gray-700 text-gray-400"
+                        : "hover:bg-gray-100 text-gray-500"
+                    }`}
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <p
+                  className={`mb-6 ${
+                    darkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  {t("areYouSureDeleteOrder")} "{orderToDelete?.title}"?
+                </p>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => {
+                      setShowDeleteConfirmation(false);
+                      setOrderToDelete(null);
+                    }}
+                    className={`px-4 py-2 rounded-lg ${
+                      darkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-white"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                    }`}
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button
+                    onClick={handleDeleteOrder}
+                    className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    {t("delete")}
                   </button>
                 </div>
               </div>

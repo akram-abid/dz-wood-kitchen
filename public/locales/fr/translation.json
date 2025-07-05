@@ -235,6 +235,8 @@
   "fillAllFields": "Veuillez remplir ce champ",
   "backToLogin": "Retour à la Connexion",
   "enterEmailToReset": "Entrez votre e-mail pour réinitialiser votre mot de passe",
-  "resetPasswordEmailSent": "Si un compte existe, un lien de réinitialisation a été envoyé."
+  "resetPasswordEmailSent": "Si un compte existe, un lien de réinitialisation a été envoyé.",
+  "confirmDelete": "Confirmer la Suppression",
+  "areYouSureDeleteOrder": "Êtes-vous sûr de vouloir supprimer la commande",
+  "delete": "Supprimer"
 }
-    
