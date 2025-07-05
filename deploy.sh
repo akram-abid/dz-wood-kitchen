@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO_URL="git@github.com:BigBr41n/fastify-DZWC-api.git"
-APP_PARENT_DIR="/home/azureuser/lab"
+APP_PARENT_DIR="/home/lab"
 APP_DIR="$APP_PARENT_DIR/fastify-DZWC-api"
 BRANCH="backend"
 
