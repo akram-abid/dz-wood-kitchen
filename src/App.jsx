@@ -394,6 +394,7 @@ function App() {
                     {[
                       { code: "en", name: "English", flag: "🇺🇸" },
                       { code: "ar", name: "العربية", flag: "🇸🇦" },
+                      { code: "fr", name: "Français", flag: "🇫🇷" },
                     ].map((language) => (
                       <button
                         key={language.code}
