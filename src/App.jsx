@@ -64,7 +64,6 @@ function App() {
     email: "",
     message: "",
   });
-
   const navigate = useNavigate();
 
   // Gallery images
