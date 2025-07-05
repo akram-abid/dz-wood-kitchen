@@ -7,7 +7,7 @@ BRANCH="backend"
 
 echo "🧼 Stopping running containers..."
 if [ -d "$APP_DIR" ]; then
-  cd "$APP_DIR" && docker compose -f docker-compose.prod.yml down
+  cd "$APP_DIR" && docker compose -f docker-compose.yml down
   cd ~
 fi
 
