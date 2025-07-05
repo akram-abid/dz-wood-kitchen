@@ -3,6 +3,9 @@ import React, { useState, useEffect } from "react";
 import WLogo from "./assets/images/whiteLogo.png";
 import Blogo from "./assets/images/blackLogo.png";
 import "./utils/i18n/i18next";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPhone, faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 import {
   Globe,
@@ -1297,59 +1300,31 @@ function App() {
         {/* WhatsApp Button */}
         <div className="relative group">
           <button
-            onClick={() => {
-              const phoneNumber = "4029799718"; // Replace with your actual number
-              window.open(`https://wa.me/${phoneNumber}`, "_blank");
-            }}
+            onClick={() => window.open("https://wa.me/4029799718", "_blank")}
             className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-110"
-            style={{
-              boxShadow: "0 0 15px rgba(37, 211, 102, 0.7)",
-              animation: "pulse 2s infinite",
-            }}
+            style={{ boxShadow: "0 0 15px rgba(37, 211, 102, 0.7)" }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="white"
-              className="w-8 h-8"
-            >
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-6.29 3.617c-.545 0-1.06-.113-1.534-.338-.416-.195-.727-.456-.92-.707-.05-.074-.089-.165-.114-.272a.687.687 0 0 1 .466-.793c.272-.1.714-.235.93-.05.148.124.594.605.711.772.075.1.149.149.223.074.074-.074.05-.149.025-.223-.025-.074-1.262-3.238-1.733-4.42-.04-.124-.008-.235.033-.347.074-.173.198-.248.322-.248h.595c.173 0 .26.024.347.074.086.05.099.124.136.272v.004c.231.694.784 2.365.841 2.538.058.173.115.26.202.26h.012c.074 0 .149-.05.198-.173.124-.248.512-1.262.594-1.724a.42.42 0 0 0-.033-.272.347.347 0 0 0-.124-.174c-.05-.041-.434-.322-.644-.433-.198-.099-.347-.124-.446-.124-.099 0-.198.05-.297.149-.099.099-.372.372-.409.413-.074.074-.148.074-.272.025-.124-.05-.521-.198-.993-.198-.744 0-1.416.248-1.901.694-.446.421-.702.959-.744 1.538-.033.446.099.882.384 1.23.198.248.446.446.744.595.52.273 1.115.421 1.74.446.446.016.882-.058 1.29-.215.446-.174.793-.446 1.04-.793.149-.198.124-.347.074-.471-.05-.124-.223-.198-.47-.347" />
-            </svg>
+            <FontAwesomeIcon
+              icon={faWhatsapp}
+              className="text-white text-2xl"
+            />
           </button>
-          <div className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-white text-gray-800 px-3 py-2 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-            Contact us on WhatsApp
-          </div>
         </div>
 
         {/* Phone Button */}
         <div className="relative group">
           <button
             onClick={async () => {
-              try {
-                const phoneNumber = "4029799718"; // Replace with your actual number
-                await navigator.clipboard.writeText(phoneNumber);
-                alert("Phone number copied to clipboard!");
-
-                // Optionally open phone dialer
-                window.open(`tel:${phoneNumber}`);
-              } catch (err) {
-                console.error("Failed to copy: ", err);
-              }
+              await navigator.clipboard.writeText("402-979-9718");
+              alert("Phone number copied to clipboard!");
             }}
             className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-110"
-            style={{
-              boxShadow: "0 0 15px rgba(234, 179, 8, 0.7)",
-              animation: "pulse 2s infinite",
-            }}
+            style={{ boxShadow: "0 0 15px rgba(234, 179, 8, 0.7)" }}
           >
-            <Phone size={24} className="text-white" />
+            <FontAwesomeIcon icon={faPhone} className="text-white text-xl" />
           </button>
-          <div className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-white text-gray-800 px-3 py-2 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-            Call us: 402-979-9718
-          </div>
         </div>
       </div>
-
       {/* Footer */}
       <footer
         className={`py-12 border-t ${
