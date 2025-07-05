@@ -496,10 +496,14 @@ function App() {
                 className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mb-12 md:mb-16"
                 data-animate
               >
-                <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl">
+                <button
+                  onClick={() => navigate("/gallery")}
+                  className="cursor-pointer bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl"
+                >
                   {t("exploreOurWork")}
                 </button>
                 <button
+                  onClick={() => navigate("/order")}
                   className={`border-2 px-8 py-4 md:px-12 md:py-5 rounded-xl text-lg md:text-xl font-semibold transition-colors shadow-lg hover:shadow-xl ${
                     isDarkMode
                       ? "border-white text-white hover:bg-white hover:text-black"
@@ -618,9 +622,12 @@ function App() {
                 </p>
               </div>
 
-              <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-colors">
+              <a
+                href="#contact"
+                className="inline-block bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-semibold shadow-md hover:shadow-lg transition-colors"
+              >
                 {t("contactUs")}
-              </button>
+              </a>
             </div>
           </div>
         </div>
