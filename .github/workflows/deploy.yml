@@ -1,5 +1,4 @@
 name: Deploy to Azure VPS
-
 on:
   push:
     branches:
@@ -8,24 +7,27 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: 📦 Checkout repo
         uses: actions/checkout@v4
-
+        
       - name: 🔐 Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-
-      - name: 📤 Upload deploy.sh to VPS
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          
+      - name: 📤 Deploy to VPS
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ~/lab"
-          scp -i ~/.ssh/id_ed25519 ./deploy.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "chmod +x ~/lab/deploy.sh"
-
-      - name: 🚀 Run deploy.sh on VPS
+          # Create directory and upload script
+          ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ~/lab"
+          scp -i ~/.ssh/id_ed25519 -P ${{ secrets.SSH_PORT }} ./deploy.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
+          
+          # Make executable and run
+          ssh -i ~/.ssh/id_ed25519 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "chmod +x ~/lab/deploy.sh && bash ~/lab/deploy.sh"
+          
+      - name: 🧹 Cleanup
+        if: always()
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "bash ~/lab/deploy.sh"
+          rm -f ~/.ssh/id_ed25519
