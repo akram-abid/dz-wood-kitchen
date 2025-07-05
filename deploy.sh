@@ -7,7 +7,7 @@ BRANCH="backend"
 
 echo "🧼 Stopping running containers..."
 if [ -d "$APP_DIR" ]; then
-  cd "$APP_DIR" && docker-compose -f docker-compose.prod.yml down
+  cd "$APP_DIR" && docker compose -f docker-compose.prod.yml down
   cd ~
 fi
 
@@ -44,6 +44,6 @@ docker system prune -af
 
 echo "🏗️ Starting app with Docker Compose (prod config)..."
 cd "$APP_DIR" || exit 1
-docker-compose -f docker-compose.yml up -d --build
+docker compose -f docker-compose.yml up -d --build
 
 echo "✅ Deployment finished successfully!"
