@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import apiFetch from "../utils/api/apiFetch";
+import Header from "../components/header";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -178,92 +179,13 @@ const ResetPassword = () => {
       }`}
     >
       {/* Header */}
-      <header
-        className={`backdrop-blur-md py-4 px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
-          darkMode
-            ? "bg-gray-900/80 border-gray-700/50"
-            : "bg-white/80 border-gray-200/50"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center flex-shrink-0">
-            <img
-              src={darkMode ? WLogo : Blogo}
-              alt="the logo"
-              className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto cursor-pointer"
-              onClick={() => navigate("/")}
-            />
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <div className="relative" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={toggleLanguageDropdown}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 ${
-                  darkMode
-                    ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                    : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-                }`}
-              >
-                <Globe size={18} />
-                <span className="text-sm font-medium">
-                  {language === "en" ? "EN" : "AR"}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform duration-200 ${
-                    isLanguageDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              {isLanguageDropdownOpen && (
-                <div
-                  className={`absolute right-0 mt-2 w-40 rounded-xl shadow-xl border overflow-hidden ${
-                    darkMode
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
-                  }`}
-                >
-                  {[
-                    { code: "en", name: "English", flag: "🇺🇸" },
-                    { code: "ar", name: "العربية", flag: "🇸🇦" },
-                  ].map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => handleLanguageChange(lang.code)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors ${
-                        darkMode
-                          ? "hover:bg-gray-700 text-white"
-                          : "hover:bg-gray-50 text-gray-900"
-                      } ${
-                        language === lang.code
-                          ? darkMode
-                            ? "bg-gray-700"
-                            : "bg-gray-50"
-                          : ""
-                      }`}
-                    >
-                      <span className="text-lg">{lang.flag}</span>
-                      <span className="font-medium">{lang.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={toggleDarkMode}
-              className={`p-2 rounded-xl transition-all duration-200 ${
-                darkMode
-                  ? "bg-gray-800 hover:bg-gray-700 text-amber-400 border border-gray-700"
-                  : "bg-white hover:bg-gray-50 text-gray-600 border border-gray-200 shadow-sm"
-              }`}
-            >
-              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-          </div>
-        </div>
-      </header>
+      <Header
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        handleLanguageChange={handleLanguageChange}
+        isLanguageDropdownOpen={isLanguageDropdownOpen}
+        toggleLanguageDropdown={toggleLanguageDropdown}
+      />
 
       {/* Main Content */}
       <main className="max-w-md mx-auto px-6 py-12">
