@@ -21,7 +21,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.get("/google/callback", googleCallback);
   app.get("/facebook/callback", facebookCallback);
 
-  app.get("/update", {
+  app.patch("/update", {
     preHandler: [app.authenticate],
     handler: updateUserInfoHandler,
   });
