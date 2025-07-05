@@ -1,4 +1,4 @@
-name: Deploy to Azure VPS
+name: Deploy to VPS
 on:
   push:
     branches:
@@ -16,16 +16,8 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           
-      - name: 📤 Deploy to VPS
+      - name: 🚀 Deploy
         run: |
-          # Create directory and upload script with timeout
-          timeout 30 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ~/lab"
-          timeout 30 scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -P ${{ secrets.SSH_PORT }} ./deploy.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
-          
-          # Make executable and run deployment
-          timeout 120 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "chmod +x ~/lab/deploy.sh && bash ~/lab/deploy.sh"
-          
-      - name: ✅ Verify Deployment
-        run: |
-          # Basic health check - adjust this based on your application
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "ps aux | grep -v grep | grep -q 'your-app-process' && echo 'Deployment verified' || echo 'Deployment verification failed'"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ~/lab"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -P ${{ secrets.SSH_PORT }} ./deploy.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "chmod +x ~/lab/deploy.sh && bash ~/lab/deploy.sh"
