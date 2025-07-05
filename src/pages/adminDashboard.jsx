@@ -495,35 +495,7 @@ const AdminDashboard = () => {
           }`}
         >
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search
-                className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                  darkMode ? "text-gray-500" : "text-gray-400"
-                }`}
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder={t("searchOrders")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                  darkMode
-                    ? "bg-gray-700 border-gray-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                    darkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
-                  <X size={18} />
-                </button>
-              )}
-            </div>
+            
 
             {activeTab === "orders" && (
               <div className="relative">
