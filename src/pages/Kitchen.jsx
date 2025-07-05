@@ -415,7 +415,8 @@ const KitchenDetails = () => {
                 </p>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">*
+                {console.log("the post i will edit is this ", post)}
                 <EditableDetailItem
                   icon={<MapPin className="text-yellow-500" />}
                   label={t("location")}
@@ -500,6 +501,8 @@ const KitchenDetails = () => {
                         originalKitchenId: kitchenId,
                       },
                     });
+                    console.log("kitchen template ", post)
+                    console.log("the original kitchen id is ", kitchenId)
                   }}
                   className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 mt-4"
                 >

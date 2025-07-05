@@ -37,6 +37,7 @@ const KitchenOrderPage = () => {
   const kitchenData = location.state?.kitchenTemplate
     ? location.state.kitchenTemplate
     : null;
+  const originalKitchenId = location.state?.originalKitchenId;
 
   const [orderData, setOrderData] = useState({
     fullName: "",
@@ -159,9 +160,8 @@ const KitchenOrderPage = () => {
 
     try {
       const formData = new FormData();
-
       formData.append("title", "");
-      formData.append("postId", kitchenData.id);
+      formData.append("postId", originalKitchenId || "");
       formData.append("description", orderData.description);
       formData.append("woodType", orderData.woodType);
       formData.append("baladia", orderData.baladia);
