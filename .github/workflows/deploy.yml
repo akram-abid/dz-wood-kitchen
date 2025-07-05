@@ -16,19 +16,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           
-      - name: 🔗 Test Connection
-        run: |
-          # Test if we can connect to the VPS
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "echo 'Connection successful'"
-          
       - name: 📤 Deploy to VPS
         run: |
-          # Create directory and upload script
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ~/lab"
-          scp -o StrictHostKeyChecking=no -P ${{ secrets.SSH_PORT }} ./deploy.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
+          # Create directory and upload script with timeout
+          timeout 30 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "mkdir -p ~/lab"
+          timeout 30 scp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -P ${{ secrets.SSH_PORT }} ./deploy.sh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
           
           # Make executable and run deployment
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "chmod +x ~/lab/deploy.sh && bash ~/lab/deploy.sh"
+          timeout 120 ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "chmod +x ~/lab/deploy.sh && bash ~/lab/deploy.sh"
           
       - name: ✅ Verify Deployment
         run: |
