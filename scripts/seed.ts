@@ -33,6 +33,7 @@ async function seedAdmin() {
     password: hashed,
     fullName,
     role: "admin",
+    isEmailVerified: true,
   });
 
   console.log(`Admin seeded successfully (${email})`);

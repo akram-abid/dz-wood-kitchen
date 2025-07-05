@@ -14,9 +14,10 @@ export class AuthService {
     email: string,
     role: string,
     name: string,
+    isEmailVerified: boolean,
   ) {
     const accessToken = jwt.sign(
-      { userId, type: "access", email, role, name },
+      { userId, type: "access", email, role, name, isEmailVerified },
       config.JWT_SECRET,
       { expiresIn: "4d" },
     );
@@ -60,6 +61,7 @@ export class AuthService {
           email: users.email,
           fullName: users.fullName,
           role: users.role,
+          isEmailVerified: users.isEmailVerified,
         });
 
       const user = newUser[0];
@@ -70,6 +72,7 @@ export class AuthService {
         user.email,
         user.role,
         user.fullName,
+        user.isEmailVerified || false,
       );
 
       logger.info("User registered successfully", {
@@ -116,6 +119,7 @@ export class AuthService {
         user.email,
         user.role,
         user.fullName,
+        user.isEmailVerified!,
       );
 
       logger.info("User logged in successfully", {
@@ -193,6 +197,7 @@ export class AuthService {
         user.email,
         user.role,
         user.fullName,
+        user.isEmailVerified!,
       );
 
       logger.info("OAuth login successful", {
