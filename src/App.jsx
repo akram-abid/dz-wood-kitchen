@@ -1300,7 +1300,7 @@ function App() {
         {/* WhatsApp Button */}
         <div className="relative group">
           <button
-            onClick={() => window.open("https://wa.me/213550347043", "_blank")}
+            onClick={() => window.open("https://wa.me/213561489657", "_blank")}
             className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-110"
             style={{ boxShadow: "0 0 15px rgba(37, 211, 102, 0.7)" }}
           >
@@ -1315,7 +1315,7 @@ function App() {
         <div className="relative group">
           <button
             onClick={async () => {
-              await navigator.clipboard.writeText("402-979-9718");
+              await navigator.clipboard.writeText("+2130550347043");
               alert("Phone number copied to clipboard!");
             }}
             className="w-14 h-14 rounded-full bg-yellow-500 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-110"
