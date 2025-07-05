@@ -1,13 +1,14 @@
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
-import {
-  Sun,
-  Moon,
-  Globe,
-  ChevronDown,
-} from "lucide-react";
+import { Sun, Moon, Globe, ChevronDown } from "lucide-react";
 
-function Header({darkMode, toggleDarkMode, toggleLanguageDropdown, isLanguageDropdownOpen, handleLanguageChange}) {
+function Header({
+  darkMode,
+  toggleDarkMode,
+  toggleLanguageDropdown,
+  isLanguageDropdownOpen,
+  handleLanguageChange,
+}) {
   return (
     <header
       className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
@@ -54,6 +55,7 @@ function Header({darkMode, toggleDarkMode, toggleLanguageDropdown, isLanguageDro
                 {[
                   { code: "en", name: "English", flag: "🇺🇸" },
                   { code: "ar", name: "العربية", flag: "🇸🇦" },
+                  { code: "fr", name: "Français", flag: "🇫🇷" },
                 ].map((lang) => (
                   <button
                     key={lang.code}
@@ -88,4 +90,4 @@ function Header({darkMode, toggleDarkMode, toggleLanguageDropdown, isLanguageDro
   );
 }
 
-export default Header;  
+export default Header;

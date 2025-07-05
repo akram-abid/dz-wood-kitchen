@@ -222,7 +222,7 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${
+      className={`   min-h-screen transition-colors duration-300 ${
         isDarkMode ? "bg-black text-white" : "bg-white text-gray-900"
       }`}
     >
@@ -302,6 +302,7 @@ function App() {
                     {[
                       { code: "en", name: "English", flag: "🇺🇸" },
                       { code: "ar", name: "العربية", flag: "🇸🇦" },
+                      { code: "fr", name: "Français", flag: "🇫🇷" },
                     ].map((language) => (
                       <button
                         key={language.code}
@@ -1168,7 +1169,7 @@ function App() {
                 }`}
               >
                 <div className="flex items-start">
-                  <div className="bg-yellow-500 p-3 rounded-full mr-4 flex-shrink-0">
+                  <div className="bg-yellow-500 p-3 rounded-full mx-4 flex-shrink-0">
                     <MapPin size={20} className="text-black" />
                   </div>
                   <div>
@@ -1182,7 +1183,7 @@ function App() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-yellow-500 p-3 rounded-full mr-4 flex-shrink-0">
+                  <div className="bg-yellow-500 p-3 rounded-full mx-4 flex-shrink-0">
                     <Phone size={20} className="text-black" />
                   </div>
                   <div>
@@ -1273,7 +1274,10 @@ function App() {
             >
               {t("getInTouchToday")}
             </p>
-            <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors">
+            <button
+              onClick={() => navigate("/order")}
+              className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 md:px-12 md:py-5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors"
+            >
               {t("getStartedToday")}
             </button>
           </div>
