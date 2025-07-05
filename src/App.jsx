@@ -39,7 +39,7 @@ function App() {
   const title2 = useTypingEffect(t("title2"), 80, title1.isComplete ? 500 : 0);
 
   const projectsCount = useCountAnimation(
-    "500+",
+    "2000+",
     2000,
     title2.isComplete ? 1000 : 0
   );
@@ -49,7 +49,7 @@ function App() {
     title2.isComplete ? 1200 : 0
   );
   const satisfactionCount = useCountAnimation(
-    "100%",
+    "99%",
     2000,
     title2.isComplete ? 1400 : 0
   );
