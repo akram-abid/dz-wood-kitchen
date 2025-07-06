@@ -5,6 +5,7 @@ import {
   loginController,
   signupController,
   updateUserInfoHandler,
+  getUserInfoHandler,
 } from "../controllers/auth.controller";
 
 import {
@@ -24,6 +25,11 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
   app.patch("/update", {
     preHandler: [app.authenticate],
     handler: updateUserInfoHandler,
+  });
+
+  app.get("/userInfo", {
+    preHandler: [app.authenticate],
+    handler: getUserInfoHandler,
   });
 
   app.post("/request-reset-password", requestResetPassword);

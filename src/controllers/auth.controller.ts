@@ -200,8 +200,42 @@ export const updateUserInfoHandler = async (
       .set({ ...updateFields, updatedAt: new Date() })
       .where(eq(users.id, userId));
 
-    return reply.status(200);
+    reply.status(200);
+    return { updated: fullName };
   } catch (err) {
     handleControllerError(err, "update user data", req.log);
+  }
+};
+
+export const getUserInfoHandler = async (
+  req: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const userId = req.ctx.user?.userId!;
+
+  try {
+    const user = await db
+      .select({
+        id: users.id,
+        fullName: users.fullName,
+        email: users.email,
+        isEmailVerified: users.isEmailVerified,
+        phoneNumber: users.phoneNumber,
+        createdAt: users.createdAt,
+
+        updatedAt: users.updatedAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user.length === 0) {
+      throw new APIError.NotFoundError("user not found");
+    }
+
+    reply.status(200);
+    return { user: user[0] };
+  } catch (err) {
+    handleControllerError(err, "get user data", req.log);
   }
 };
