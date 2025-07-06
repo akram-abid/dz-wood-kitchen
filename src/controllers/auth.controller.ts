@@ -116,13 +116,16 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     delete (req.session as any).grant;
 
     reply.status(200);
+    reply.redirect(
+      `https://dzwoodkitchen.com/login/success?token=${result.accessToken}`,
+    );
 
-    return {
+    /*return {
       message: "Login successful",
       user: result.user,
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
-    };
+    };*/
   } catch (error) {
     handleControllerError(error, "google oauth", req.log);
   }
