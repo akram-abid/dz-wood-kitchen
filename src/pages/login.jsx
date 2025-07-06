@@ -191,7 +191,7 @@ const LoginPage = () => {
 
             {/* Social Login Buttons */}
             <div className="flex flex-col space-y-4 mb-6">
-              <a href="www.dzwoodkitchen.com/connect/google"
+              <a href="/connect/google"
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
@@ -207,7 +207,7 @@ const LoginPage = () => {
                 </svg>
                 <span>{t("continueWithGoogle")}</span>
               </a>
-              <a href="www.dzwoodkitchen.com/connect/facebook"
+              <a href="/connect/facebook"
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
