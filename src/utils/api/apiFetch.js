@@ -26,6 +26,7 @@ const apiFetch = async (link, body = null, addContentType = true, method = null)
     const options = {
       method: httpMethod,
       headers: headers,
+      credentials: 'omit',
     };
 
     console.log("i got this body ", body)
