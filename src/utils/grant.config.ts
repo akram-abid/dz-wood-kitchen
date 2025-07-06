@@ -15,6 +15,9 @@ export const grantConfig = {
     secret: config.GOOGLE_CLIENT_SECRET,
     callback: "/api/v1/auth/google/callback",
     scope: ["openid", "email", "profile"],
+    access_type: "offline",
+    response_type: "code",
+    prompt: "select_account",
   },
   facebook: {
     key: config.FACEBOOK_CLIENT_ID,
