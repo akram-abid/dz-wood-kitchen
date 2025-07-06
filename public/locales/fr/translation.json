@@ -249,6 +249,8 @@
   "illVerifyLater": "Je vérifierai plus tard",
   "verificationEmailSent": "E-mail de vérification envoyé ! Veuillez vérifier votre boîte de réception.",
   "failedToSendVerificationEmail": "Échec de l'envoi de l'e-mail de vérification. Veuillez réessayer plus tard.",
-  "verifyEmailWarning": "Nous vous avons envoyé un e-mail de vérification. Veuillez vérifier votre boîte de réception. Votre compte sera supprimé dans 7 heures s’il n’est pas vérifié."
-
+  "verifyEmailWarning": "Nous vous avons envoyé un e-mail de vérification. Veuillez vérifier votre boîte de réception. Votre compte sera supprimé dans 7 heures s’il n’est pas vérifié.",
+  "verificationEmailSent": "E-mail de vérification envoyé",
+  "verificationEmailMessage": "Nous avons envoyé un lien de vérification à votre adresse e-mail. Veuillez vérifier votre boîte de réception et cliquer sur le lien pour vérifier votre compte.",
+  "okay": "D'accord"
 }

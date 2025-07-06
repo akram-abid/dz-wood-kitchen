@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import apiFetch from "../utils/api/apiFetch";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/header";
+import { Dialog, Transition } from "@headlessui/react";
 
 const SignupPage = () => {
   const { t } = useTranslation();
@@ -30,32 +31,24 @@ const SignupPage = () => {
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading to true when form is submitted
+    setIsLoading(true);
     const signupData = {
       fullName: formData.fullName,
       email: formData.email,
       password: formData.password,
     };
-    console.log("User Signup Data:", {
-      email: formData.email,
-      password: formData.password,
-      fullName: formData.fullName,
-    });
 
     try {
       const result = await apiFetch("/api/v1/auth/signup", signupData);
 
       if (result.success) {
         console.log("Signup successful:", result.data);
-        navigate("/login", {
-          state: {
-            message: t("signupSuccessMessage"),
-          },
-        });
+        setShowVerificationModal(true); // Show verification modal instead of immediate redirect
       } else {
         console.error("Signup failed:", result.error);
         // Handle error (show error message to user)
@@ -63,8 +56,17 @@ const SignupPage = () => {
     } catch (error) {
       console.error("Signup error:", error);
     } finally {
-      setIsLoading(false); // Set loading to false when done
+      setIsLoading(false);
     }
+  };
+
+  const handleModalClose = () => {
+    setShowVerificationModal(false);
+    navigate("/login", {
+      state: {
+        message: t("signupSuccessMessage"),
+      },
+    });
   };
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
@@ -104,6 +106,68 @@ const SignupPage = () => {
           : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
       }`}
     >
+      {/* Verification Success Modal */}
+      <Transition appear show={showVerificationModal} as={React.Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={handleModalClose}>
+          <Transition.Child
+            as={React.Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={React.Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-green-50 p-6 text-left align-middle shadow-xl transition-all">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div className="ml-4">
+                      <Dialog.Title
+                        as="h3"
+                        className="text-lg font-medium leading-6 text-gray-900"
+                      >
+                        {t("verificationEmailSent")}
+                      </Dialog.Title>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600">
+                          {t("verificationEmailMessage")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                      onClick={handleModalClose}
+                    >
+                      {t("okay")}
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+      
       {/* Header */}
       <Header
         darkMode={darkMode}

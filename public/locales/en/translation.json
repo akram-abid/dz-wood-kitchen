@@ -258,6 +258,9 @@
   "illVerifyLater": "I'll verify later",
   "verificationEmailSent": "Verification email sent! Please check your inbox.",
   "failedToSendVerificationEmail": "Failed to send verification email. Please try again later.",
-  "verifyEmailWarning": "We've sent you a verification email. Please check your inbox. Your account will be deleted in 7 hours if not verified."
+  "verifyEmailWarning": "We've sent you a verification email. Please check your inbox. Your account will be deleted in 7 hours if not verified.",
+  "verificationEmailSent": "Verification Email Sent",
+  "verificationEmailMessage": "We've sent a verification link to your email address. Please check your inbox and click the link to verify your account.",
+  "okay": "Okay"
 
 }
