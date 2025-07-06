@@ -109,19 +109,19 @@ const buildServer = async (): Promise<FastifyInstance> => {
 
   // CORS configuration
 
-  await server.register(cors, {
-    origin: origin: (origin, callback) => {
-      const whitelist = ['https://dzwoodkitchen.com', 'http://localhost:5173'];
-      if (!origin || whitelist.includes(origin)) {
-          callback(null, true);
-       } else {
-          callback(new Error('Not allowed by CORS'), false);
-       }  
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    credentials: false,
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  });
+await server.register(cors, {
+  origin: (origin, callback) => {
+    const whitelist = ['https://dzwoodkitchen.com', 'http://localhost:5173'];
+    if (!origin || whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  credentials: false,
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+});
 
   // JWT authentication
   await server.register(jwt, {
