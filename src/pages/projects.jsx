@@ -838,9 +838,6 @@ const KitchenGallery = () => {
             {t("customKitchenDescription") ||
               "Let us create a custom kitchen that perfectly fits your style and needs."}
           </p>
-          <button className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-3 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-            {t("startYourProject") || "Start Your Project"}
-          </button>
         </div>
       </div>
     </div>
