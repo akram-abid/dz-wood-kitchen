@@ -110,23 +110,13 @@ const buildServer = async (): Promise<FastifyInstance> => {
   // CORS configuration
 
   await server.register(cors, {
-    origin: (origin, callback) => {
-      const allowedOrigins = Array.isArray(config.CORS_ORIGIN)
-        ? config.CORS_ORIGIN
-        : config.CORS_ORIGIN.split(",");
-
-      server.log.info(allowedOrigins);
-      server.log.info("the comming origin : ", origin);
-
-      if (!origin || origin.trim() === "") {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"), false);
+    origin: origin: (origin, callback) => {
+      const whitelist = ['https://dzwoodkitchen.com', 'http://localhost:5173'];
+      if (!origin || whitelist.includes(origin)) {
+          callback(null, true);
+       } else {
+          callback(new Error('Not allowed by CORS'), false);
+       }  
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     credentials: false,
