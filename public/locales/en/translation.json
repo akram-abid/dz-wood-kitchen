@@ -247,5 +247,17 @@
   "resetPasswordEmailSent": "If an account with that email exists, a password reset link has been sent.",
   "confirmDelete": "Confirm Deletion",
   "areYouSureDeleteOrder": "Are you sure you want to delete the order",
-  "delete": "Delete"
+  "delete": "Delete",
+  "updateFailed": "Update failed",
+  "noCurrentOrders": "No current orders",
+  "verifyYourEmail": "Verify Your Email",
+  "emailVerificationRequired": "Please verify your email address to continue using your account.",
+  "accountDeletionWarning": "Your account will be deleted in {time} if not verified.",
+  "checkYourEmailForVerificationLink": "We've sent a verification link to your email address.",
+  "resendVerificationEmail": "Resend Verification Email",
+  "illVerifyLater": "I'll verify later",
+  "verificationEmailSent": "Verification email sent! Please check your inbox.",
+  "failedToSendVerificationEmail": "Failed to send verification email. Please try again later.",
+  "verifyEmailWarning": "We've sent you a verification email. Please check your inbox. Your account will be deleted in 7 hours if not verified."
+
 }

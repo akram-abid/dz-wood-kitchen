@@ -16,25 +16,41 @@ function decodeJWT(token) {
   }
 }
 
-function getValidAccessToken(requiredRole = null) {
+function getValidAccessToken(requiredRole = null, requireEmailVerification = true) {
   try {
     // Get token from localStorage
     const token = localStorage.getItem('accessToken');
     
     if (!token) {
-      return { isValid: false, token: null, reason: 'No token found' };
+      return { 
+        isValid: false, 
+        token: null, 
+        isEmailVerified: false,
+        reason: 'No token found' 
+      };
     }
     
     // Decode the token
     const payload = decodeJWT(token);
+    console.log("this is the payload i got ", payload)
     
     if (!payload) {
-      return { isValid: false, token: null, reason: 'Invalid token format' };
+      return { 
+        isValid: false, 
+        token: null, 
+        isEmailVerified: false,
+        reason: 'Invalid token format' 
+      };
     }
     
     // Check if token has expiration time
     if (!payload.exp) {
-      return { isValid: false, token: null, reason: 'Token has no expiration time' };
+      return { 
+        isValid: false, 
+        token: null, 
+        isEmailVerified: payload.isEmailVerified || false,
+        reason: 'Token has no expiration time' 
+      };
     }
     
     // Check if token is expired
@@ -43,15 +59,30 @@ function getValidAccessToken(requiredRole = null) {
     
     if (isExpired) {
       localStorage.removeItem('accessToken');
-      return { isValid: false, token: null, reason: 'Token expired' };
+      return { 
+        isValid: false, 
+        token: null, 
+        isEmailVerified: payload.isEmailVerified || false,
+        reason: 'Token expired' 
+      };
     }
+    
+    console.log("i am here")
+    // Check email verification if required
+    const emailVerified = payload.isEmailVerified || false;
+
     
     // Check role if required
     if (requiredRole) {
       const userRole = payload.role || payload.roles || payload.user_role;
       
       if (!userRole) {
-        return { isValid: false, token: null, reason: 'No role found in token' };
+        return { 
+          isValid: false, 
+          token: null, 
+          isEmailVerified: emailVerified,
+          reason: 'No role found in token' 
+        };
       }
       
       // Handle single role or array of roles
@@ -63,56 +94,74 @@ function getValidAccessToken(requiredRole = null) {
         return { 
           isValid: false, 
           token: null, 
+          isEmailVerified: emailVerified,
           reason: `Insufficient permissions. Required role: ${requiredRole}` 
         };
       }
+    }
+
+    if (requireEmailVerification && !emailVerified) {
+      return { 
+        isValid: true, 
+        token: null, 
+        isEmailVerified: false,
+        reason: 'Email not verified' 
+      };
     }
     
     return { 
       isValid: true, 
       token, 
       payload,
+      isEmailVerified: emailVerified,
       expiresAt: new Date(payload.exp * 1000), // Convert to readable date
       reason: 'Token is valid'
     };
     
   } catch (error) {
     console.error('Error validating token:', error);
-    return { isValid: false, token: null, reason: 'Error validating token' };
+    return { 
+      isValid: false, 
+      token: null, 
+      isEmailVerified: false,
+      reason: 'Error validating token' 
+    };
   }
 }
 
-function isAuthenticated(requiredRole = null) {
-  const result = getValidAccessToken(requiredRole);
+function isAuthenticated(requiredRole = null, requireEmailVerification = true) {
+  const result = getValidAccessToken(requiredRole, requireEmailVerification);
   return result.isValid;
 }
 
-function useAuth(requiredRole = null) {
+function useAuth(requiredRole = null, requireEmailVerification = true) {
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     token: null,
     loading: true,
-    userRole: null
+    userRole: null,
+    isEmailVerified: false,
+    authError: null
   });
   
   useEffect(() => {
     const checkAuth = () => {
-      const result = getValidAccessToken(requiredRole);
+      const result = getValidAccessToken(requiredRole, requireEmailVerification);
       setAuthState({
         isAuthenticated: result.isValid,
         token: result.token,
         userRole: result.payload?.role || result.payload?.roles || result.payload?.user_role || null,
+        isEmailVerified: result.isEmailVerified,
+        authError: result.reason,
         loading: false
       });
     };
     
     checkAuth();
     
-    // Optional: Set up interval to check token periodically
-    const interval = setInterval(checkAuth, 60000); // Check every minute
-    
+    const interval = setInterval(checkAuth, 60000);
     return () => clearInterval(interval);
-  }, [requiredRole]);
+  }, [requiredRole, requireEmailVerification]);
   
   return authState;
 }
@@ -139,10 +188,33 @@ function getUserRole() {
   return result.payload?.role || result.payload?.roles || result.payload?.user_role || null;
 }
 
+// Utility function to check if email is verified
+function isEmailVerified() {
+  const result = getValidAccessToken(null, false); // Don't require email verification for this check
+  return result.isEmailVerified;
+}
+
+// Utility function to get user info from token
+function getUserInfo() {
+  const result = getValidAccessToken(null, false); // Don't require email verification for this check
+  if (!result.isValid) return null;
+  
+  return {
+    email: result.payload?.email || null,
+    name: result.payload?.name || null,
+    userId: result.payload?.userId || null,
+    role: result.payload?.role || result.payload?.roles || result.payload?.user_role || null,
+    isEmailVerified: result.payload?.isEmailVerified || false,
+    type: result.payload?.type || null
+  };
+}
+
 export { 
   getValidAccessToken, 
   isAuthenticated, 
   useAuth,
   hasRole,
-  getUserRole
+  getUserRole,
+  isEmailVerified,
+  getUserInfo
 };

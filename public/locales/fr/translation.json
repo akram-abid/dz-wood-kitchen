@@ -238,5 +238,17 @@
   "resetPasswordEmailSent": "Si un compte existe, un lien de réinitialisation a été envoyé.",
   "confirmDelete": "Confirmer la Suppression",
   "areYouSureDeleteOrder": "Êtes-vous sûr de vouloir supprimer la commande",
-  "delete": "Supprimer"
+  "delete": "Supprimer",
+  "updateFailed": "Échec de la mise à jour",
+  "noCurrentOrders": "Aucune commande en cours",
+  "verifyYourEmail": "Vérifiez votre adresse e-mail",
+  "emailVerificationRequired": "Veuillez vérifier votre adresse e-mail pour continuer à utiliser votre compte.",
+  "accountDeletionWarning": "Votre compte sera supprimé dans {time} s'il n'est pas vérifié.",
+  "checkYourEmailForVerificationLink": "Nous avons envoyé un lien de vérification à votre adresse e-mail.",
+  "resendVerificationEmail": "Renvoyer l'e-mail de vérification",
+  "illVerifyLater": "Je vérifierai plus tard",
+  "verificationEmailSent": "E-mail de vérification envoyé ! Veuillez vérifier votre boîte de réception.",
+  "failedToSendVerificationEmail": "Échec de l'envoi de l'e-mail de vérification. Veuillez réessayer plus tard.",
+  "verifyEmailWarning": "Nous vous avons envoyé un e-mail de vérification. Veuillez vérifier votre boîte de réception. Votre compte sera supprimé dans 7 heures s’il n’est pas vérifié."
+
 }
