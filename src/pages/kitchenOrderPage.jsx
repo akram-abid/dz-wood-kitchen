@@ -275,6 +275,7 @@ const KitchenOrderPage = () => {
         handleLanguageChange={handleLanguageChange}
         isLanguageDropdownOpen={isLanguageDropdownOpen}
         toggleLanguageDropdown={toggleLanguageDropdown}
+        showProfileButton={true}
       />
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-12">

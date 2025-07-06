@@ -282,6 +282,7 @@ const KitchenDetails = () => {
         handleLanguageChange={handleLanguageChange}
         isLanguageDropdownOpen={isLanguageDropdownOpen}
         toggleLanguageDropdown={toggleLanguageDropdown}
+        showProfileButton={true}
       />
 
       {/* Main Content */}
