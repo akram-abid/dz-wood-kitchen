@@ -26,6 +26,7 @@ import rawLocationData from "../assets/addresses.json";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/header";
+import { useAuth } from "../utils/protectedRootesVerf";
 
 const KitchenOrderPage = () => {
   const { wilayas, dairas, communes } = processLocationData(rawLocationData);
@@ -64,6 +65,28 @@ const KitchenOrderPage = () => {
   const [apiError, setApiError] = useState(null);
 
   const { t } = useTranslation();
+
+  const {
+      isAuthenticated,
+      isEmailVerified,
+      authError,
+      loading: authLoading,
+    } = useAuth();
+  
+    // Handle authentication check in useEffect
+    useEffect(() => {
+      console.log("Auth state:", {
+        isAuthenticated,
+        isEmailVerified,
+        authError,
+        authLoading,
+      });
+  
+      // Only redirect if we're not loading and not authenticated
+      if (!isEmailVerified && !isAuthenticated) {
+        navigate("/login");
+      }
+    }, [isAuthenticated, authLoading, navigate]);
 
   const filteredWilayas = wilayas
     .filter((w) => w.name.toLowerCase().includes(wilayaSearch.toLowerCase()))
