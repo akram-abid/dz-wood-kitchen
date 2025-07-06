@@ -7,7 +7,7 @@ set -x  # Debug mode
 APP_DIR="/home/lab-fe"
 PROJECT_NAME="dz-wood-kitchen"
 PROJECT_PATH="$APP_DIR/$PROJECT_NAME"
-GIT_REPO="git@github.com:akram-abid/dz-wood-kitchen.git"
+GIT_REPO="git@github-akram:akram-abid/dz-wood-kitchen.git"
 CONTAINER_NAME="dzwoodkitchen-frontend"
 IMAGE_NAME="dzwoodkitchen-frontend"
 BUILD_ARG_ORIGIN="https://dzwoodkitchen.com"
