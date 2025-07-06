@@ -28,8 +28,8 @@ const LoginSuccess = () => {
     const processLogin = async () => {
       try {
         
-        const token = useSearchParams.("token");
-        console.log("the token is this ", token)
+          console.log("the token is this ")
+        const token = useSearchParams.get("token");
         
         if (!token) {
           setError('No access token found in URL parameters');
