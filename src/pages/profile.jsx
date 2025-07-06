@@ -7,6 +7,7 @@ import {
   User,
   Mail,
   Edit,
+  LayoutDashboard,
   Image,
   Check,
   X,
