@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy Frontend 
 
 on:
   push:
@@ -23,14 +23,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
-            "mkdir -p ~/lab"
+            "mkdir -p /home/lab-fe"
 
           scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 \
             -P ${{ secrets.SSH_PORT }} \
             ./deploy.sh \
-            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:~/lab/deploy.sh
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/lab-fe/deploy.sh
 
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=30 \
             -p ${{ secrets.SSH_PORT }} \
             ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} \
-            "chmod +x ~/lab/deploy.sh && bash ~/lab/deploy.sh"
+            "chmod +x /home/lab-fe/deploy.sh && bash /home/lab-fe/deploy.sh"
