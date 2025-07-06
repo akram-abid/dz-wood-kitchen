@@ -9,12 +9,14 @@ import {
   Moon,
   Globe,
   ChevronDown,
-} from "lucide-react";
+  AlertTriangle,
+  X,
+} from "lucide-react"; // Added AlertTriangle and X icons
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
 import picture from "../assets/images/homeMain.jpg";
 import apiFetch from "../utils/api/apiFetch";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
 import Header from "../components/header";
@@ -23,12 +25,41 @@ const LoginPage = () => {
   const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation(); // Get location object
   const [isLoading, setIsLoading] = useState(false);
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+    type: "error", // 'error' or 'info'
+  });
+
+  // Show notification function
+  const showNotification = (message, type = "error") => {
+    setNotification({
+      show: true,
+      message,
+      type,
+    });
+
+    // Hide after 5 seconds
+    setTimeout(() => {
+      setNotification(prev => ({ ...prev, show: false }));
+    }, 5000);
+  };
+
+  // Check for location state problems on mount
+  useEffect(() => {
+    if (location.state?.problem) {
+      showNotification(location.state.problem, "info");
+      // Clear the state to prevent showing again on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location]);
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleLanguageDropdown = () => {
@@ -78,10 +109,11 @@ const LoginPage = () => {
         navigate("/profile");
       } else {
         console.error("Login failed:", result.error);
-        // Optionally show error message to user
+        showNotification(t("invalidEmailOrPassword")); // Show error notification
       }
     } catch (error) {
       console.error("Login error:", error);
+      showNotification(t("loginError")); // Show generic error notification
     } finally {
       setIsLoading(false); // Stop loading in any case
     }
@@ -95,6 +127,35 @@ const LoginPage = () => {
           : "bg-gradient-to-br from-gray-50 via-white to-gray-100"
       }`}
     >
+      {notification.show && (
+        <div
+          className={`fixed top-26 right-4 z-50 transform transition-all duration-300 ${
+            notification.show ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          }`}
+        >
+          <div
+            className={`flex items-center p-4 rounded-lg shadow-lg ${
+              notification.type === "error"
+                ? darkMode
+                  ? "bg-red-900/90 text-red-100"
+                  : "bg-red-100 text-red-900"
+                : darkMode
+                ? "bg-blue-900/90 text-blue-100"
+                : "bg-blue-100 text-blue-900"
+            }`}
+          >
+            <AlertTriangle className="mr-3" size={20} />
+            <span>{notification.message}</span>
+            <button
+              onClick={() => setNotification(prev => ({ ...prev, show: false }))}
+              className="ml-4"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <Header
         darkMode={darkMode}

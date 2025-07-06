@@ -83,8 +83,11 @@ const KitchenOrderPage = () => {
       });
     }, [isAuthenticated, authLoading, navigate]);
     
-    if (!isEmailVerified && !isAuthenticated) {
-        navigate("/login");
+      if(!isAuthenticated){
+        navigate('/login', { state: { problem: t("sessionExpiredOrNoAccount") } });
+      }
+      if(!isEmailVerified){
+        navigate('/login', { state: { problem: t("emailNotVerified") } });
       }
   const filteredWilayas = wilayas
     .filter((w) => w.name.toLowerCase().includes(wilayaSearch.toLowerCase()))

@@ -252,5 +252,8 @@
   "verifyEmailWarning": "Nous vous avons envoyé un e-mail de vérification. Veuillez vérifier votre boîte de réception. Votre compte sera supprimé dans 7 heures s’il n’est pas vérifié.",
   "verificationEmailSent": "E-mail de vérification envoyé",
   "verificationEmailMessage": "Nous avons envoyé un lien de vérification à votre adresse e-mail. Veuillez vérifier votre boîte de réception et cliquer sur le lien pour vérifier votre compte.",
-  "okay": "D'accord"
+  "okay": "D'accord",
+  "invalidEmailOrPassword": "E-mail ou mot de passe invalide",
+"loginError": "Une erreur est survenue lors de la connexion"
+
 }
