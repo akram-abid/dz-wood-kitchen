@@ -81,13 +81,11 @@ const KitchenOrderPage = () => {
         authError,
         authLoading,
       });
-  
-      // Only redirect if we're not loading and not authenticated
-      if (!isEmailVerified && !isAuthenticated) {
+    }, [isAuthenticated, authLoading, navigate]);
+    
+    if (!isEmailVerified && !isAuthenticated) {
         navigate("/login");
       }
-    }, [isAuthenticated, authLoading, navigate]);
-
   const filteredWilayas = wilayas
     .filter((w) => w.name.toLowerCase().includes(wilayaSearch.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -571,7 +569,7 @@ const KitchenOrderPage = () => {
               className={`cursor-pointer px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 focus:scale-105 flex items-center justify-center space-x-2 mx-auto ${
                 darkMode
                   ? "bg-gradient-to-r bg-yellow-500  text-gray-900 hover:from-amber-400 hover:to-orange-400 shadow-lg hover:shadow-amber-500/25"
-                  : "bg-gradient-to-r bg-blue-600  text-white hover:from-blue-500 hover:to-purple-500 shadow-lg hover:shadow-blue-500/25"
+                  : "bg-gradient-to-r bg-yellow-600  text-white hover:from-yellow-500 hover:to-yellow-500 shadow-lg hover:shadow-blue-500/25"
               }`}
             >
               <span>{t("seeOrder")}</span>

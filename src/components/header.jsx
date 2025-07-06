@@ -1,6 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
-import { Sun, Moon, Globe, ChevronDown } from "lucide-react";
+import { Sun, Moon, Globe, ChevronDown, User } from "lucide-react";
 
 function Header({
   darkMode,
@@ -8,7 +9,10 @@ function Header({
   toggleLanguageDropdown,
   isLanguageDropdownOpen,
   handleLanguageChange,
+  showProfileButton = false,
 }) {
+  const navigate = useNavigate();
+
   return (
     <header
       className={`backdrop-blur-md py-4 px-4 sm:px-6 lg:px-8 sticky top-0 z-50 border-b transition-all duration-300 ${
@@ -19,14 +23,29 @@ function Header({
     >
       <div className="w-full max-w-7xl mx-auto flex justify-between items-center min-w-0">
         <div className="flex items-center flex-shrink-0">
-          <img
-            src={darkMode ? WLogo : Blogo}
-            alt="the logo"
-            className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto"
-          />
+          <button onClick={() => navigate("/")} className="focus:outline-none">
+            <img
+              src={darkMode ? WLogo : Blogo}
+              alt="the logo"
+              className="w-[80px] xs:w-[90px] sm:w-[100px] md:w-[120px] lg:w-[140px] h-auto cursor-pointer"
+            />
+          </button>
         </div>
 
         <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0 min-w-0">
+          {showProfileButton && (
+            <button
+              onClick={() => navigate("/profile")}
+              className={`p-2 rounded-xl transition-all duration-200 ${
+                darkMode
+                  ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                  : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+              }`}
+            >
+              <User size={18} />
+            </button>
+          )}
+
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={toggleLanguageDropdown}
