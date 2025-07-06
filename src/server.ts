@@ -111,7 +111,7 @@ const buildServer = async (): Promise<FastifyInstance> => {
 
 await server.register(cors, {
   origin: (origin, callback) => {
-    const whitelist = ['https://dzwoodkitchen.com', 'http://localhost:5173'];
+    const whitelist = ['https://dzwoodkitchen.com', 'http://localhost:5173','https://www.dzwoodkitchen.com'];
     if (!origin || whitelist.includes(origin)) {
       callback(null, true);
     } else {
