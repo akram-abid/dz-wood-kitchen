@@ -13,6 +13,8 @@ import OrderDetails from "./pages/orderDetails";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmailPage from "./pages/verifyEmail";
+import LoginSuccess from "./pages/loginSuccess";
+import NotFoundPage from "./pages/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -62,6 +64,14 @@ const router = createBrowserRouter([
   {
     path: "/verify-email",
     element: <VerifyEmailPage />
+  },
+  {
+    path: "/login/success", 
+    element: <LoginSuccess />
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />
   }
 ]);
 

@@ -191,7 +191,7 @@ const LoginPage = () => {
 
             {/* Social Login Buttons */}
             <div className="flex flex-col space-y-4 mb-6">
-              <button
+              <a href="www.dzwoodkitchen.com/connect/google"
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
@@ -206,8 +206,8 @@ const LoginPage = () => {
                   <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.784-1.664-4.177-2.664-6.735-2.664-5.521 0-10 4.479-10 10s4.479 10 10 10c8.396 0 10-7.496 10-9.634 0-0.768-0.085-1.354-0.189-1.939h-9.811z"></path>
                 </svg>
                 <span>{t("continueWithGoogle")}</span>
-              </button>
-              <button
+              </a>
+              <a href="www.dzwoodkitchen.com/connect/facebook"
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
@@ -216,7 +216,7 @@ const LoginPage = () => {
               >
                 <Facebook size={20} />
                 <span>{t("continueWithFacebook")}</span>
-              </button>
+              </a>
             </div>
 
             <div className="relative mb-6">
