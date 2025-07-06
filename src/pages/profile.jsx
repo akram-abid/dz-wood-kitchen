@@ -7,6 +7,7 @@ import {
   User,
   Mail,
   Edit,
+  Image,
   Check,
   X,
   ChevronDown,
@@ -15,6 +16,7 @@ import {
   Moon,
   Home,
   Package,
+  LogOut,
   CheckCircle,
   Clock,
   Truck,
@@ -28,7 +30,7 @@ import { useNavigate } from "react-router-dom";
 import apiFetch from "../utils/api/apiFetch";
 import Header from "../components/header";
 import { AlertTriangle, RefreshCw } from "lucide-react";
-import { useAuth } from "../utils/protectedRootesVerf";
+import { hasRole, useAuth } from "../utils/protectedRootesVerf";
 
 const ProfilePage = () => {
   const [language, setLanguage] = useState("en");
@@ -202,6 +204,15 @@ const ProfilePage = () => {
     }
   };
 
+  const isAdmin = hasRole('admin');
+  const handleDashboard = () => {
+    navigate("/dashboard")
+  };
+
+  const handleGallery = () => {
+    navigate("/gallery")
+  };
+
   useEffect(() => {
     const updateDirection = () => {
       document.documentElement.dir = i18next.dir();
@@ -210,6 +221,12 @@ const ProfilePage = () => {
     i18next.on("languageChanged", updateDirection);
     return () => i18next.off("languageChanged", updateDirection);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   const toggleLanguageDropdown = () => {
     setIsLanguageDropdownOpen(!isLanguageDropdownOpen);
@@ -347,9 +364,7 @@ const ProfilePage = () => {
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center">
               <AlertTriangle className="mr-2" size={16} />
-              <span className="text-sm">
-                {t("verifyEmailWarning")} •{" "}
-              </span>
+              <span className="text-sm">{t("verifyEmailWarning")} • </span>
             </div>
             <div className="flex gap-2">
               <button
@@ -411,19 +426,35 @@ const ProfilePage = () => {
                   <User className="mr-2" size={20} />
                   {t("personalInformation")}
                 </h2>
-                {!isEditing && !userDataLoading ? (
+
+                <div className="flex items-center space-x-2">
+                  {!isEditing && !userDataLoading ? (
+                    <button
+                      onClick={handleEdit}
+                      className={`cursor-pointer flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm ${
+                        darkMode
+                          ? "bg-gray-700 hover:bg-gray-600 text-amber-400"
+                          : "bg-gray-100 hover:bg-gray-200 text-blue-600"
+                      }`}
+                    >
+                      <Edit size={16} />
+                      <span>{t("edit")}</span>
+                    </button>
+                  ) : null}
+
+                  {/* Logout Button */}
                   <button
-                    onClick={handleEdit}
-                    className={`cursor-pointer flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm ${
+                    onClick={handleLogout}
+                    className={`cursor-pointer flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                       darkMode
-                        ? "bg-gray-700 hover:bg-gray-600 text-amber-400"
-                        : "bg-gray-100 hover:bg-gray-200 text-blue-600"
+                        ? "bg-red-700 hover:bg-red-600 text-red-300"
+                        : "bg-red-100 hover:bg-red-200 text-red-600"
                     }`}
                   >
-                    <Edit size={16} />
-                    <span>{t("edit")}</span>
+                    <LogOut size={16} />
+                    <span>{t("logout")}</span>
                   </button>
-                ) : null}
+                </div>
               </div>
 
               {userDataLoading ? (
@@ -525,6 +556,52 @@ const ProfilePage = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div
+              className={`rounded-2xl p-6 border transition-all duration-300 ${
+                darkMode
+                  ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm"
+                  : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
+              }`}
+            >
+              <h2
+                className={`text-xl font-semibold mb-6 ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {t("navigation")}
+              </h2>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                {/* Dashboard Button - Only show for admin */}
+                {isAdmin && (
+                  <button
+                    onClick={handleDashboard}
+                    className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      darkMode
+                        ? "bg-blue-600 hover:bg-blue-500 text-white"
+                        : "bg-blue-500 hover:bg-blue-400 text-white"
+                    }`}
+                  >
+                    <LayoutDashboard size={20} />
+                    <span>{t("dashboard")}</span>
+                  </button>
+                )}
+
+                {/* Gallery Button - Always visible */}
+                <button
+                  onClick={handleGallery}
+                  className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    darkMode
+                      ? "bg-purple-600 hover:bg-purple-500 text-white"
+                      : "bg-purple-500 hover:bg-purple-400 text-white"
+                  }`}
+                >
+                  <Image size={20} />
+                  <span>{t("gallery")}</span>
+                </button>
+              </div>
             </div>
 
             {/* Current Orders */}
