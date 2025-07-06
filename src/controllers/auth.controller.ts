@@ -116,7 +116,7 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     delete (req.session as any).grant;
 
     reply.status(200);
-    reply.redirect(
+    return reply.redirect(
       `https://dzwoodkitchen.com/login/success?token=${result.accessToken}`,
     );
 
