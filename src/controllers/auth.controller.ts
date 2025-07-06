@@ -80,35 +80,79 @@ export async function loginController(req: LoginRequest, reply: FastifyReply) {
 
 export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
   try {
+    if (!req.session) {
+      throw new APIError.UnauthorizedError(
+        "Session not found. Please try logging in again.",
+      );
+    }
+
     const grantData = (req.session as any).grant as GrantSessionData;
-
     if (!grantData?.response) {
-      throw new APIError.UnauthorizedError("Authentication failed");
-    }
-
-    const idToken = grantData.response.id_token;
-    if (!idToken) {
-      throw new APIError.BadRequestError(
-        "Missing id_token from Google OAuth response",
+      throw new APIError.UnauthorizedError(
+        "Authentication failed - no grant data",
       );
     }
 
-    const profile = jwt.decode(idToken) as any;
-    req.log.info(profile);
+    let userProfile;
 
-    if (!profile.sub || !profile.email) {
+    if (grantData.response.id_token) {
+      // Primary method: Use id_token when available
+      const profile = jwt.decode(grantData.response.id_token) as any;
+      req.log.info("Using id_token for profile:", profile);
+
+      if (!profile.sub || !profile.email) {
+        throw new APIError.BadRequestError(
+          "Missing required profile data, Google profile must include ID and email",
+        );
+      }
+
+      userProfile = {
+        id: profile.sub,
+        email: profile.email,
+        firstName: profile.given_name || "",
+        lastName: profile.family_name || "",
+        provider: "google" as const,
+      };
+    } else if (grantData.response.access_token) {
+      // Fallback method: Use access_token to fetch user info
+      req.log.info("No id_token found, using access_token to fetch profile");
+
+      const response = await fetch(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${grantData.response.access_token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new APIError.BadRequestError(
+          "Failed to fetch user info from Google",
+        );
+      }
+
+      const profile = await response.json();
+      req.log.info("Fetched profile using access_token:", profile);
+
+      if (!profile.id || !profile.email) {
+        throw new APIError.BadRequestError(
+          "Missing required profile data from Google userinfo endpoint",
+        );
+      }
+
+      userProfile = {
+        id: profile.id,
+        email: profile.email,
+        firstName: profile.given_name || "",
+        lastName: profile.family_name || "",
+        provider: "google" as const,
+      };
+    } else {
       throw new APIError.BadRequestError(
-        "Missing required profile data, Google profile must include ID and email",
+        "No valid token found in Google OAuth response",
       );
     }
-
-    const userProfile = {
-      id: profile.sub,
-      email: profile.email,
-      firstName: profile.given_name || "",
-      lastName: profile.family_name || "",
-      provider: "google" as const,
-    };
 
     const result = await authService.oauthLogin(userProfile);
 
@@ -118,13 +162,6 @@ export async function googleCallback(req: FastifyRequest, reply: FastifyReply) {
     return reply.redirect(
       `https://dzwoodkitchen.com/login/success?token=${result.accessToken}`,
     );
-
-    /*return {
-      message: "Login successful",
-      user: result.user,
-      accessToken: result.accessToken,
-      refreshToken: result.refreshToken,
-    };*/
   } catch (error) {
     handleControllerError(error, "google oauth", req.log);
   }

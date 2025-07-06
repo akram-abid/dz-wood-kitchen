@@ -17,7 +17,7 @@ export const grantConfig = {
     scope: ["openid", "email", "profile"],
     access_type: "offline",
     response_type: "code",
-    prompt: "select_account",
+    prompt: "consent",
   },
   facebook: {
     key: config.FACEBOOK_CLIENT_ID,
