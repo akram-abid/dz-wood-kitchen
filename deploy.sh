@@ -20,11 +20,20 @@ if [ -d "$APP_DIR" ]; then
   docker compose -f docker-compose.yml down --volumes --remove-orphans
 fi
 
-echo "🧹 Removing old repo folder..."
-rm -rf "$APP_DIR"
+echo "📁 Checking repo existence in $APP_DIR..."
+if [ -d "$APP_DIR/.git" ]; then
+  echo "🔄 Repo already exists. Pulling latest changes..."
+  cd "$APP_DIR" || exit 1
+  git reset --hard HEAD        
+  git clean -fd                    
+  git fetch origin "$BRANCH"
+  git checkout "$BRANCH"
+  git pull origin "$BRANCH"
+else
+  echo "📥 Cloning repo into $APP_PARENT_DIR..."
+  git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
+fi
 
-echo "📥 Cloning repo into $APP_PARENT_DIR..."
-git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
 
 echo "🧼 Cleaning up old Docker images..."
 docker system prune -af
