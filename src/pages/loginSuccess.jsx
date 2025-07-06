@@ -5,6 +5,7 @@ const LoginSuccess = () => {
   const [status, setStatus] = useState('processing');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  console.log("this is not good ")
 
   const decodeJWT = (token) => {
     try {
@@ -27,7 +28,8 @@ const LoginSuccess = () => {
     const processLogin = async () => {
       try {
         
-        const token = useSearchParams.get("token");
+        const token = useSearchParams.("token");
+        console.log("the token is this ", token)
         
         if (!token) {
           setError('No access token found in URL parameters');
@@ -37,27 +39,27 @@ const LoginSuccess = () => {
 
         localStorage.setItem('accessToken', token);
         
-        const decodedToken = decodeJWT(token);
+        // const decodedToken = decodeJWT(token);
         
-        if (decodedToken) {
-          const userData = {
-            id: decodedToken.id ,
-            role: decodedToken.role,
-            email: decodedToken.email,
-            exp: decodedToken.exp,
-          };
+        // if (decodedToken) {
+        //   const userData = {
+        //     id: decodedToken.id ,
+        //     role: decodedToken.role,
+        //     email: decodedToken.email,
+        //     exp: decodedToken.exp,
+        //   };
           
-          localStorage.setItem('user', JSON.stringify(userData));
+        //   localStorage.setItem('user', JSON.stringify(userData));
           
-          setStatus('success');
+        //   setStatus('success');
           
-          setTimeout(() => {
-            navigate('/');
-          }, 1500);
-        } else {
-          setError('Failed to decode user information from token');
-          setStatus('error');
-        }
+        //   setTimeout(() => {
+        //     navigate('/');
+        //   }, 1500);
+        // } else {
+        //   setError('Failed to decode user information from token');
+        //   setStatus('error');
+        // }
       } catch (error) {
         console.error('Login processing error:', error);
         setError('An error occurred while processing login');
