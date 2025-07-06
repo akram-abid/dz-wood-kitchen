@@ -11,27 +11,14 @@ if [ -d "$APP_DIR" ]; then
   cd ~
 fi
 
-echo "🗑️ Nuclear Docker cleanup - removing EVERYTHING..."
-# Stop all running containers
-docker stop $(docker ps -aq) 2>/dev/null || true
+echo "🧼 Stopping and removing containers/images from Docker Compose..."
 
-# Remove all containers (running and stopped)
-docker rm $(docker ps -aq) 2>/dev/null || true
+if [ -d "$APP_DIR" ]; then
+  cd "$APP_DIR"
 
-# Remove all images (including tagged ones)
-docker rmi $(docker images -q) --force 2>/dev/null || true
-
-# Remove all volumes
-docker volume rm $(docker volume ls -q) 2>/dev/null || true
-
-# Remove all networks (except default ones)
-docker network rm $(docker network ls -q) 2>/dev/null || true
-
-# Remove all build cache, unused images, containers, networks
-docker system prune -af --volumes
-
-# Remove all buildx cache
-docker buildx prune -af 2>/dev/null || true
+  # Stop and remove containers, networks, volumes, images created by docker-compose
+  docker compose -f docker-compose.yml down --volumes --remove-orphans
+fi
 
 echo "🧹 Removing old repo folder..."
 rm -rf "$APP_DIR"
