@@ -41,15 +41,10 @@ const LoginSuccess = () => {
         
         if (decodedToken) {
           const userData = {
-            id: decodedToken.sub || decodedToken.id || decodedToken.user_id,
+            id: decodedToken.id ,
+            role: decodedToken.role,
             email: decodedToken.email,
-            name: decodedToken.name || (decodedToken.given_name && decodedToken.family_name 
-              ? decodedToken.given_name + ' ' + decodedToken.family_name 
-              : decodedToken.given_name || decodedToken.family_name),
-            picture: decodedToken.picture || decodedToken.avatar,
-            provider: decodedToken.provider || 'oauth',
             exp: decodedToken.exp,
-            iat: decodedToken.iat
           };
           
           localStorage.setItem('user', JSON.stringify(userData));
