@@ -1,113 +1,144 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const LoginSuccess = () => {
-  const [status, setStatus] = useState('processing');
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState("processing");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  console.log("this is not good ")
+  const [searchParams] = useSearchParams(); // Fix: Properly use useSearchParams hook
 
   const decodeJWT = (token) => {
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
         atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
       );
       return JSON.parse(jsonPayload);
     } catch (error) {
-      console.error('Error decoding JWT:', error);
+      console.error("Error decoding JWT:", error);
       return null;
     }
   };
 
   useEffect(() => {
     const processLogin = async () => {
+      console.log("Processing login...");
       try {
-        
-          console.log("the token is this ")
-        const token = useSearchParams.get("token");
-        
+        // Fix: Get token from search params correctly
+        const token = searchParams.get("token");
+        console.log("Token from URL:", token);
+
         if (!token) {
-          setError('No access token found in URL parameters');
-          setStatus('error');
+          setError("No access token found in URL parameters");
+          setStatus("error");
           return;
         }
 
-        localStorage.setItem('accessToken', token);
-        
-        // const decodedToken = decodeJWT(token);
-        
-        // if (decodedToken) {
-        //   const userData = {
-        //     id: decodedToken.id ,
-        //     role: decodedToken.role,
-        //     email: decodedToken.email,
-        //     exp: decodedToken.exp,
-        //   };
-          
-        //   localStorage.setItem('user', JSON.stringify(userData));
-          
-        //   setStatus('success');
-          
-        //   setTimeout(() => {
-        //     navigate('/');
-        //   }, 1500);
-        // } else {
-        //   setError('Failed to decode user information from token');
-        //   setStatus('error');
-        // }
+        // Store token in localStorage
+        localStorage.setItem("accessToken", token);
+
+        // Decode and store user data
+        const decodedToken = decodeJWT(token);
+
+        if (decodedToken) {
+          const userData = {
+            id: decodedToken.id,
+            role: decodedToken.role,
+            email: decodedToken.email,
+            exp: decodedToken.exp,
+          };
+
+          localStorage.setItem("user", JSON.stringify(userData));
+
+          setStatus("success");
+
+          // Redirect after successful login
+          setTimeout(() => {
+            navigate("/");
+          }, 1500);
+        } else {
+          setError("Failed to decode user information from token");
+          setStatus("error");
+        }
       } catch (error) {
-        console.error('Login processing error:', error);
-        setError('An error occurred while processing login');
-        setStatus('error');
+        console.error("Login processing error:", error);
+        setError("An error occurred while processing login");
+        setStatus("error");
       }
     };
 
     processLogin();
-  }, []);
+  }, [searchParams, navigate]); // Fix: Add dependencies
 
-  // Handle error cases - redirect to login after delay
   useEffect(() => {
-    if (status === 'error') {
+    if (status === "error") {
       setTimeout(() => {
-        navigate('/login');
+        navigate("/login");
       }, 3000);
     }
-  }, [status]);
+  }, [status, navigate]); // Fix: Add navigate dependency
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          {status === 'processing' && (
+          {status === "processing" && (
             <div className="space-y-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <h2 className="text-2xl font-bold text-gray-900">Processing Login...</h2>
-              <p className="text-gray-600">Please wait while we complete your authentication.</p>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Processing Login...
+              </h2>
+              <p className="text-gray-600">
+                Please wait while we complete your authentication.
+              </p>
             </div>
           )}
-          
-          {status === 'success' && (
+
+          {status === "success" && (
             <div className="space-y-4">
               <div className="rounded-full h-12 w-12 bg-green-100 mx-auto flex items-center justify-center">
-                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="h-6 w-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Login Successful!</h2>
-              <p className="text-gray-600">Redirecting you to the homepage...</p>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Login Successful!
+              </h2>
+              <p className="text-gray-600">
+                Redirecting you to the homepage...
+              </p>
             </div>
           )}
-          
-          {status === 'error' && (
+
+          {status === "error" && (
             <div className="space-y-4">
               <div className="rounded-full h-12 w-12 bg-red-100 mx-auto flex items-center justify-center">
-                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                <svg
+                  className="h-6 w-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-gray-900">Login Failed</h2>
