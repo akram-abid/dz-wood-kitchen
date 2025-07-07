@@ -254,7 +254,7 @@ const LoginPage = () => {
             <div className="flex flex-col space-y-4 mb-6">
               {console.log("thlsfsdlkjfsdlfkj ", authUrl)}
               <a
-                target="_blank"
+                target="_self"
                 href={
                   authUrl && authUrl.startsWith("http")
                     ? authUrl
