@@ -37,11 +37,11 @@ const LoginPage = () => {
         setAuthUrl(data.authUrl);
       });
 
-    const ff = async () => {
+    const ff = async (platform) => {
       try {
         console.log(
           "i am calling ",
-          `${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/google`
+          `${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/${platform}`
         );
         const response = await fetch(
           `https://dzwoodkitchen.com/connect/google`,
@@ -56,11 +56,14 @@ const LoginPage = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        // Parse the JSON response
+        
         const data = await response.json();
+        if (platform === "facebook") {
+           localStorage.setItem("faceState", data.data.state);
+           return data; 
+        }
+        
         console.log("the response data is ", data.data);
-
         localStorage.setItem("state", data.data.state);
         localStorage.setItem("code_verifier", data.data.code_verifier);
         setAuthUrl(data.data.authUrl);
@@ -72,7 +75,8 @@ const LoginPage = () => {
       }
     };
 
-    ff();
+    ff("facebook");
+    ff("google");
 
     console.log("i am exiting the useEffect");
   }, []);
