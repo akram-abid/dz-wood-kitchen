@@ -20,6 +20,7 @@ function getValidAccessToken(requiredRole = null, requireEmailVerification = tru
   try {
     // Get token from localStorage
     const token = localStorage.getItem('accessToken');
+    console.log("this is the token i got from the api ")
     
     if (!token) {
       return { 
@@ -48,7 +49,7 @@ function getValidAccessToken(requiredRole = null, requireEmailVerification = tru
       return { 
         isValid: false, 
         token: null, 
-        isEmailVerified: payload.isEmailVerified || false,
+        isEmailVerified: payload.isEmailVerified,
         reason: 'Token has no expiration time' 
       };
     }
@@ -62,19 +63,18 @@ function getValidAccessToken(requiredRole = null, requireEmailVerification = tru
       return { 
         isValid: false, 
         token: null, 
-        isEmailVerified: payload.isEmailVerified || false,
+        isEmailVerified: payload.isEmailVerified ,
         reason: 'Token expired' 
       };
     }
     
-    console.log("i am here")
     // Check email verification if required
-    const emailVerified = payload.isEmailVerified || false;
+    const emailVerified = payload.isEmailVerified ;
 
     
     // Check role if required
     if (requiredRole) {
-      const userRole = payload.role || payload.roles || payload.user_role;
+      const userRole = payload.role;
       
       if (!userRole) {
         return { 

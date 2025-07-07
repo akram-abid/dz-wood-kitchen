@@ -54,7 +54,6 @@ const ProfilePage = () => {
 
   const { t } = useTranslation();
 
-  // Call useAuth hook - this should be called at the top level
   const {
     isAuthenticated,
     isEmailVerified,
@@ -62,8 +61,8 @@ const ProfilePage = () => {
     loading: authLoading,
   } = useAuth();
 
-  // Handle authentication check in useEffect
   useEffect(() => {
+    console.log("i am in the useEffect")
     console.log("Auth state:", {
       isAuthenticated,
       isEmailVerified,
@@ -224,6 +223,7 @@ const ProfilePage = () => {
   }, []);
 
   const handleLogout = () => {
+    console.log("i am logging out bye")
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
     navigate("/login");

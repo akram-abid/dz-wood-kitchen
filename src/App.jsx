@@ -6,6 +6,15 @@ import "./utils/i18n/i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhone, faCopy } from "@fortawesome/free-solid-svg-icons";
 import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
+import img1 from "./assets/images/carousel/imgcarousel1.jpg";
+import img2 from "./assets/images/carousel/imgcarousel2.jpg";
+import img3 from "./assets/images/carousel/imgcarousel3.jpg";
+import img4 from "./assets/images/carousel/imgcarousel4.jpg";
+import img5 from "./assets/images/carousel/imgcarousel5.jpg";
+import img6 from "./assets/images/carousel/imgcarousel6.jpg";
+import img7 from "./assets/images/carousel/imgcarousel7.jpg";
+import img8 from "./assets/images/carousel/imgcarousel8.jpg";
+import img9 from "./assets/images/carousel/imgcarousel9.jpg";
 
 import {
   Globe,
@@ -122,26 +131,55 @@ function App() {
       id: 1,
       title: "Modern Kitchen Design",
       description: "Sleek contemporary kitchen with custom cabinetry",
+      src: img1,
     },
     {
       id: 2,
       title: "Classic Wood Finish",
       description: "Traditional oak kitchen with modern appliances",
+      src: img2,
     },
     {
       id: 3,
       title: "Luxury Kitchen Island",
       description: "Spacious island with granite countertops",
+      src: img3,
     },
     {
       id: 4,
       title: "Minimalist Design",
       description: "Clean lines with premium materials",
+      src: img4,
     },
     {
       id: 5,
-      title: "Custom Storage Solutions",
-      description: "Optimized storage with elegant design",
+      title: "Modern Kitchen Design",
+      description: "Sleek contemporary kitchen with custom cabinetry",
+      src: img5,
+    },
+    {
+      id: 6,
+      title: "Classic Wood Finish",
+      description: "Traditional oak kitchen with modern appliances",
+      src: img6,
+    },
+    {
+      id: 7,
+      title: "Luxury Kitchen Island",
+      description: "Spacious island with granite countertops",
+      src: img7,
+    },
+    {
+      id: 8,
+      title: "Minimalist Design",
+      description: "Clean lines with premium materials",
+      src: img8,
+    },
+    {
+      id: 9,
+      title: "Minimalist Design",
+      description: "Clean lines with premium materials",
+      src: img9,
     },
   ];
 
@@ -690,14 +728,14 @@ function App() {
         className={`py-16 md:py-24 ${isDarkMode ? "bg-black" : "bg-gray-50"}`}
       >
         <div className="container mx-auto px-4 md:px-8">
-          <div className="text-center mb-12 md:mb-20" data-animate>
+          <div className="text-center mb-8 md:mb-12" data-animate>
             <div className="text-yellow-500 text-xs md:text-sm font-semibold mb-4 uppercase tracking-wider">
               {t("ourWork")}
             </div>
             <h2 className="text-3xl md:text-5xl font-bold">{t("gallery")}</h2>
           </div>
 
-          <div className="relative max-w-4xl mx-auto" data-animate>
+          <div className="relative max-w-6xl mx-auto" data-animate>
             <div className="overflow-hidden rounded-xl shadow-xl">
               <div
                 className="flex transition-transform duration-500 ease-in-out"
@@ -714,32 +752,29 @@ function App() {
                     key={image.id}
                     className="w-full flex-shrink-0 relative group"
                   >
-                    <div
-                      className={`w-full h-64 md:h-96 flex items-center justify-center ${
-                        isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                      }`}
-                    >
-                      <div className="text-center">
-                        <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Palette size={24} className="text-black" />
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">
+                    <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px]">
+                      <img
+                        src={image.src}
+                        alt={image.title}
+                        className="w-full h-[90%] object-contain md:object-cover"
+                        loading="lazy"
+                      />
+
+                      {/* Image overlay with gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                      {/* Content overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                        <h3 className="text-lg md:text-xl lg:text-2xl font-bold mb-2">
                           {image.title}
                         </h3>
-                        <p
-                          className={
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }
-                        >
+                        <p className="text-sm md:text-base text-gray-200 mb-4">
                           {image.description}
                         </p>
+                        <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold text-sm md:text-base transition-colors duration-300">
+                          {t("viewProject")}
+                        </button>
                       </div>
-                    </div>
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                        {t("viewProject")}
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -751,32 +786,38 @@ function App() {
               onClick={prevSlide}
               className={`absolute ${
                 document.documentElement.dir === "rtl" ? "right-2" : "left-2"
-              } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
+              } md:${
+                document.documentElement.dir === "rtl" ? "right-4" : "left-4"
+              } top-1/2 transform -translate-y-1/2 p-2 md:p-3 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white hover:bg-gray-700"
-                  : "bg-gray-50 text-gray-900 hover:bg-gray-100"
-              } transition-colors`}
+                  : "bg-white text-gray-900 hover:bg-gray-100"
+              } transition-all duration-300 opacity-80 hover:opacity-100`}
+              aria-label="Previous image"
             >
               {document.documentElement.dir === "rtl" ? (
-                <ChevronRight size={20} />
+                <ChevronRight size={20} className="md:w-6 md:h-6" />
               ) : (
-                <ChevronLeft size={20} />
+                <ChevronLeft size={20} className="md:w-6 md:h-6" />
               )}
             </button>
             <button
               onClick={nextSlide}
               className={`absolute ${
                 document.documentElement.dir === "rtl" ? "left-2" : "right-2"
-              } top-1/2 transform -translate-y-1/2 p-2 rounded-full shadow-md hover:shadow-lg ${
+              } md:${
+                document.documentElement.dir === "rtl" ? "left-4" : "right-4"
+              } top-1/2 transform -translate-y-1/2 p-2 md:p-3 rounded-full shadow-md hover:shadow-lg ${
                 isDarkMode
                   ? "bg-gray-800 text-white hover:bg-gray-700"
-                  : "bg-gray-50 text-gray-900 hover:bg-gray-100"
-              } transition-colors`}
+                  : "bg-white text-gray-900 hover:bg-gray-100"
+              } transition-all duration-300 opacity-80 hover:opacity-100`}
+              aria-label="Next image"
             >
               {document.documentElement.dir === "rtl" ? (
-                <ChevronLeft size={20} />
+                <ChevronLeft size={20} className="md:w-6 md:h-6" />
               ) : (
-                <ChevronRight size={20} />
+                <ChevronRight size={20} className="md:w-6 md:h-6" />
               )}
             </button>
 
@@ -786,12 +827,37 @@ function App() {
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
+                  className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
                     index === currentSlide
-                      ? "bg-yellow-500 w-6"
+                      ? "bg-yellow-500 w-4 md:w-6"
                       : "bg-gray-400 hover:bg-gray-500"
                   }`}
+                  aria-label={`Go to slide ${index + 1}`}
                 />
+              ))}
+            </div>
+          </div>
+
+          {/* Thumbnail navigation for larger screens */}
+          <div className="hidden lg:block mt-8" data-animate>
+            <div className="flex justify-center space-x-4 overflow-x-auto pb-2">
+              {galleryImages.map((image, index) => (
+                <button
+                  key={image.id}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                    index === currentSlide
+                      ? "border-yellow-500 opacity-100"
+                      : "border-transparent opacity-60 hover:opacity-80"
+                  }`}
+                >
+                  <img
+                    src={image.src}
+                    alt={image.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </button>
               ))}
             </div>
           </div>
@@ -800,7 +866,7 @@ function App() {
           <div className="text-center mt-12" data-animate>
             <button
               onClick={() => navigate("/gallery")}
-              className={`inline-flex items-center px-8 py-4 border-2 rounded-xl font-semibold text-lg md:text-xl transition-all duration-300 group ${
+              className={`inline-flex items-center px-6 py-3 md:px-8 md:py-4 border-2 rounded-xl font-semibold text-base md:text-lg lg:text-xl transition-all duration-300 group ${
                 isDarkMode
                   ? "border-white text-white hover:bg-white hover:text-black"
                   : "border-black text-black hover:bg-black hover:text-white"
@@ -816,7 +882,7 @@ function App() {
             </button>
           </div>
         </div>
-      </section>
+      </section>  
 
       {/* Mission Section */}
       <section
