@@ -9,7 +9,8 @@ export default function GoogleOAuthCallback() {
     const code = urlParams.get("code");
     const state = urlParams.get("state");
 
-    const code_verifier = sessionStorage.getItem("code_verifier");
+    const code_verifier = localStorage.getItem("code_verifier");
+    //const state = localStorage.getItem("state");
 
     if (!code || !state || !code_verifier) {
       console.error("Missing OAuth info");
