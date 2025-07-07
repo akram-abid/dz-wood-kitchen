@@ -23,6 +23,7 @@ import Header from "../components/header";
 
 const LoginPage = () => {
   const [authUrl, setAuthUrl] = useState("");
+  const [fbAuthUrl, setFbAuthUrl] = useState("");
 
   useEffect(() => {
     console.log("i am in the useEffect");
@@ -60,6 +61,7 @@ const LoginPage = () => {
         const data = await response.json();
         if (platform === "facebook") {
            localStorage.setItem("faceState", data.data.state);
+           setFbAuthUrl(data.data.authUrl)
            return data; 
         }
         
@@ -264,6 +266,9 @@ const LoginPage = () => {
                     ? authUrl
                     : `https://${authUrl}`
                 }
+                onClick={()=>{
+                  localStorage.setItem("provider","google")
+                }}
                 className={`cursor-pointer flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
@@ -280,7 +285,15 @@ const LoginPage = () => {
                 <span>{t("continueWithGoogle")}</span>
               </a>
               <a
-                href="/connect/facebook"
+                target="_self"
+                href={
+                  fbAuthUrl && fbAuthUrl.startsWith("http")
+                  ? fbAuthUrl 
+                  : `https://${fbAuthUrl}`
+                }
+                onClick={() => {
+                      localStorage.setItem("provider", "facebook");
+                }}
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
