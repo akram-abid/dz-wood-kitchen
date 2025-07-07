@@ -45,7 +45,7 @@ const LoginPage = () => {
           `${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/${platform}`
         );
         const response = await fetch(
-          `https://dzwoodkitchen.com/connect/google`,
+          `https://dzwoodkitchen.com/connect/${platform}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -77,8 +77,7 @@ const LoginPage = () => {
       }
     };
 
-    ff("facebook");
-    ff("google");
+    Promise.all([ff("facebook"), ff("google")]);
 
     console.log("i am exiting the useEffect");
   }, []);
