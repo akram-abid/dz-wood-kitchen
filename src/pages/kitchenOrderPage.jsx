@@ -1135,12 +1135,9 @@ const KitchenOrderPage = () => {
                       } ${errors.woodType ? "border-red-500" : ""}`}
                     >
                       <option value="">{t("selectWoodType")}</option>
-                      <option value="oak">{t("oak")}</option>
-                      <option value="pine">{t("pine")}</option>
-                      <option value="walnut">{t("walnut")}</option>
-                      <option value="cherry">{t("cherry")}</option>
-                      <option value="reclaimedOak">{t("reclaimedOak")}</option>
-                      <option value="maple">{t("maple")}</option>
+                      <option value="Egger">Egger</option>
+                      <option value="High-Gloss">High Gloss</option>
+                      <option value="MDF">MDF</option>
                     </select>
                     {errors.woodType && (
                       <p className="text-red-500 text-sm mt-1">

@@ -912,11 +912,9 @@ const AdminDashboard = () => {
                       }`}
                     >
                       <option value="">{t("selectWoodType")}</option>
-                      <option value="Oak">{t("oak")}</option>
-                      <option value="Pine">{t("pine")}</option>
-                      <option value="Walnut">{t("walnut")}</option>
-                      <option value="Cherry">{t("cherry")}</option>
-                      <option value="Maple">{t("maple")}</option>
+                      <option value="Egger">Egger</option>
+                      <option value="High-Gloss">High Gloss</option>
+                      <option value="MDF">MDF</option>
                     </select>
                   </div>
 

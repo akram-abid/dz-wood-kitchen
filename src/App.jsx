@@ -15,8 +15,13 @@ import img6 from "./assets/images/carousel/imgcarousel6.jpg";
 import img7 from "./assets/images/carousel/imgcarousel7.jpg";
 import img8 from "./assets/images/carousel/imgcarousel8.jpg";
 import img9 from "./assets/images/carousel/imgcarousel9.jpg";
+import workshop from "./assets/images/workshop.jpg";
+import designExcellenceImage from "./assets/images/designExcellenceImage.jpg";
+import craftsmanshipImage from "./assets/images/craftsmanshipImage.jpg";
+import precisionWorkImage from "./assets/images/precisionWorkImage.jpg";
 
 import {
+  User,
   Globe,
   ChevronDown,
   Sun,
@@ -69,7 +74,7 @@ function App() {
   const socialLinks = [
     {
       name: "Facebook",
-      url: "https://facebook.com/yourprofile", // Replace with your actual Facebook URL
+      url: "https://www.facebook.com/share/1FDSeBntVX/", // Replace with your actual Facebook URL
       bgColor: "bg-blue-600",
       hoverBg: "hover:bg-blue-700",
       icon: (
@@ -80,7 +85,7 @@ function App() {
     },
     {
       name: "Instagram",
-      url: "https://instagram.com/yourprofile", // Replace with your actual Instagram URL
+      url: "https://www.instagram.com/dz_wood_kitchen?igsh=cTFpajlsazZiNzM=", // Replace with your actual Instagram URL
       bgColor: "bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600",
       hoverBg: "hover:from-purple-700 hover:via-pink-700 hover:to-orange-700",
       icon: (
@@ -102,7 +107,7 @@ function App() {
     },
     {
       name: "TikTok",
-      url: "https://tiktok.com/@yourprofile", // Replace with your actual TikTok URL
+      url: "https://vm.tiktok.com/ZMSqppp5g/", // Replace with your actual TikTok URL
       bgColor: "bg-black",
       hoverBg: "hover:bg-gray-800",
       icon: (
@@ -185,31 +190,61 @@ function App() {
 
   // Team members
   const teamMembers = [
-    {
-      id: 1,
-      name: "David Zhang",
-      role: "Founder & Master Carpenter",
-      bio: "With over 20 years of experience, David brings precision and artistry to every project.",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      role: "Design Consultant",
-      bio: "Sarah transforms ideas into beautiful, functional kitchen designs that clients love.",
-    },
-    {
-      id: 3,
-      name: "Michael Chen",
-      role: "Project Manager",
-      bio: "Michael ensures every project runs smoothly from start to finish with meticulous attention to detail.",
-    },
-    {
-      id: 4,
-      name: "Emily Rodriguez",
-      role: "Customer Relations",
-      bio: "Emily is your dedicated point of contact, ensuring your experience with us is exceptional.",
-    },
-  ];
+  {
+    id: 1,
+    name: "أمين",
+    role: t("manager"),
+    bio: t("experienceModernKitchenInteriorExpert"),
+  },
+  {
+    id: 2,
+    name: "محمد الشلفي",
+    role: t("workshopTeamLeader"),
+    bio: t("experienceKitchenPassionate"),
+  },
+  {
+    id: 3,
+    name: "نبيل",
+    role: t("workshopAssistant"),
+    bio: t("disciplinedAndFunny"),
+  },
+  {
+    id: 4,
+    name: "عبد الجليل",
+    role: t("workshopAssistant"),
+    bio: t("strongAndLovesChallenges"),
+  },
+  {
+    id: 5,
+    name: "سمير",
+    role: t("carpentryTechnician"),
+    bio: t("seriousAndStrictInWork"),
+  },
+  {
+    id: 6,
+    name: "أكرم",
+    role: t("engineerAndDesigner"),
+    bio: t("responsibleForDesignAndMedia"),
+  },
+  {
+    id: 7,
+    name: "شهرازاد",
+    role: t("commercialAgent"),
+    bio: t("disciplinedAndDevelopmentLover"),
+  },
+  {
+    id: 8,
+    name: "بلال",
+    role: t("driverAndAssistant"),
+    bio: t("driverAndWorkshopHelper"),
+  },
+  {
+    id: 9,
+    name: "محمد",
+    role: t("designerAnd3dEngineer"),
+    bio: t("specializedIn3dAndInterior"),
+  }
+];
 
   useEffect(() => {
     const updateDirection = () => {
@@ -352,6 +387,16 @@ function App() {
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
                 </a>
               ))}
+              <button
+                  onClick={() => navigate("/profile")}
+                  className={`p-2 rounded-xl transition-all duration-200 ${
+                    isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                      : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+                  }`}
+                >
+                  <User size={18} />
+                </button>
 
               {/* Language Dropdown */}
               <div className="relative">
@@ -669,22 +714,13 @@ function App() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-center">
             <div className="relative" data-animate>
-              <div
-                className={`w-full h-64 md:h-96 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
-                  isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                }`}
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Camera size={24} className="text-black" />
-                  </div>
-                  <p
-                    className={`text-base ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Workshop Image Placeholder
-                  </p>
+              <div className="relative" data-animate>
+                <div className="w-full h-64 md:h-96 rounded-xl shadow-lg overflow-hidden">
+                  <img
+                    src={workshop}
+                    alt="Workshop"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -951,62 +987,29 @@ function App() {
             {/* Image Gallery Column */}
             <div className="space-y-4" data-animate>
               {/* Large top image */}
-              <div
-                className={`w-full h-64 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
-                  isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                }`}
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Camera size={24} className="text-black" />
-                  </div>
-                  <p
-                    className={`text-base ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Craftsmanship in Action
-                  </p>
-                </div>
+              <div className="w-full h-64 rounded-xl shadow-lg overflow-hidden">
+                <img
+                  src={craftsmanshipImage}
+                  alt="Craftsmanship in Action"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Two smaller bottom images */}
               <div className="grid grid-cols-2 gap-4">
-                <div
-                  className={`h-48 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
-                    isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Wrench size={20} className="text-black" />
-                    </div>
-                    <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      Precision Work
-                    </p>
-                  </div>
+                <div className="h-48 rounded-xl shadow-lg overflow-hidden">
+                  <img
+                    src={precisionWorkImage}
+                    alt="Precision Work"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                <div
-                  className={`h-48 rounded-xl shadow-lg overflow-hidden flex items-center justify-center ${
-                    isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                  }`}
-                >
-                  <div className="text-center">
-                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Palette size={20} className="text-black" />
-                    </div>
-                    <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      Design Excellence
-                    </p>
-                  </div>
+                <div className="h-48 rounded-xl shadow-lg overflow-hidden">
+                  <img
+                    src={designExcellenceImage}
+                    alt="Design Excellence"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
             </div>
@@ -1318,7 +1321,7 @@ function App() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="bg-yellow-500 p-3 rounded-full mr-4 flex-shrink-0">
+                  <div className="bg-yellow-500 p-3 rounded-full mx-4 flex-shrink-0">
                     <Mail size={20} className="text-black" />
                   </div>
                   <div>
@@ -1341,7 +1344,6 @@ function App() {
                 <ul className="space-y-3">
                   {[
                     { day: t("mondayFriday"), hours: t("hours1") },
-                    { day: t("saturday"), hours: t("hours2") },
                     { day: t("sunday"), hours: t("closed") },
                   ].map((item, index) => (
                     <li key={index} className="flex justify-between">
@@ -1520,15 +1522,15 @@ function App() {
                 }`}
               >
                 <div className="flex items-start">
-                  <MapPin size={16} className="mr-2 mt-0.5 text-yellow-500" />
-                  <span>2458 Oak Ridge Omaha, NE 68105</span>
+                  <MapPin size={16} className="mx-2 mt-0.5 text-yellow-500" />
+                  <span>Ouled Slama, Blida</span>
                 </div>
                 <div className="flex items-center">
-                  <Phone size={16} className="mr-2 text-yellow-500" />
-                  <span>402-979-9718</span>
+                  <Phone size={16} className="mx-2 text-yellow-500" />
+                  <span>+2130550347043</span>
                 </div>
                 <div className="flex items-center">
-                  <Mail size={16} className="mr-2 text-yellow-500" />
+                  <Mail size={16} className="mx-2 text-yellow-500" />
                   <span>info@dzwoodkitchen.com</span>
                 </div>
               </div>
