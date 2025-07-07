@@ -16,7 +16,7 @@ export default function GoogleOAuthCallback() {
       return;
     }
 
-    fetch(`${import.meta.env.VITE_API_URL}/connect/google/callback`, {
+    fetch(`${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/google/callback`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export default function GoogleOAuthCallback() {
       .then((data) => {
         if (data.accessToken) {
           localStorage.setItem("accessToken", data.accessToken);
-          navigate("/dashboard"); // or wherever you want
+          navigate("/"); // or wherever you want
         } else {
           console.error("OAuth failed:", data);
         }
