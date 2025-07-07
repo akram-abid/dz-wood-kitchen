@@ -9,13 +9,26 @@ export default function GoogleOAuthCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
     const state = urlParams.get("state");
-    const code_verifier = localStorage.getItem("code_verifier");
+    let code_verifier; 
 
-    if (!code || !state || !code_verifier) {
-      console.error("Missing OAuth info");
-      setHasFailed(true);
-      return;
+    const provider = localStorage.getItem("provider"); 
+
+    if (provider === "facebook"){
+        if (!code || !state) {
+          console.error("Missing OAuth info");
+          setHasFailed(true);
+          return;
+        }
+    } else if (provider === "google") {
+      code_verifier = localStorage.getItem("code_verifier");
+      if (!code || !state || !code_verifier) {
+          console.error("Missing OAuth info");
+          setHasFailed(true);
+          return;
+      }
     }
+          
+
 
     const maxRetries = 3;
     let attempts = 0;
@@ -23,14 +36,18 @@ export default function GoogleOAuthCallback() {
     const tryOAuth = async () => {
       while (attempts < maxRetries) {
         try {
-          const res = await fetch(
-            `${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/google/callback`,
+            const requestBody =
+            provider === "google"
+                ? { code, code_verifier, state }
+                : { code, state };
+
+          const res = await fetch(`${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/${provider}/callback`,
             {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ code, code_verifier, state }),
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                body: JSON.stringify(requestBody),
             }
           );
 
