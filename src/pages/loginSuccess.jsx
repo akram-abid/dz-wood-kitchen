@@ -87,6 +87,9 @@ export default function GoogleOAuthCallback() {
           } else {
             await new Promise((r) => setTimeout(r, 15000 * attempts));
           }
+        } finally {
+          localStorage.removeItem("provider")
+          localStorage.removeItem("faceState")
         }
       }
     };
