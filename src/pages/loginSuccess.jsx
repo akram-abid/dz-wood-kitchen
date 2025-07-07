@@ -54,7 +54,7 @@ export default function GoogleOAuthCallback() {
             localStorage.removeItem("code_verifier");
             localStorage.removeItem("state");
 
-            navigate("/");
+            navigate("/profile");
             return;
           } else {
             console.error("OAuth failed:", data);
