@@ -61,8 +61,8 @@ const LoginPage = () => {
         const data = await response.json();
         console.log("the response data is ", data.data);
 
-        sessionStorage.setItem("state", data.data.state);
-        sessionStorage.setItem("code_verifier", data.data.code_verifier);
+        localStorage.setItem("state", data.data.state);
+        localStorage.setItem("code_verifier", data.data.code_verifier);
         setAuthUrl(data.data.authUrl);
 
         return data; // Return the parsed data
