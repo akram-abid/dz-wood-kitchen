@@ -22,6 +22,61 @@ import { useTranslation } from "react-i18next";
 import Header from "../components/header";
 
 const LoginPage = () => {
+  const [authUrl, setAuthUrl] = useState("");
+
+  useEffect(() => {
+    console.log("i am in the useEffect");
+    // Fetch the auth URL from backend
+    fetch(`${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/google`)
+      .then((res) => res.json())
+      .then((data) => {
+        // Save the values in sessionStorage (or memory)
+        console.log("this is the url slksjfmsjd ", data.authUrl);
+        sessionStorage.setItem("state", data.state);
+        sessionStorage.setItem("code_verifier", data.code_verifier);
+        setAuthUrl(data.authUrl);
+      });
+
+    const ff = async () => {
+      try {
+        console.log(
+          "i am calling ",
+          `${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/google`
+        );
+        const response = await fetch(
+          `https://dzwoodkitchen.com/connect/google`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Check if the response is ok
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Parse the JSON response
+        const data = await response.json();
+        console.log("the response data is ", data.data);
+
+        sessionStorage.setItem("state", data.data.state);
+        sessionStorage.setItem("code_verifier", data.data.code_verifier);
+        setAuthUrl(data.data.authUrl);
+
+        return data; // Return the parsed data
+      } catch (err) {
+        console.log("an error happened ", err);
+        throw err; // Re-throw the error if you want calling code to handle it
+      }
+    };
+
+    ff();
+
+    console.log("i am exiting the useEffect");
+  }, []);
+
   const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(true);
   const navigate = useNavigate();
@@ -48,7 +103,7 @@ const LoginPage = () => {
 
     // Hide after 5 seconds
     setTimeout(() => {
-      setNotification(prev => ({ ...prev, show: false }));
+      setNotification((prev) => ({ ...prev, show: false }));
     }, 5000);
   };
 
@@ -119,6 +174,8 @@ const LoginPage = () => {
     }
   };
 
+  ///////////////////////////////////:
+
   return (
     <div
       className={`min-h-screen transition-all duration-300 ${
@@ -130,7 +187,9 @@ const LoginPage = () => {
       {notification.show && (
         <div
           className={`fixed top-26 right-4 z-50 transform transition-all duration-300 ${
-            notification.show ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+            notification.show
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0"
           }`}
         >
           <div
@@ -147,7 +206,9 @@ const LoginPage = () => {
             <AlertTriangle className="mr-3" size={20} />
             <span>{notification.message}</span>
             <button
-              onClick={() => setNotification(prev => ({ ...prev, show: false }))}
+              onClick={() =>
+                setNotification((prev) => ({ ...prev, show: false }))
+              }
               className="ml-4"
             >
               <X size={18} />
@@ -191,8 +252,15 @@ const LoginPage = () => {
 
             {/* Social Login Buttons */}
             <div className="flex flex-col space-y-4 mb-6">
-              <a href="/connect/google"
-                className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
+              {console.log("thlsfsdlkjfsdlfkj ", authUrl)}
+              <a
+                target="_blank"
+                href={
+                  authUrl && authUrl.startsWith("http")
+                    ? authUrl
+                    : `https://${authUrl}`
+                }
+                className={`cursor-pointer flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
                     : "bg-white border-gray-300 hover:bg-gray-50 text-gray-800"
@@ -207,7 +275,8 @@ const LoginPage = () => {
                 </svg>
                 <span>{t("continueWithGoogle")}</span>
               </a>
-              <a href="/connect/facebook"
+              <a
+                href="/connect/facebook"
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
@@ -348,8 +417,8 @@ const LoginPage = () => {
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
-                    </svg>
-                    {" "}{t("loggingIn")}{" "}
+                    </svg>{" "}
+                    {t("loggingIn")}{" "}
                   </>
                 ) : (
                   t("logIn")

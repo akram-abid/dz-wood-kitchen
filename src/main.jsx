@@ -15,6 +15,7 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmailPage from "./pages/verifyEmail";
 import LoginSuccess from "./pages/loginSuccess";
 import NotFoundPage from "./pages/NotFound";
+import GoogleOAuthCallback from "./pages/loginSuccess";
 
 const router = createBrowserRouter([
   {
@@ -66,8 +67,8 @@ const router = createBrowserRouter([
     element: <VerifyEmailPage />
   },
   {
-    path: "/login/success", 
-    element: <LoginSuccess />
+    path: "/login/oauth", 
+    element: <GoogleOAuthCallback />
   },
   {
     path: "*",
