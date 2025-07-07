@@ -752,11 +752,11 @@ function App() {
                     key={image.id}
                     className="w-full flex-shrink-0 relative group"
                   >
-                    <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px]">
+                    <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px] xl:h-[600px] overflow-hidden rounded-xl">
                       <img
                         src={image.src}
                         alt={image.title}
-                        className="w-full h-[90%] object-contain md:object-cover"
+                        className="w-full h-full object-cover rounded-xl"
                         loading="lazy"
                       />
 
@@ -771,9 +771,6 @@ function App() {
                         <p className="text-sm md:text-base text-gray-200 mb-4">
                           {image.description}
                         </p>
-                        <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 md:px-6 md:py-3 rounded-lg font-semibold text-sm md:text-base transition-colors duration-300">
-                          {t("viewProject")}
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -882,7 +879,7 @@ function App() {
             </button>
           </div>
         </div>
-      </section>  
+      </section>
 
       {/* Mission Section */}
       <section
