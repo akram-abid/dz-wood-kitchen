@@ -38,6 +38,22 @@ export default function GoogleOAuthCallback() {
 
           if (res.ok && data.data?.accessToken) {
             localStorage.setItem("accessToken", data.data.accessToken);
+
+            const token = data.data.accessToken;
+
+            // Decode JWT
+            const payload = JSON.parse(
+              atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+            );
+
+            // Store accessToken and user info
+            localStorage.setItem("accessToken", token);
+            localStorage.setItem("user", JSON.stringify(payload));
+
+            // Clean up
+            localStorage.removeItem("code_verifier");
+            localStorage.removeItem("state");
+
             navigate("/");
             return;
           } else {
