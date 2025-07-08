@@ -339,6 +339,7 @@ function App() {
   };
 
   const handleSubmit = async (e) => {
+    console.log("hi there")
     e.preventDefault();
     setIsLoading(true);
 
@@ -353,16 +354,16 @@ function App() {
         "POST",
       );
 
-      const data = await response.json();
-      console.log("the data is this ", data)
+      
+      console.log("the data is this ", response)
 
-      if (data.success) {
+      if (response.success) {
         setPopupMessage("Your message has been sent successfully!");
         setShowPopup(true);
         setFormData({ name: "", email: "", message: "" });
       } else {
         const errorMsg =
-          data.message || "Failed to send message. Please try again later.";
+          response.message || "Failed to send message. Please try again later.";
         setPopupMessage(errorMsg);
         setShowPopup(true);
       }
