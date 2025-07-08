@@ -343,17 +343,15 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/v1/emails/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await apiFetch("/api/v1/emails/send", 
+        {
           fullName: formData.name,
           email: formData.email,
           message: formData.message,
-        }),
-      });
+        },
+        true,
+        "POST",
+      );
 
       const data = await response.json();
       console.log("the data is this ", data)
