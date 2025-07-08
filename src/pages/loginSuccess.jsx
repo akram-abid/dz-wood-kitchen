@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function GoogleOAuthCallback() {
   const navigate = useNavigate();
   const [hasFailed, setHasFailed] = useState(false);
+  const [noEmailErr, setNoEMailErr] = useState(false); 
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -13,22 +14,12 @@ export default function GoogleOAuthCallback() {
 
     const provider = localStorage.getItem("provider"); 
 
-    if (provider === "facebook"){
-        if (!code || !state) {
-          console.error("Missing OAuth info");
-          setHasFailed(true);
-          return;
-        }
-    } else if (provider === "google") {
-      code_verifier = localStorage.getItem("code_verifier");
-      if (!code || !state || !code_verifier) {
-          console.error("Missing OAuth info");
-          setHasFailed(true);
-          return;
-      }
+    if (!code || !state || (provider === "google" && !code_verifier)) {
+      console.error("Missing OAuth info");
+      setHasFailed(true);
+      return;
     }
           
-
 
     const maxRetries = 3;
     let attempts = 0;
@@ -52,8 +43,16 @@ export default function GoogleOAuthCallback() {
           );
 
           const data = await res.json();
+          if (data.data?.noEmailEmailAccount) {
+              setNoEmailErr(true); 
+              setHasFailed(true); 
+              setTimeout(() => navigate("/"), 4000);
+              return;
+          }
 
-          if (res.ok && data.data?.accessToken) {
+
+          
+          else if (res.ok && data.data?.accessToken) {
             localStorage.setItem("accessToken", data.data.accessToken);
 
             const token = data.data.accessToken;
@@ -70,26 +69,30 @@ export default function GoogleOAuthCallback() {
             // Clean up
             localStorage.removeItem("code_verifier");
             localStorage.removeItem("state");
+            localStorage.removeItem("provider");
+            localStorage.removeItem("faceState");
 
+            
             navigate("/profile");
             return;
           } else {
-            console.error("OAuth failed:", data);
-            break; 
+            throw new Error("OAuth failed: invalid response");
           }
         } catch (err) {
           attempts++;
           console.warn(`Attempt ${attempts} failed. Retrying...`, err);
           if (attempts >= maxRetries) {
             console.error("All attempts failed. Giving up.");
+            localStorage.removeItem("code_verifier");
+            localStorage.removeItem("state");
+            localStorage.removeItem("provider");
+            localStorage.removeItem("faceState");
+
             setHasFailed(true);
             setTimeout(() => navigate("/"), 4000);
           } else {
             await new Promise((r) => setTimeout(r, 15000 * attempts));
           }
-        } finally {
-          localStorage.removeItem("provider")
-          localStorage.removeItem("faceState")
         }
       }
     };
@@ -100,19 +103,14 @@ export default function GoogleOAuthCallback() {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex flex-col items-center space-y-4">
-        {!hasFailed ? (
-          <>
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-gray-600 text-sm">Signing you in...</p>
-          </>
-        ) : (
-          <>
-            <div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-red-600 text-sm">
-              Login failed. Redirecting you back...
-            </p>
-          </>
-        )}
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-600 text-sm text-center px-4">
+            {noEmailErr
+                ? "Your Facebook account doesn't have an email. Please sign in with another account or use Google."
+                : hasFailed
+                    ? "Login failed. Please try again later."
+                    : "Signing you in..."}
+          </p>
       </div>
     </div>
   );
