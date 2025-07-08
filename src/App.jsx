@@ -343,31 +343,35 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await apiFetch(`/api/v1/emails/send`,
-        {
+      const response = await fetch("/api/v1/emails/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           fullName: formData.name,
           email: formData.email,
           message: formData.message,
-        },
-        true,
-        "POST",
-        false
-      );
-
-      console.log("the dslkjqfmlsdfjkqsdmlfj ", response)
+        }),
+      });
 
       const data = await response.json();
+      console.log("the data is this ", data)
 
       if (data.success) {
         setPopupMessage("Your message has been sent successfully!");
         setShowPopup(true);
         setFormData({ name: "", email: "", message: "" });
       } else {
-        setPopupMessage("Failed to send message. Please try again later.");
+        const errorMsg =
+          data.message || "Failed to send message. Please try again later.";
+        setPopupMessage(errorMsg);
         setShowPopup(true);
       }
     } catch (error) {
-      setPopupMessage("An error occurred. Please try again later.");
+      setPopupMessage(
+        "Network error. Please check your connection and try again."
+      );
       setShowPopup(true);
     } finally {
       setIsLoading(false);
@@ -404,7 +408,8 @@ function App() {
                   />
                 </svg>
               </div>
-              <h3
+              <h3      // Check both the response status and the success flag in the data
+
                 className={`text-lg font-medium mb-2 ${
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
