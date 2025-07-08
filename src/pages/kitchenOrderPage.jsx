@@ -67,28 +67,28 @@ const KitchenOrderPage = () => {
   const { t } = useTranslation();
 
   const {
+    isAuthenticated,
+    isEmailVerified,
+    authError,
+    loading: authLoading,
+  } = useAuth();
+
+  // Handle authentication check in useEffect
+  useEffect(() => {
+    console.log("Auth state:", {
       isAuthenticated,
       isEmailVerified,
       authError,
-      loading: authLoading,
-    } = useAuth();
-  
-    // Handle authentication check in useEffect
-    useEffect(() => {
-      console.log("Auth state:", {
-        isAuthenticated,
-        isEmailVerified,
-        authError,
-        authLoading,
-      });
-    }, [isAuthenticated, authLoading, navigate]);
-    
-      if(!isAuthenticated){
-        navigate('/login', { state: { problem: t("sessionExpiredOrNoAccount") } });
-      }
-      if(!isEmailVerified){
-        navigate('/login', { state: { problem: t("emailNotVerified") } });
-      }
+      authLoading,
+    });
+  }, [isAuthenticated, authLoading, navigate]);
+
+  if (!isAuthenticated) {
+    navigate("/login", { state: { problem: t("sessionExpiredOrNoAccount") } });
+  }
+  if (!isEmailVerified) {
+    navigate("/login", { state: { problem: t("emailNotVerified") } });
+  }
   const filteredWilayas = wilayas
     .filter((w) => w.name.toLowerCase().includes(wilayaSearch.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -155,7 +155,14 @@ const KitchenOrderPage = () => {
     if (!orderData.email.trim()) newErrors.email = t("fillAllFields");
     else if (!/\S+@\S+\.\S+/.test(orderData.email))
       newErrors.email = t("invalidEmail");
+
     if (!orderData.phoneNumber.trim()) newErrors.phone = t("fillAllFields");
+    else if (
+      !/^(\+213|0)(5|6|7)[0-9]{8}$/.test(
+        orderData.phoneNumber.replace(/\s/g, "")
+      )
+    )
+      newErrors.phone = t("invalidPhoneNumber");
     if (!orderData.wilaya) newErrors.wilaya = t("fillAllFields");
     if (!orderData.daira) newErrors.daira = t("fillAllFields");
     if (!orderData.baladia) newErrors.baladia = t("fillAllFields");
