@@ -19,7 +19,9 @@ import workshop from "./assets/images/workshop.jpg";
 import designExcellenceImage from "./assets/images/designExcellenceImage.jpg";
 import craftsmanshipImage from "./assets/images/craftsmanshipImage.jpg";
 import precisionWorkImage from "./assets/images/precisionWorkImage.jpg";
-
+import akram from "./assets/images/akram.jpg";
+import abdeldjalile from "./assets/images/abdeldjalile.jpg";
+import samir from "./assets/images/samir.jpg";
 import {
   User,
   Globe,
@@ -179,72 +181,69 @@ function App() {
       title: "Minimalist Design",
       description: "Clean lines with premium materials",
       src: img8,
-    },
-    {
-      id: 9,
-      title: "Minimalist Design",
-      description: "Clean lines with premium materials",
-      src: img9,
-    },
+    }
   ];
 
   // Team members
   const teamMembers = [
-  {
-    id: 1,
-    name: "أمين",
-    role: t("manager"),
-    bio: t("experienceModernKitchenInteriorExpert"),
-  },
-  {
-    id: 2,
-    name: "محمد الشلفي",
-    role: t("workshopTeamLeader"),
-    bio: t("experienceKitchenPassionate"),
-  },
-  {
-    id: 3,
-    name: "نبيل",
-    role: t("workshopAssistant"),
-    bio: t("disciplinedAndFunny"),
-  },
-  {
-    id: 4,
-    name: "عبد الجليل",
-    role: t("workshopAssistant"),
-    bio: t("strongAndLovesChallenges"),
-  },
-  {
-    id: 5,
-    name: "سمير",
-    role: t("carpentryTechnician"),
-    bio: t("seriousAndStrictInWork"),
-  },
-  {
-    id: 6,
-    name: "أكرم",
-    role: t("engineerAndDesigner"),
-    bio: t("responsibleForDesignAndMedia"),
-  },
-  {
-    id: 7,
-    name: "شهرازاد",
-    role: t("commercialAgent"),
-    bio: t("disciplinedAndDevelopmentLover"),
-  },
-  {
-    id: 8,
-    name: "بلال",
-    role: t("driverAndAssistant"),
-    bio: t("driverAndWorkshopHelper"),
-  },
-  {
-    id: 9,
-    name: "محمد",
-    role: t("designerAnd3dEngineer"),
-    bio: t("specializedIn3dAndInterior"),
-  }
-];
+    {
+      id: 1,
+      name: "أمين",
+      role: t("manager"),
+      bio: t("experienceModernKitchenInteriorExpert"),
+    },
+    {
+      id: 2,
+      name: "محمد الشلفي",
+      role: t("workshopTeamLeader"),
+      bio: t("experienceKitchenPassionate"),
+    },
+    {
+      id: 3,
+      name: "نبيل",
+      role: t("workshopAssistant"),
+      bio: t("disciplinedAndFunny"),
+    },
+    {
+      id: 4,
+      name: "عبد الجليل",
+      role: t("workshopAssistant"),
+      bio: t("strongAndLovesChallenges"),
+      img: abdeldjalile
+    },
+    {
+      id: 5,
+      name: "سمير",
+      role: t("carpentryTechnician"),
+      bio: t("seriousAndStrictInWork"),
+      img: samir  
+    },
+    {
+      id: 6,
+      name: "أكرم",
+      role: t("engineerAndDesigner"),
+      bio: t("responsibleForDesignAndMedia"),
+      img: akram
+    },
+    {
+      id: 7,
+      name: "شهرازاد",
+      role: t("commercialAgent"),
+      bio: t("disciplinedAndDevelopmentLover"),
+    },
+    {
+      id: 8,
+      name: "بلال",
+      role: t("driverAndAssistant"),
+      bio: t("driverAndWorkshopHelper"),
+    },
+    {
+      id: 9,
+      name: "محمد",
+      role: t("designerAnd3dEngineer"),
+      bio: t("specializedIn3dAndInterior"),
+    },
+  ];
 
   useEffect(() => {
     const updateDirection = () => {
@@ -388,15 +387,15 @@ function App() {
                 </a>
               ))}
               <button
-                  onClick={() => navigate("/profile")}
-                  className={`p-2 rounded-xl transition-all duration-200 ${
-                    isDarkMode
-                      ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                      : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-                  }`}
-                >
-                  <User size={18} />
-                </button>
+                onClick={() => navigate("/profile")}
+                className={`p-2 rounded-xl transition-all duration-200 ${
+                  isDarkMode
+                    ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                    : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+                }`}
+              >
+                <User size={18} />
+              </button>
 
               {/* Language Dropdown */}
               <div className="relative">
@@ -1091,11 +1090,19 @@ function App() {
                       <div className="flex flex-col md:flex-row items-center gap-8">
                         <div className="w-full md:w-1/3">
                           <div
-                            className={`w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto flex items-center justify-center ${
+                            className={`w-32 h-32 md:w-48 md:h-48 rounded-full mx-auto flex items-center justify-center overflow-hidden ${
                               isDarkMode ? "bg-gray-700" : "bg-gray-200"
                             }`}
                           >
-                            <Users size={48} className="text-yellow-500" />
+                            {member.img ? (
+                              <img
+                                src={member.img}
+                                alt={member.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Users size={48} className="text-yellow-500" />
+                            )}
                           </div>
                         </div>
                         <div

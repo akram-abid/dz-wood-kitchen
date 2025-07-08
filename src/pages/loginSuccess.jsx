@@ -10,16 +10,15 @@ export default function GoogleOAuthCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
     const state = urlParams.get("state");
-    let code_verifier; 
+    let code_verifier;
 
-    const provider = localStorage.getItem("provider"); 
+    const provider = localStorage.getItem("provider");
 
     if (!code || !state || (provider === "google" && !code_verifier)) {
       console.error("Missing OAuth info");
       setHasFailed(true);
       return;
     }
-          
 
     const maxRetries = 3;
     let attempts = 0;
@@ -27,32 +26,31 @@ export default function GoogleOAuthCallback() {
     const tryOAuth = async () => {
       while (attempts < maxRetries) {
         try {
-            const requestBody =
+          const requestBody =
             provider === "google"
-                ? { code, code_verifier, state }
-                : { code, state };
+              ? { code, code_verifier, state }
+              : { code, state };
 
-          const res = await fetch(`${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/${provider}/callback`,
+          const res = await fetch(
+            `${
+              import.meta.env.VITE_REACT_APP_ORIGIN
+            }/connect/${provider}/callback`,
             {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                  },
-                body: JSON.stringify(requestBody),
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestBody),
             }
           );
 
           const data = await res.json();
           if (data.data?.noEmailEmailAccount) {
-              setNoEmailErr(true); 
-              setHasFailed(true); 
-              setTimeout(() => navigate("/"), 4000);
-              return;
-          }
-
-
-          
-          else if (res.ok && data.data?.accessToken) {
+            setNoEmailErr(true);
+            setHasFailed(true);
+            setTimeout(() => navigate("/"), 4000);
+            return;
+          } else if (res.ok && data.data?.accessToken) {
             localStorage.setItem("accessToken", data.data.accessToken);
 
             const token = data.data.accessToken;
@@ -72,7 +70,6 @@ export default function GoogleOAuthCallback() {
             localStorage.removeItem("provider");
             localStorage.removeItem("faceState");
 
-            
             navigate("/profile");
             return;
           } else {
@@ -104,13 +101,13 @@ export default function GoogleOAuthCallback() {
     <div className="flex items-center justify-center h-screen">
       <div className="flex flex-col items-center space-y-4">
         <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-600 text-sm text-center px-4">
-            {noEmailErr
-                ? "Your Facebook account doesn't have an email. Please sign in with another account or use Google."
-                : hasFailed
-                    ? "Login failed. Please try again later."
-                    : "Signing you in..."}
-          </p>
+        <p className="text-gray-600 text-sm text-center px-4">
+          {noEmailErr
+            ? "Your Facebook account doesn't have an email. Please sign in with another account or use Google."
+            : hasFailed
+            ? "Login failed. Please try again later."
+            : "Signing you in..."}
+        </p>
       </div>
     </div>
   );
