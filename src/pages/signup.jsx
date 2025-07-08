@@ -25,6 +25,8 @@ const SignupPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(true);
+  const [authUrl, setAuthUrl] = useState("");
+  const [fbAuthUrl, setFbAuthUrl] = useState("");
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -33,6 +35,63 @@ const SignupPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+
+  useEffect(() => {
+    console.log("i am in the useEffect");
+    // Fetch the auth URL from backend
+    fetch(`${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/google`)
+      .then((res) => res.json())
+      .then((data) => {
+        // Save the values in sessionStorage (or memory)
+        console.log("this is the url slksjfmsjd ", data.authUrl);
+        sessionStorage.setItem("state", data.state);
+        sessionStorage.setItem("code_verifier", data.code_verifier);
+        setAuthUrl(data.authUrl);
+      });
+
+    const ff = async (platform) => {
+      try {
+        console.log(
+          "i am calling ",
+          `${import.meta.env.VITE_REACT_APP_ORIGIN}/connect/${platform}`
+        );
+        const response = await fetch(
+          `https://dzwoodkitchen.com/connect/${platform}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Check if the response is ok
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (platform === "facebook") {
+          localStorage.setItem("faceState", data.data.state);
+          setFbAuthUrl(data.data.authUrl);
+          return data;
+        }
+
+        console.log("the response data is ", data.data);
+        localStorage.setItem("state", data.data.state);
+        localStorage.setItem("code_verifier", data.data.code_verifier);
+        setAuthUrl(data.data.authUrl);
+
+        return data; // Return the parsed data
+      } catch (err) {
+        console.log("an error happened ", err);
+        throw err; // Re-throw the error if you want calling code to handle it
+      }
+    };
+
+    Promise.all([ff("facebook"), ff("google")]);
+
+    console.log("i am exiting the useEffect");
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -167,7 +226,7 @@ const SignupPage = () => {
           </div>
         </Dialog>
       </Transition>
-      
+
       {/* Header */}
       <Header
         darkMode={darkMode}
@@ -203,7 +262,16 @@ const SignupPage = () => {
 
             {/* Social Login Buttons */}
             <div className="flex flex-col space-y-4 mb-6">
-              <a href="/connect/google"
+              <a
+                target="_self"
+                href={
+                  authUrl && authUrl.startsWith("http")
+                    ? authUrl
+                    : `https://${authUrl}`
+                }
+                onClick={() => {
+                  localStorage.setItem("provider", "google");
+                }}
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
@@ -219,7 +287,16 @@ const SignupPage = () => {
                 </svg>
                 <span>{t("continueWithGoogle")}</span>
               </a>
-              <a href="/connect/facebook"
+              <a
+                target="_self"
+                href={
+                  fbAuthUrl && fbAuthUrl.startsWith("http")
+                    ? fbAuthUrl
+                    : `https://${fbAuthUrl}`
+                }
+                onClick={() => {
+                  localStorage.setItem("provider", "facebook");
+                }}
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
                     ? "bg-gray-700 border-gray-600 hover:bg-gray-600 text-white"
