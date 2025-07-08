@@ -1436,7 +1436,7 @@ function App() {
                     <p
                       className={isDarkMode ? "text-gray-400" : "text-gray-600"}
                     >
-                      {t("phone")}
+                      {+2130550347043}
                     </p>
                   </div>
                 </div>
