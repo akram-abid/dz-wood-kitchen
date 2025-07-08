@@ -10,13 +10,14 @@ export default function GoogleOAuthCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
     const state = urlParams.get("state");
-    let code_verifier;
+    let code_verifier = localStorage.getItem("code_verifier");
 
     const provider = localStorage.getItem("provider");
 
     if (!code || !state || (provider === "google" && !code_verifier)) {
       console.error("Missing OAuth info");
       setHasFailed(true);
+      setTimeout(() => navigate("/"), 4000)
       return;
     }
 
