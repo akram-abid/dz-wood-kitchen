@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export default function GoogleOAuthCallback() {
   const navigate = useNavigate();
   const [hasFailed, setHasFailed] = useState(false);
-  const [noEmailErr, setNoEMailErr] = useState(false); 
+  const [noEmailErr, setNoEmailErr] = useState(false); 
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
