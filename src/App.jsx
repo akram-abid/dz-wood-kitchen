@@ -51,6 +51,7 @@ import {
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useNavigate } from "react-router-dom";
+import apiFetch from "./utils/api/apiFetch";
 
 function App() {
   const { t } = useTranslation();
@@ -125,6 +126,9 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentTeamSlide, setCurrentTeamSlide] = useState(0);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -181,7 +185,7 @@ function App() {
       title: "Minimalist Design",
       description: "Clean lines with premium materials",
       src: img8,
-    }
+    },
   ];
 
   // Team members
@@ -209,21 +213,21 @@ function App() {
       name: "عبد الجليل",
       role: t("workshopAssistant"),
       bio: t("strongAndLovesChallenges"),
-      img: abdeldjalile
+      img: abdeldjalile,
     },
     {
       id: 5,
       name: "سمير",
       role: t("carpentryTechnician"),
       bio: t("seriousAndStrictInWork"),
-      img: samir  
+      img: samir,
     },
     {
       id: 6,
       name: "أكرم",
       role: t("engineerAndDesigner"),
       bio: t("responsibleForDesignAndMedia"),
-      img: akram
+      img: akram,
     },
     {
       id: 7,
@@ -334,12 +338,40 @@ function App() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", message: "" });
+    setIsLoading(true);
+
+    try {
+      const response = await apiFetch(`/api/v1/emails/send`,
+        {
+          fullName: formData.name,
+          email: formData.email,
+          message: formData.message,
+        },
+        true,
+        "POST",
+        false
+      );
+
+      console.log("the dslkjqfmlsdfjkqsdmlfj ", response)
+
+      const data = await response.json();
+
+      if (data.success) {
+        setPopupMessage("Your message has been sent successfully!");
+        setShowPopup(true);
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        setPopupMessage("Failed to send message. Please try again later.");
+        setShowPopup(true);
+      }
+    } catch (error) {
+      setPopupMessage("An error occurred. Please try again later.");
+      setShowPopup(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -348,6 +380,57 @@ function App() {
         isDarkMode ? "bg-black text-white" : "bg-white text-gray-900"
       }`}
     >
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div
+            className={`p-6 rounded-xl max-w-md w-full ${
+              isDarkMode ? "bg-gray-800" : "bg-white"
+            }`}
+          >
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+                <svg
+                  className="h-6 w-6 text-yellow-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3
+                className={`text-lg font-medium mb-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {popupMessage.includes("success") ? "Success!" : "Error"}
+              </h3>
+              <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
+                {popupMessage}
+              </p>
+              <div className="mt-4">
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className={`px-4 py-2 rounded-md ${
+                    isDarkMode
+                      ? "bg-gray-700 hover:bg-gray-600 text-white"
+                      : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                  }`}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -1282,9 +1365,36 @@ function App() {
 
                 <button
                   type="submit"
-                  className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors w-full"
+                  disabled={isLoading}
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-colors w-full flex items-center justify-center"
                 >
-                  {t("sendMessage")}
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      {t("sending")}
+                    </>
+                  ) : (
+                    t("sendMessage")
+                  )}
                 </button>
               </form>
             </div>

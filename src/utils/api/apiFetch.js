@@ -1,12 +1,15 @@
-const apiFetch = async (link, body = null, addContentType = true, method = null) => {
+const apiFetch = async (link, body = null, addContentType = true, method = null, includeAuth = true) => {
   const origin = import.meta.env.VITE_REACT_APP_ORIGIN;
-  const token = localStorage.getItem('accessToken');
   
   try {
     const url = `${origin}${link}`;
-    const headers = {
-      "Authorization": `Bearer ${token}`,
-    };
+    const headers = {};
+
+    // Only add Authorization header if includeAuth is true
+    if (includeAuth) {
+      const token = localStorage.getItem('accessToken');
+      headers["Authorization"] = `Bearer ${token}`;
+    }
 
     // Only add Content-Type for non-FormData bodies
     if (addContentType && !(body instanceof FormData)) {
