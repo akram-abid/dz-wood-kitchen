@@ -293,5 +293,6 @@
   "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
   "updating": "جاري التحديث...",
   "invalidTokenTitle": "الرابط غير صالح",
-  "requestNewLink": "طلب رابط جديد"
+  "requestNewLink": "طلب رابط جديد",
+  "enterOrderTitle": "أدخل عنوان الطلب"
 }

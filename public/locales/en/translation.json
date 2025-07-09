@@ -299,6 +299,7 @@
   "confirmNewPassword": "Confirm your new password",
   "updating": "Updating...",
   "invalidTokenTitle": "Link not valid",
-  "requestNewLink": "Request a new link"
+  "requestNewLink": "Request a new link",
+  "enterOrderTitle": "Enter your order title"
 
 }
