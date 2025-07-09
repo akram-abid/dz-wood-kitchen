@@ -283,5 +283,22 @@
   "driverAndAssistant": "Chauffeur et assistant",
   "driverAndWorkshopHelper": "Conducteur et aide dans l'atelier",
   "designerAnd3dEngineer": "Designer et ingénieur 3D",
-  "specializedIn3dAndInterior": "Spécialisé en modélisation 3D et décoration intérieure"
+  "specializedIn3dAndInterior": "Spécialisé en modélisation 3D et décoration intérieure",
+  "invalidOrExpiredToken": "This link is no longer valid",
+  "noTokenProvided": "This link is incomplete or broken",
+  "fillAllFields": "Please fill in all fields",
+  "passwordMinLength": "Password must be at least 6 characters",
+  "passwordsDontMatch": "Passwords do not match",
+  "passwordResetSuccess": "Your password has been updated",
+  "somethingWentWrong": "Something went wrong. Please try again.",
+  "resetPassword": "Reset Password",
+  "enterNewPassword": "Enter your new password",
+  "invalidTokenMessage": "The link you used is invalid or has expired",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
+  "confirmNewPassword": "Confirm your new password",
+  "updating": "Updating...",
+  "invalidTokenTitle": "Link not valid",
+  "requestNewLink": "Request a new link"
+
 }

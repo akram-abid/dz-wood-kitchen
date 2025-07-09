@@ -649,7 +649,7 @@ const OrderDetails = () => {
                 <p className="font-medium">{order.fullName}</p>
                 <p className="text-sm">{order.email}</p>
                 <p className="text-sm">{order.phoneNumber}</p>
-                <p className="text-sm">{order.street}</p>
+                <p className="text-sm">{ `${order.wilaya}, ${order.daira}, ${order.baladia}, ${order.street}`}</p>
               </div>
             </div>
 

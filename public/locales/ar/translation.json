@@ -277,5 +277,21 @@
   "driverAndAssistant": "سائق ومساعد",
   "driverAndWorkshopHelper": "سائق ومساعد في الورشة",
   "designerAnd3dEngineer": "مصمم ومهندس ثلاثي الأبعاد",
-  "specializedIn3dAndInterior": "متخصص في النمذجة ثلاثية الأبعاد والديكور الداخلي"
+  "specializedIn3dAndInterior": "متخصص في النمذجة ثلاثية الأبعاد والديكور الداخلي",
+   "invalidOrExpiredToken": "هذا الرابط لم يعد صالحًا",
+  "noTokenProvided": "هذا الرابط غير مكتمل أو غير صالح",
+  "fillAllFields": "يرجى ملء جميع الخانات",
+  "passwordMinLength": "كلمة المرور يجب أن تكون على الأقل 6 أحرف",
+  "passwordsDontMatch": "كلمتا المرور غير متطابقتين",
+  "passwordResetSuccess": "تم تغيير كلمة المرور بنجاح",
+  "somethingWentWrong": "حدث خطأ ما، حاول مرة أخرى",
+  "resetPassword": "إعادة تعيين كلمة المرور",
+  "enterNewPassword": "أدخل كلمة مرور جديدة",
+  "invalidTokenMessage": "الرابط المستخدم غير صالح أو منتهي الصلاحية",
+  "newPassword": "كلمة المرور الجديدة",
+  "confirmPassword": "تأكيد كلمة المرور",
+  "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+  "updating": "جاري التحديث...",
+  "invalidTokenTitle": "الرابط غير صالح",
+  "requestNewLink": "طلب رابط جديد"
 }
