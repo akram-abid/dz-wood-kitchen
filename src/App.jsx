@@ -473,7 +473,6 @@ function App() {
                 </a>
               ))}
 
-
               {/* Language Dropdown */}
               <div className="relative">
                 <button
@@ -549,17 +548,17 @@ function App() {
             </div>
 
             {/* Mobile menu button */}
+            <button
+              onClick={() => navigate("/profile")}
+              className={`p-2 rounded-xl transition-all duration-200 ${
+                isDarkMode
+                  ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                  : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+              }`}
+            >
+              <User size={18} />
+            </button>
             <div>
-              <button
-                  onClick={() => navigate("/profile")}
-                  className={`p-2 rounded-xl transition-all duration-200 ${
-                    isDarkMode
-                      ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                      : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-                  }`}
-                >
-                  <User size={18} />
-                </button>
               <button
                 onClick={toggleMobileMenu}
                 className="lg:hidden p-2 text-current"
@@ -568,10 +567,9 @@ function App() {
               </button>
             </div>
           </nav>
-          
 
           {/* Mobile Menu */}
-          
+
           <div
             className={`lg:hidden transition-all duration-300 overflow-hidden ${
               isMobileMenuOpen
@@ -579,7 +577,6 @@ function App() {
                 : "max-h-0 opacity-0"
             }`}
           >
-            
             <div
               className={`py-4 rounded-lg mt-2 shadow-xl ${
                 isDarkMode ? "bg-gray-800" : "bg-gray-50"

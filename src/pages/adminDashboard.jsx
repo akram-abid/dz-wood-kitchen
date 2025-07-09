@@ -718,14 +718,16 @@ const AdminDashboard = () => {
                           darkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
-                        {order.title}
+                        {order.title || t("noTitleProvided")}
                       </h3>
                       <p
                         className={`text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        {order.id} • {order.client}
+                        {order.date
+                          ? new Date(order.date).toLocaleDateString()
+                          : t("noDateProvided")}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
