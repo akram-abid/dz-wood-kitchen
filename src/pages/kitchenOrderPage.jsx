@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
+import imageCompression from "browser-image-compression";
+
 import i18next from "i18next";
 import {
   Globe,
@@ -62,6 +64,8 @@ const KitchenOrderPage = () => {
   const [showBaladiaSuggestions, setShowBaladiaSuggestions] = useState(false);
   const [orderStatus, setOrderStatus] = useState(null); // null, 'loading', 'success', 'error'
   const [errors, setErrors] = useState({});
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [apiError, setApiError] = useState(null);
 
   const { t } = useTranslation();
@@ -89,6 +93,15 @@ const KitchenOrderPage = () => {
   if (!isEmailVerified) {
     navigate("/login", { state: { problem: t("emailNotVerified") } });
   }
+  const openImageModal = (file) => {
+    setSelectedImage(URL.createObjectURL(file));
+    setIsModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
   const filteredWilayas = wilayas
     .filter((w) => w.name.toLowerCase().includes(wilayaSearch.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -134,11 +147,36 @@ const KitchenOrderPage = () => {
     setShowBaladiaSuggestions(false);
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
+    const convertedFiles = await Promise.all(
+      files.map(async (file) => {
+        // Only convert image files
+        if (!file.type.match("image.*")) return file;
+
+        try {
+          const options = {
+            maxSizeMB: 1, // Maximum file size in MB
+            maxWidthOrHeight: 1920, // Maximum width/height
+            useWebWorker: true, // Use web worker for faster processing
+            fileType: "image/webp", // Convert to WebP
+          };
+
+          const compressedFile = await imageCompression(file, options);
+          return new File([compressedFile], `${file.name.split(".")[0]}.webp`, {
+            type: "image/webp",
+            lastModified: Date.now(),
+          });
+        } catch (error) {
+          console.error("Error compressing image:", error);
+          return file; // Fallback to original if conversion fails
+        }
+      })
+    );
+
     setOrderData((prev) => ({
       ...prev,
-      media: [...prev.media, ...files],
+      media: [...prev.media, ...convertedFiles],
     }));
   };
 
@@ -560,7 +598,8 @@ const KitchenOrderPage = () => {
                     {orderData.media.map((file, index) => (
                       <div
                         key={index}
-                        className="relative rounded-lg overflow-hidden"
+                        className="relative rounded-lg overflow-hidden cursor-pointer"
+                        onClick={() => openImageModal(file)}
                       >
                         <img
                           src={URL.createObjectURL(file)}
@@ -572,6 +611,7 @@ const KitchenOrderPage = () => {
                         </div>
                       </div>
                     ))}
+                    a
                   </div>
                 </div>
               )}
@@ -1243,7 +1283,8 @@ const KitchenOrderPage = () => {
                           {orderData.media.map((file, index) => (
                             <div
                               key={index}
-                              className="relative group rounded-lg overflow-hidden"
+                              className="relative group rounded-lg overflow-hidden cursor-pointer"
+                              onClick={() => openImageModal(file)}
                             >
                               <img
                                 src={URL.createObjectURL(file)}
@@ -1252,7 +1293,10 @@ const KitchenOrderPage = () => {
                               />
                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                 <button
-                                  onClick={() => removeFile(index)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeFile(index);
+                                  }}
                                   className="p-1 rounded-full bg-red-500 text-white hover:bg-red-600"
                                 >
                                   <X size={16} />
@@ -1289,6 +1333,24 @@ const KitchenOrderPage = () => {
           </form>
         )}
       </main>
+      {/* Image Modal */}
+      {isModalOpen && selectedImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          <div className="relative max-w-4xl w-full max-h-[90vh]">
+            <button
+              onClick={closeImageModal}
+              className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300"
+            >
+              <X size={24} />
+            </button>
+            <img
+              src={selectedImage}
+              alt="Enlarged preview"
+              className="w-full h-full object-contain max-h-[90vh]"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
