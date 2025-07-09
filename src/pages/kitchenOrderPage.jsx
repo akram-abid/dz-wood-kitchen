@@ -230,7 +230,7 @@ const KitchenOrderPage = () => {
     try {
       const formData = new FormData();
       formData.append("title", "");
-      formData.append("postId", originalKitchenId || "");
+      if(originalKitchenId) formData.append("postId", originalKitchenId);
       formData.append("description", orderData.description);
       formData.append("woodType", orderData.woodType);
       formData.append("baladia", orderData.baladia);

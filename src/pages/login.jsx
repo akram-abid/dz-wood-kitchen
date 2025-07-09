@@ -469,7 +469,7 @@ const LoginPage = () => {
           >
             <div className="text-center">
               <img
-                loading="lazy"
+                loading="lazy" 
                 src={picture}
                 alt="Kitchen Design"
                 className="w-full h-64 object-cover rounded-lg mb-6"
