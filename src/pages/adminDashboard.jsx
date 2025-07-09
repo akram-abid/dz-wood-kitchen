@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import WLogo from "../assets/images/whiteLogo.png";
 import Blogo from "../assets/images/blackLogo.png";
+import imageCompression from "browser-image-compression";
+
 import {
   Globe,
   Sun,
@@ -232,26 +234,64 @@ const AdminDashboard = () => {
     setShowCompletionForm(true);
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    files.forEach((file) => {
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const imageObj = {
+
+    // Process each file with WebP conversion
+    const processedImages = await Promise.all(
+      files.map(async (file) => {
+        if (!file.type.startsWith("image/")) return null;
+
+        try {
+          // Convert to WebP
+          const options = {
+            maxSizeMB: 1, // Maximum file size in MB
+            maxWidthOrHeight: 1920, // Maximum width/height
+            useWebWorker: true, // Use web worker for faster processing
+            fileType: "image/webp", // Convert to WebP
+          };
+
+          const compressedFile = await imageCompression(file, options);
+
+          // Create preview
+          const preview = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.readAsDataURL(compressedFile);
+          });
+
+          return {
+            file: compressedFile,
+            preview: preview,
+            name: `${file.name.split(".")[0]}.webp`, // Change extension to .webp
+          };
+        } catch (error) {
+          console.error("Error processing image:", error);
+          // Fallback to original if conversion fails
+          const preview = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.readAsDataURL(file);
+          });
+
+          return {
             file: file,
-            preview: event.target.result,
+            preview: preview,
             name: file.name,
           };
-          setNewPost((prev) => ({
-            ...prev,
-            images: [...prev.images, imageObj],
-          }));
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-    e.target.value = "";
+        }
+      })
+    );
+
+    // Filter out any null values (non-image files)
+    const validImages = processedImages.filter((img) => img !== null);
+
+    setNewPost((prev) => ({
+      ...prev,
+      images: [...prev.images, ...validImages],
+    }));
+
+    e.target.value = ""; // Reset file input
   };
 
   const removeImage = (index) => {
@@ -298,7 +338,11 @@ const AdminDashboard = () => {
       formData.append("items", JSON.stringify(newPost.items));
 
       if (newPost.location) formData.append("location", newPost.location);
-      newPost.images.forEach((image) => formData.append("media", image.file));
+
+      // Append all images (already converted to WebP)
+      newPost.images.forEach((image) => {
+        formData.append("media", image.file, image.name);
+      });
 
       const response = await apiFetch(
         "/api/v1/services/posts",
@@ -1053,11 +1097,17 @@ const AdminDashboard = () => {
                               className="w-full h-32 object-cover rounded-lg"
                             />
                             <button
-                              onClick={() => removeImage(index)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeImage(index);
+                              }}
                               className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                               <X size={16} />
                             </button>
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 truncate">
+                              {image.name}
+                            </div>
                           </div>
                         ))}
                       </div>
