@@ -1377,7 +1377,75 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {/* Order details content remains the same */}
+                {selectedOrder && (
+                  <div className="fixed inset-0 bg-black dark:text-gray-50 bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div
+                      className={`rounded-2xl w-full max-w-md ${
+                        darkMode ? "bg-gray-800" : "bg-white"
+                      }`}
+                    >
+                      <div className="p-6">
+                        <div className="flex justify-between items-center mb-6">
+                          <h2
+                            className={`text-xl font-bold ${
+                              darkMode ? "text-white" : "text-gray-900"
+                            }`}
+                          >
+                            {t("orderOverview")}
+                          </h2>
+                          <button
+                            onClick={() => setSelectedOrder(null)}
+                            className={`p-2 rounded-full ${
+                              darkMode
+                                ? "hover:bg-gray-700 text-gray-400"
+                                : "hover:bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <h3
+                              className={`text-lg font-semibold ${
+                                darkMode ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {selectedOrder.title}
+                            </h3>
+                            <p
+                              className={`text-sm ${
+                                darkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
+                            >
+                              Created:{" "}
+                              {new Date(
+                                selectedOrder.date
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+
+                          <div className="flex justify-end">
+                            <button
+                              onClick={() => {
+                                setSelectedOrder(null);
+                                navigate(`/orders/${selectedOrder.id}`);
+                              }}
+                              className={`px-4 py-2 rounded-lg ${
+                                darkMode
+                                  ? "bg-gray-700 hover:bg-gray-600 text-white"
+                                  : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                              }`}
+                            >
+                              {t("viewFullDetails")}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
