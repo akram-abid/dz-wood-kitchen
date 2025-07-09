@@ -36,7 +36,21 @@ const KitchenDetails = () => {
   const { isAuthenticated } = useAuth("admin");
   const fileInputRef = useRef(null);
   const [error, setError] = useState(null);
+  const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const fullscreenStyles = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    zIndex: 1000,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
 
   // Store original post data for canceling edits
   const [originalPost, setOriginalPost] = useState(null);
@@ -274,6 +288,60 @@ const KitchenDetails = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Header */}
+
+      {isFullscreenPreview && (
+        <div
+          style={fullscreenStyles}
+          onClick={() => setIsFullscreenPreview(false)}
+          className="cursor-zoom-out"
+        >
+          <div className="relative max-w-4xl w-full h-full flex items-center justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsFullscreenPreview(false);
+              }}
+              className="absolute top-4 right-4 bg-gray-800 text-white rounded-full p-2 z-10 hover:bg-gray-700"
+            >
+              <X size={24} />
+            </button>
+
+            <img
+              src={
+                post.images[currentImageIndex].isExisting
+                  ? `${import.meta.env.VITE_REACT_APP_ORIGIN}${
+                      post.images[currentImageIndex].url
+                    }`
+                  : post.images[currentImageIndex].preview
+              }
+              alt={post.title}
+              className="max-w-full max-h-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+              className="absolute left-4 bg-gray-800 text-white rounded-full p-2 z-10 hover:bg-gray-700"
+            >
+              <ChevronLeft size={24} />
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+              className="absolute right-4 bg-gray-800 text-white rounded-full p-2 z-10 hover:bg-gray-700"
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
+        </div>
+      )}
+
       <Header
         darkMode={darkMode}
         toggleDarkMode={toggleDarkMode}
@@ -324,37 +392,43 @@ const KitchenDetails = () => {
               )}
 
               <div className="relative h-full w-full">
-                {post.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
-                      index === currentImageIndex
-                        ? "opacity-100"
-                        : "opacity-0 pointer-events-none"
-                    }`}
-                  >
-                    <img
-                      src={
-                        image.isExisting
-                          ? `${import.meta.env.VITE_REACT_APP_ORIGIN}${
-                              image.url
-                            }`
-                          : image.preview
-                      }
-                      alt={post.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    {isEditing && (
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-70 hover:opacity-100 transition-opacity"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))}
+                <div className="relative h-full w-full cursor-zoom-in">
+                  {post.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+                        index === currentImageIndex
+                          ? "opacity-100"
+                          : "opacity-0 pointer-events-none"
+                      }`}
+                      onClick={() => setIsFullscreenPreview(true)}
+                    >
+                      <img
+                        src={
+                          image.isExisting
+                            ? `${import.meta.env.VITE_REACT_APP_ORIGIN}${
+                                image.url
+                              }`
+                            : image.preview
+                        }
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      {isEditing && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeImage(index);
+                          }}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-70 hover:opacity-100 transition-opacity"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <button
@@ -414,8 +488,8 @@ const KitchenDetails = () => {
                 </p>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">*
-                {console.log("the post i will edit is this ", post)}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                *{console.log("the post i will edit is this ", post)}
                 <EditableDetailItem
                   icon={<MapPin className="text-yellow-500" />}
                   label={t("location")}
@@ -500,8 +574,8 @@ const KitchenDetails = () => {
                         originalKitchenId: kitchenId,
                       },
                     });
-                    console.log("kitchen template ", post)
-                    console.log("the original kitchen id is ", kitchenId)
+                    console.log("kitchen template ", post);
+                    console.log("the original kitchen id is ", kitchenId);
                   }}
                   className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 mt-4"
                 >
