@@ -472,16 +472,7 @@ function App() {
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
                 </a>
               ))}
-              <button
-                onClick={() => navigate("/profile")}
-                className={`p-2 rounded-xl transition-all duration-200 ${
-                  isDarkMode
-                    ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                    : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-                }`}
-              >
-                <User size={18} />
-              </button>
+
 
               {/* Language Dropdown */}
               <div className="relative">
@@ -538,7 +529,6 @@ function App() {
                   </div>
                 </div>
               </div>
-
               <button
                 className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
                 onClick={() => navigate("/order")}
@@ -559,15 +549,29 @@ function App() {
             </div>
 
             {/* Mobile menu button */}
-            <button
-              onClick={toggleMobileMenu}
-              className="lg:hidden p-2 text-current"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div>
+              <button
+                  onClick={() => navigate("/profile")}
+                  className={`p-2 rounded-xl transition-all duration-200 ${
+                    isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                      : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
+                  }`}
+                >
+                  <User size={18} />
+                </button>
+              <button
+                onClick={toggleMobileMenu}
+                className="lg:hidden p-2 text-current"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </nav>
+          
 
           {/* Mobile Menu */}
+          
           <div
             className={`lg:hidden transition-all duration-300 overflow-hidden ${
               isMobileMenuOpen
@@ -575,6 +579,7 @@ function App() {
                 : "max-h-0 opacity-0"
             }`}
           >
+            
             <div
               className={`py-4 rounded-lg mt-2 shadow-xl ${
                 isDarkMode ? "bg-gray-800" : "bg-gray-50"
