@@ -198,7 +198,7 @@ const KitchenOrderPage = () => {
       formData.append("description", orderData.description);
       formData.append("woodType", orderData.woodType);
       formData.append("baladia", orderData.baladia);
-      formData.append("email", orderData.email);
+      if (orderData.email) formData.append("email", orderData.email);
       formData.append("fullName", orderData.fullName);
       formData.append("street", orderData.street);
       formData.append("daira", orderData.daira);
