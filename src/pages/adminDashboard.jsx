@@ -629,14 +629,16 @@ const AdminDashboard = () => {
                           darkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
-                        {order.title}
+                        {order.title || t("noTitleProvided")}
                       </h3>
                       <p
                         className={`text-sm ${
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        {order.id} • {order.client}
+                        {order.date
+                          ? new Date(order.date).toLocaleDateString()
+                          : t("noDateProvided")}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -1170,9 +1172,6 @@ const AdminDashboard = () => {
                     <X size={20} />
                   </button>
                 </div>
-
-                {/* Payment form fields remain the same */}
-
                 <div className="flex justify-end space-x-3">
                   <button
                     onClick={() => setShowPaymentModal(false)}
@@ -1229,8 +1228,6 @@ const AdminDashboard = () => {
                     <X size={20} />
                   </button>
                 </div>
-
-                {/* Completion form fields remain the same */}
 
                 <div className="flex justify-end space-x-3">
                   <button
@@ -1403,7 +1400,6 @@ const AdminDashboard = () => {
                             <X size={20} />
                           </button>
                         </div>
-
                         <div className="space-y-4">
                           <div>
                             <h3
