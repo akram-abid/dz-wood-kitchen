@@ -20,8 +20,6 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
-import WLogo from "../assets/images/whiteLogo.png";
-import Blogo from "../assets/images/blackLogo.png";
 import i18next from "i18next";
 import apiFetch from "../utils/api/apiFetch";
 import { useAuth } from "../utils/protectedRootesVerf";

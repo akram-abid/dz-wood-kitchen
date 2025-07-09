@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import WLogo from "../assets/images/whiteLogo.png";
-import Blogo from "../assets/images/blackLogo.png";
 import {
   Globe,
   Calendar,

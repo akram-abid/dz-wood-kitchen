@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import WLogo from "../assets/images/whiteLogo.png";
-import Blogo from "../assets/images/blackLogo.png";
+import WLogo from "../assets/images/whiteLogo.webp";
+import Blogo from "../assets/images/blackLogo.webp";
 import { Sun, Moon, Globe, ChevronDown, User } from "lucide-react";
 
 function Header({

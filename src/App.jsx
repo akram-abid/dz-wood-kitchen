@@ -1,7 +1,7 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
-import WLogo from "./assets/images/whiteLogo.png";
-import Blogo from "./assets/images/blackLogo.png";
+import WLogo from "./assets/images/whiteLogo.webp";
+import Blogo from "./assets/images/blackLogo.webp";
 import "./utils/i18n/i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhone, faCopy } from "@fortawesome/free-solid-svg-icons";
@@ -15,13 +15,13 @@ import img6 from "./assets/images/carousel/imgcarousel6.jpg";
 import img7 from "./assets/images/carousel/imgcarousel7.jpg";
 import img8 from "./assets/images/carousel/imgcarousel8.jpg";
 import img9 from "./assets/images/carousel/imgcarousel9.jpg";
-import workshop from "./assets/images/workshop.jpg";
-import designExcellenceImage from "./assets/images/designExcellenceImage.jpg";
-import craftsmanshipImage from "./assets/images/craftsmanshipImage.jpg";
-import precisionWorkImage from "./assets/images/precisionWorkImage.jpg";
-import akram from "./assets/images/akram.jpg";
-import abdeldjalile from "./assets/images/abdeldjalile.jpg";
-import samir from "./assets/images/samir.jpg";
+import workshop from "./assets/images/workshop.webp";
+import designExcellenceImage from "./assets/images/designExcellenceImage.webp";
+import craftsmanshipImage from "./assets/images/craftsmanshipImage.webp";
+import precisionWorkImage from "./assets/images/precisionWorkImage.webp";
+import akram from "./assets/images/akram.webp";
+import abdeldjalile from "./assets/images/abdeldjalile.webp";
+import samir from "./assets/images/samir.webp";
 import {
   User,
   Globe,

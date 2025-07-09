@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import WLogo from "../assets/images/blackLogo.png";
+import WLogo from "../assets/images/blackLogo.webp";
 import {
   Clock,
   Hammer,

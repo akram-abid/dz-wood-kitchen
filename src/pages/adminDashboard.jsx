@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import WLogo from "../assets/images/whiteLogo.png";
-import Blogo from "../assets/images/blackLogo.png";
 import imageCompression from "browser-image-compression";
 
 import {
