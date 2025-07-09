@@ -444,7 +444,7 @@ function App() {
             : "bg-transparent"
         }`}
       >
-        <div className="container mx-auto px-2 py-1 md:px-8 md:py-6 ">
+        <div className="container mx-auto px-2 py-1 md:px-8 md:py-6">
           <nav className="flex items-center justify-between">
             <div className="flex items-center">
               <img
@@ -454,122 +454,125 @@ function App() {
               />
             </div>
 
-            <div className="hidden lg:flex items-center space-x-6 md:space-x-8">
-              {[
-                { tag: t("home"), link: "home" },
-                { tag: t("about"), link: "about" },
-                { tag: t("mission"), link: "mission" },
-                { tag: t("gallery"), link: "gallery" },
-                { tag: t("team"), link: "team" },
-                { tag: t("contact"), link: "contact" },
-              ].map(({ tag, link }) => (
-                <a
-                  key={link}
-                  href={`#${link}`}
-                  className="hover:text-yellow-500 transition-colors duration-200 font-medium relative group"
-                >
-                  {tag}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
-                </a>
-              ))}
+            <div className="flex items-center space-x-4">
+              {/* Desktop Navigation */}
+              <div className="hidden lg:flex items-center space-x-6 md:space-x-8">
+                {[
+                  { tag: t("home"), link: "home" },
+                  { tag: t("about"), link: "about" },
+                  { tag: t("mission"), link: "mission" },
+                  { tag: t("gallery"), link: "gallery" },
+                  { tag: t("team"), link: "team" },
+                  { tag: t("contact"), link: "contact" },
+                ].map(({ tag, link }) => (
+                  <a
+                    key={link}
+                    href={`#${link}`}
+                    className="hover:text-yellow-500 transition-colors duration-200 font-medium relative group"
+                  >
+                    {tag}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-yellow-500 transition-all duration-300 group-hover:w-full"></span>
+                  </a>
+                ))}
 
-              {/* Language Dropdown */}
-              <div className="relative">
+                {/* Language Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={toggleLanguageDropdown}
+                    className={`flex items-center space-x-2 p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                      isDarkMode
+                        ? "bg-gray-800 text-white"
+                        : "bg-gray-50 text-gray-900"
+                    } hover:text-yellow-500`}
+                  >
+                    <Globe size={20} />
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${
+                        isLanguageDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Language Dropdown Menu */}
+                  <div
+                    className={`absolute right-0 mt-2 w-40 transition-all duration-200 ${
+                      isLanguageDropdownOpen
+                        ? "opacity-100 visible translate-y-0"
+                        : "opacity-0 invisible -translate-y-2"
+                    }`}
+                  >
+                    <div
+                      className={`rounded-lg shadow-xl border ${
+                        isDarkMode
+                          ? "bg-gray-800 border-gray-700"
+                          : "bg-white border-gray-200"
+                      }`}
+                    >
+                      {[
+                        { code: "en", name: "English", flag: "🇺🇸" },
+                        { code: "ar", name: "العربية", flag: "🇸🇦" },
+                        { code: "fr", name: "Français", flag: "🇫🇷" },
+                      ].map((language) => (
+                        <button
+                          key={language.code}
+                          onClick={() => handleLanguageChange(language.code)}
+                          className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
+                            isDarkMode
+                              ? "hover:bg-gray-700 text-white"
+                              : "hover:bg-gray-50 text-gray-900"
+                          } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
+                        >
+                          <span className="text-lg">{language.flag}</span>
+                          <span className="font-medium">{language.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
                 <button
-                  onClick={toggleLanguageDropdown}
-                  className={`flex items-center space-x-2 p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
+                  className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                  onClick={() => navigate("/order")}
+                >
+                  {t("orderNow")}
+                </button>
+
+                <button
+                  onClick={toggleMode}
+                  className={`p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
                     isDarkMode
                       ? "bg-gray-800 text-white"
                       : "bg-gray-50 text-gray-900"
                   } hover:text-yellow-500`}
                 >
-                  <Globe size={20} />
-                  <ChevronDown
-                    size={16}
-                    className={`transition-transform duration-200 ${
-                      isLanguageDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                 </button>
+              </div>
 
-                {/* Language Dropdown Menu */}
-                <div
-                  className={`absolute right-0 mt-2 w-40 transition-all duration-200 ${
-                    isLanguageDropdownOpen
-                      ? "opacity-100 visible translate-y-0"
-                      : "opacity-0 invisible -translate-y-2"
+              {/* Profile and Mobile Menu Buttons */}
+              <div className="flex items-center space-x-2 lg:space-x-4">
+                <button
+                  onClick={() => navigate("/profile")}
+                  className={`p-2 rounded-xl transition-all duration-200 ${
+                    isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
+                      : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
                   }`}
                 >
-                  <div
-                    className={`rounded-lg shadow-xl border ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    {[
-                      { code: "en", name: "English", flag: "🇺🇸" },
-                      { code: "ar", name: "العربية", flag: "🇸🇦" },
-                      { code: "fr", name: "Français", flag: "🇫🇷" },
-                    ].map((language) => (
-                      <button
-                        key={language.code}
-                        onClick={() => handleLanguageChange(language.code)}
-                        className={`w-full flex items-center space-x-3 px-4 py-3 text-left transition-colors duration-200 ${
-                          isDarkMode
-                            ? "hover:bg-gray-700 text-white"
-                            : "hover:bg-gray-50 text-gray-900"
-                        } hover:text-yellow-500 first:rounded-t-lg last:rounded-b-lg`}
-                      >
-                        <span className="text-lg">{language.flag}</span>
-                        <span className="font-medium">{language.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                  <User size={18} />
+                </button>
+
+                <button
+                  onClick={toggleMobileMenu}
+                  className="lg:hidden p-2 text-current"
+                >
+                  {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
               </div>
-              <button
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-2 md:px-8 md:py-3 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
-                onClick={() => navigate("/order")}
-              >
-                {t("orderNow")}
-              </button>
-
-              <button
-                onClick={toggleMode}
-                className={`p-2 md:p-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg ${
-                  isDarkMode
-                    ? "bg-gray-800 text-white"
-                    : "bg-gray-50 text-gray-900"
-                } hover:text-yellow-500`}
-              >
-                {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => navigate("/profile")}
-              className={`p-2 rounded-xl transition-all duration-200 ${
-                isDarkMode
-                  ? "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
-                  : "bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 shadow-sm"
-              }`}
-            >
-              <User size={18} />
-            </button>
-            <div>
-              <button
-                onClick={toggleMobileMenu}
-                className="lg:hidden p-2 text-current"
-              >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
             </div>
           </nav>
 
           {/* Mobile Menu */}
-
           <div
             className={`lg:hidden transition-all duration-300 overflow-hidden ${
               isMobileMenuOpen
