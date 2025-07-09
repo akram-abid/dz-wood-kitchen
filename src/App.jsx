@@ -658,7 +658,6 @@ function App() {
           </div>
         </div>
       </header>
-
       {/* Hero Section */}
       <section
         id="home"
