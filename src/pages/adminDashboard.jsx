@@ -1090,6 +1090,7 @@ const AdminDashboard = () => {
                         {newPost.images.map((image, index) => (
                           <div key={index} className="relative group">
                             <img
+                              loading="lazy"
                               src={image.preview}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-32 object-cover rounded-lg"

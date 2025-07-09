@@ -55,14 +55,14 @@ const LoginPage = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         if (platform === "facebook") {
-           localStorage.setItem("faceState", data.data.state);
-           setFbAuthUrl(data.data.authUrl)
-           return data; 
+          localStorage.setItem("faceState", data.data.state);
+          setFbAuthUrl(data.data.authUrl);
+          return data;
         }
-        
+
         console.log("the response data is ", data.data);
         localStorage.setItem("state", data.data.state);
         localStorage.setItem("code_verifier", data.data.code_verifier);
@@ -263,8 +263,8 @@ const LoginPage = () => {
                     ? authUrl
                     : `https://${authUrl}`
                 }
-                onClick={()=>{
-                  localStorage.setItem("provider","google")
+                onClick={() => {
+                  localStorage.setItem("provider", "google");
                 }}
                 className={`cursor-pointer flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
@@ -285,11 +285,11 @@ const LoginPage = () => {
                 target="_self"
                 href={
                   fbAuthUrl && fbAuthUrl.startsWith("http")
-                  ? fbAuthUrl 
-                  : `https://${fbAuthUrl}`
+                    ? fbAuthUrl
+                    : `https://${fbAuthUrl}`
                 }
                 onClick={() => {
-                      localStorage.setItem("provider", "facebook");
+                  localStorage.setItem("provider", "facebook");
                 }}
                 className={`flex items-center justify-center space-x-2 py-3 px-4 rounded-xl border ${
                   darkMode
@@ -469,6 +469,7 @@ const LoginPage = () => {
           >
             <div className="text-center">
               <img
+                loading="lazy"
                 src={picture}
                 alt="Kitchen Design"
                 className="w-full h-64 object-cover rounded-lg mb-6"

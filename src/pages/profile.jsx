@@ -1132,6 +1132,7 @@ const ProfilePage = () => {
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-center">
                     <img
+                      loading="lazy"
                       src={darkMode ? WLogo : Blogo}
                       alt="Company Logo"
                       className="w-16 h-auto mr-4"

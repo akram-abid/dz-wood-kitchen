@@ -600,6 +600,7 @@ const KitchenOrderPage = () => {
                         onClick={() => openImageModal(file)}
                       >
                         <img
+                          loading="lazy"
                           src={URL.createObjectURL(file)}
                           alt={`Upload ${index + 1}`}
                           className="w-full h-24 object-cover"
@@ -652,6 +653,7 @@ const KitchenOrderPage = () => {
                     <div className="w-24 h-24 rounded-xl overflow-hidden">
                       {kitchenData.images && (
                         <img
+                          loading="lazy"
                           src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${
                             kitchenData.images[0].url
                           }`}
@@ -1285,6 +1287,7 @@ const KitchenOrderPage = () => {
                               onClick={() => openImageModal(file)}
                             >
                               <img
+                                loading="lazy"
                                 src={URL.createObjectURL(file)}
                                 alt={`Upload ${index + 1}`}
                                 className="w-full h-24 object-cover"
@@ -1342,6 +1345,7 @@ const KitchenOrderPage = () => {
               <X size={24} />
             </button>
             <img
+              loading="lazy"
               src={selectedImage}
               alt="Enlarged preview"
               className="w-full h-full object-contain max-h-[90vh]"

@@ -339,23 +339,23 @@ function App() {
   };
 
   const handleSubmit = async (e) => {
-    console.log("hi there")
+    console.log("hi there");
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await apiFetch("/api/v1/emails/send", 
+      const response = await apiFetch(
+        "/api/v1/emails/send",
         {
           fullName: formData.name,
           email: formData.email,
           message: formData.message,
         },
         true,
-        "POST",
+        "POST"
       );
 
-      
-      console.log("the data is this ", response)
+      console.log("the data is this ", response);
 
       if (response.success) {
         setPopupMessage("Your message has been sent successfully!");
@@ -407,8 +407,7 @@ function App() {
                   />
                 </svg>
               </div>
-              <h3      // Check both the response status and the success flag in the data
-
+              <h3 // Check both the response status and the success flag in the data
                 className={`text-lg font-medium mb-2 ${
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
@@ -1075,6 +1074,7 @@ function App() {
               {/* Large top image */}
               <div className="w-full h-64 rounded-xl shadow-lg overflow-hidden">
                 <img
+                  loading="lazy"
                   src={craftsmanshipImage}
                   alt="Craftsmanship in Action"
                   className="w-full h-full object-cover"
@@ -1085,6 +1085,7 @@ function App() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="h-48 rounded-xl shadow-lg overflow-hidden">
                   <img
+                    loading="lazy"
                     src={precisionWorkImage}
                     alt="Precision Work"
                     className="w-full h-full object-cover"
@@ -1092,6 +1093,7 @@ function App() {
                 </div>
                 <div className="h-48 rounded-xl shadow-lg overflow-hidden">
                   <img
+                    loading="lazy"
                     src={designExcellenceImage}
                     alt="Design Excellence"
                     className="w-full h-full object-cover"
@@ -1183,6 +1185,7 @@ function App() {
                           >
                             {member.img ? (
                               <img
+                                loading="lazy"
                                 src={member.img}
                                 alt={member.name}
                                 className="w-full h-full object-cover"
@@ -1450,7 +1453,7 @@ function App() {
                     <p
                       className={isDarkMode ? "text-gray-400" : "text-gray-600"}
                     >
-                      {t("emailValue")}
+                      support@dzwoodkitchen.com
                     </p>
                   </div>
                 </div>
@@ -1571,6 +1574,7 @@ function App() {
             <div className="md:col-span-2">
               <div className="flex items-center mb-4">
                 <img
+                  loading="lazy"
                   src={isDarkMode ? WLogo : Blogo}
                   alt="the logo"
                   className="w-[280px]"

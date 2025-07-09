@@ -510,6 +510,7 @@ const OrderDetails = () => {
                 <div className="w-24 h-24 rounded-xl overflow-hidden">
                   {kitchenData.images && (
                     <img
+                      loading="lazy"
                       src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${
                         kitchenData.images[0].url
                       }`}
@@ -621,6 +622,7 @@ const OrderDetails = () => {
                     className="relative h-36 sm:h-48 rounded-xl overflow-hidden"
                   >
                     <img
+                      loading="lazy"
                       src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${img}`}
                       alt={`${order.title} - ${index + 1}`}
                       className="w-full h-full object-cover"
@@ -649,7 +651,7 @@ const OrderDetails = () => {
                 <p className="font-medium">{order.fullName}</p>
                 <p className="text-sm">{order.email}</p>
                 <p className="text-sm">{order.phoneNumber}</p>
-                <p className="text-sm">{ `${order.wilaya}, ${order.daira}, ${order.baladia}, ${order.street}`}</p>
+                <p className="text-sm">{`${order.wilaya}, ${order.daira}, ${order.baladia}, ${order.street}`}</p>
               </div>
             </div>
 
@@ -1686,6 +1688,7 @@ const OrderDetails = () => {
               <div className="flex items-center">
                 <div className="mx-2 sm:mx-4 w-12 sm:w-16 h-12 sm:h-16 flex items-center justify-center print-logo">
                   <img
+                    loading="lazy"
                     src={WLogo}
                     alt="Company Logo"
                     className="max-w-full max-h-full object-contain"
