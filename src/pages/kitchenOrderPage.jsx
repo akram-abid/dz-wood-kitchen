@@ -738,7 +738,7 @@ const KitchenOrderPage = () => {
                         darkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
-                      {t("phone")}
+                      {(+213)x xxxxxxxx / 06xxxxxxxx}
                     </label>
                     <div className="relative">
                       <Phone
