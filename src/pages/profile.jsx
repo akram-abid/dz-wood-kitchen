@@ -13,6 +13,7 @@ import {
   X,
   ChevronDown,
   Globe,
+  ShoppingCart,
   Sun,
   Moon,
   Home,
@@ -62,7 +63,7 @@ const ProfilePage = () => {
   } = useAuth();
 
   useEffect(() => {
-    console.log("i am in the useEffect")
+    console.log("i am in the useEffect");
     console.log("Auth state:", {
       isAuthenticated,
       isEmailVerified,
@@ -204,13 +205,13 @@ const ProfilePage = () => {
     }
   };
 
-  const isAdmin = hasRole('admin');
+  const isAdmin = hasRole("admin");
   const handleDashboard = () => {
-    navigate("/dashboard")
+    navigate("/dashboard");
   };
 
   const handleGallery = () => {
-    navigate("/gallery")
+    navigate("/gallery");
   };
 
   useEffect(() => {
@@ -223,7 +224,7 @@ const ProfilePage = () => {
   }, []);
 
   const handleLogout = () => {
-    console.log("i am logging out bye")
+    console.log("i am logging out bye");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user");
     navigate("/login");
@@ -245,6 +246,10 @@ const ProfilePage = () => {
   const handleCancel = () => {
     setTempName(userData.name);
     setIsEditing(false);
+  };
+
+  const handleOrder = () => {
+    navigate("/order");
   };
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
@@ -345,7 +350,6 @@ const ProfilePage = () => {
     );
   }
 
-  // Don't render anything if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null;
   }
@@ -412,15 +416,15 @@ const ProfilePage = () => {
           <div className="space-y-8">
             {/* Personal Information Card */}
             <div
-              className={`rounded-2xl p-6 border transition-all duration-300 ${
+              className={`rounded-2xl p-4 sm:p-6 border transition-all duration-300 ${
                 darkMode
                   ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm"
                   : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
               }`}
             >
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
                 <h2
-                  className={`text-xl font-semibold flex items-center ${
+                  className={`text-lg sm:text-xl font-semibold flex items-center ${
                     darkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
@@ -428,11 +432,11 @@ const ProfilePage = () => {
                   {t("personalInformation")}
                 </h2>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2">
                   {!isEditing && !userDataLoading ? (
                     <button
                       onClick={handleEdit}
-                      className={`cursor-pointer flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm ${
+                      className={`cursor-pointer flex items-center justify-center space-x-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         darkMode
                           ? "bg-gray-700 hover:bg-gray-600 text-amber-400"
                           : "bg-gray-100 hover:bg-gray-200 text-blue-600"
@@ -446,7 +450,7 @@ const ProfilePage = () => {
                   {/* Logout Button */}
                   <button
                     onClick={handleLogout}
-                    className={`cursor-pointer flex items-center space-x-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                    className={`cursor-pointer flex items-center justify-center space-x-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                       darkMode
                         ? "bg-red-700 hover:bg-red-600 text-red-300"
                         : "bg-red-100 hover:bg-red-200 text-red-600"
@@ -461,16 +465,16 @@ const ProfilePage = () => {
               {userDataLoading ? (
                 <LoadingSpinner />
               ) : (
-                <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
+                <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-6">
                   {/* Avatar */}
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-amber-500 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-amber-500 flex items-center justify-center">
                     <div
                       className={`w-full h-full flex items-center justify-center ${
                         darkMode ? "bg-gray-600" : "bg-gray-200"
                       }`}
                     >
                       <User
-                        size={40}
+                        size={window.innerWidth < 640 ? 32 : 40}
                         className={darkMode ? "text-gray-400" : "text-gray-500"}
                       />
                     </div>
@@ -488,7 +492,7 @@ const ProfilePage = () => {
                         {t("fullName")}
                       </label>
                       {isEditing ? (
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <input
                             type="text"
                             value={tempName}
@@ -499,10 +503,10 @@ const ProfilePage = () => {
                                 : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
                             }`}
                           />
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-2 justify-end sm:justify-start">
                             <button
                               onClick={handleSave}
-                              className={`p-2 rounded-xl ${
+                              className={`p-2 rounded-xl transition-colors ${
                                 darkMode
                                   ? "bg-green-600 hover:bg-green-500 text-white"
                                   : "bg-green-500 hover:bg-green-400 text-white"
@@ -512,7 +516,7 @@ const ProfilePage = () => {
                             </button>
                             <button
                               onClick={handleCancel}
-                              className={`p-2 rounded-xl ${
+                              className={`p-2 rounded-xl transition-colors ${
                                 darkMode
                                   ? "bg-red-600 hover:bg-red-500 text-white"
                                   : "bg-red-500 hover:bg-red-400 text-white"
@@ -524,7 +528,7 @@ const ProfilePage = () => {
                         </div>
                       ) : (
                         <p
-                          className={`px-4 py-2 rounded-xl ${
+                          className={`px-4 py-2 rounded-xl break-words ${
                             darkMode
                               ? "bg-gray-700 text-white"
                               : "bg-gray-100 text-gray-900"
@@ -545,7 +549,7 @@ const ProfilePage = () => {
                         {t("email")}
                       </label>
                       <p
-                        className={`px-4 py-2 rounded-xl ${
+                        className={`px-4 py-2 rounded-xl break-words ${
                           darkMode
                             ? "bg-gray-700 text-white"
                             : "bg-gray-100 text-gray-900"
@@ -560,47 +564,60 @@ const ProfilePage = () => {
             </div>
 
             <div
-              className={`rounded-2xl p-6 border transition-all duration-300 ${
+              className={`rounded-2xl p-4 sm:p-6 border transition-all duration-300 ${
                 darkMode
                   ? "bg-gray-800/50 border-gray-700/50 backdrop-blur-sm"
                   : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
               }`}
             >
               <h2
-                className={`text-xl font-semibold mb-6 ${
+                className={`text-lg sm:text-xl font-semibold mb-6 ${
                   darkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 {t("navigation")}
               </h2>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 {/* Dashboard Button - Only show for admin */}
                 {isAdmin && (
                   <button
                     onClick={handleDashboard}
-                    className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:transform hover:scale-105 ${
                       darkMode
                         ? "bg-blue-600 hover:bg-blue-500 text-white"
                         : "bg-blue-500 hover:bg-blue-400 text-white"
                     }`}
                   >
                     <LayoutDashboard size={20} />
-                    <span>{t("dashboard")}</span>
+                    <span className="hidden xs:inline">{t("dashboard")}</span>
                   </button>
                 )}
 
                 {/* Gallery Button - Always visible */}
                 <button
                   onClick={handleGallery}
-                  className={`flex items-center justify-center space-x-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:transform hover:scale-105 ${
                     darkMode
                       ? "bg-purple-600 hover:bg-purple-500 text-white"
                       : "bg-purple-500 hover:bg-purple-400 text-white"
                   }`}
                 >
                   <Image size={20} />
-                  <span>{t("gallery")}</span>
+                  <span className="hidden xs:inline">{t("gallery")}</span>
+                </button>
+
+                {/* Order Button - New navigation button */}
+                <button
+                  onClick={handleOrder}
+                  className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:transform hover:scale-105 ${
+                    darkMode
+                      ? "bg-orange-600 hover:bg-orange-500 text-white"
+                      : "bg-orange-500 hover:bg-orange-400 text-white"
+                  }`}
+                >
+                  <ShoppingCart size={20} />
+                  <span className="hidden xs:inline">{t("orders")}</span>
                 </button>
               </div>
             </div>

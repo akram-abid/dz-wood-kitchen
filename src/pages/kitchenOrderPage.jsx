@@ -152,9 +152,12 @@ const KitchenOrderPage = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!orderData.fullName.trim()) newErrors.fullName = t("fillAllFields");
-    if (!orderData.email.trim()) newErrors.email = t("fillAllFields");
-    else if (!/\S+@\S+\.\S+/.test(orderData.email))
-      newErrors.email = t("invalidEmail");
+
+    if (orderData.email && orderData.email.trim()) {
+      if (!/\S+@\S+\.\S+/.test(orderData.email)) {
+        newErrors.email = t("invalidEmail");
+      }
+    }
 
     if (!orderData.phoneNumber.trim()) newErrors.phone = t("fillAllFields");
     else if (
@@ -172,7 +175,6 @@ const KitchenOrderPage = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const token = localStorage.getItem("accessToken");
   const handleSeeOrder = () => {
     navigate("/profile");
@@ -716,7 +718,7 @@ const KitchenOrderPage = () => {
                         onChange={(e) =>
                           setOrderData({ ...orderData, email: e.target.value })
                         }
-                        placeholder={t("enterEmail")}
+                        placeholder={`${t("enterEmail")} (Optional)`}
                         className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-200 ${
                           darkMode
                             ? "bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-amber-500 focus:bg-gray-700"
