@@ -610,7 +610,6 @@ const KitchenOrderPage = () => {
                         </div>
                       </div>
                     ))}
-                    a
                   </div>
                 </div>
               )}
