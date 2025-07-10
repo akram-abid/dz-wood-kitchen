@@ -1740,11 +1740,11 @@ const OrderDetails = () => {
                     <p className="text-sm font-medium">{order.id}</p>
                     <p className="text-sm">{t("orderDate")}:</p>
                     <p className="text-sm font-medium">
-                      {order.updatedAt.split("T")[0]}
+                      {order.createdAt.split("T")[0]}
                     </p>
                     <p className="text-sm">{t("completionDate")}:</p>
                     <p className="text-sm font-medium">
-                      {order.completedAt.split("T")[0]}
+                      {order.updatedAt.split("T")[0]}
                     </p>
                     <p className="text-sm">{t("woodType")}:</p>
                     <p className="text-sm font-medium">{order.woodType}</p>
