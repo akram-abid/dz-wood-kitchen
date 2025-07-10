@@ -636,8 +636,8 @@ const AdminDashboard = () => {
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        {order.date
-                          ? new Date(order.createdAt).toLocaleDateString()
+                        {order.createdAt
+                          ? order.createdAt.split("T")[0]
                           : t("noDateProvided")}
                       </p>
                     </div>
