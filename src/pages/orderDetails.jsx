@@ -9,6 +9,7 @@ import {
   DollarSign,
   X,
   ChevronLeft,
+  ChevronRight,
   Plus,
   Edit2,
   Home,
