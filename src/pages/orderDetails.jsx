@@ -563,7 +563,7 @@ const OrderDetails = () => {
               : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
           }`}
         >
-          {kitchenData && (
+          {kitchenData && order?.postId && (
             <div
               className={`mb-6 rounded-2xl p-6 border transition-all duration-300 ${
                 darkMode
@@ -571,14 +571,27 @@ const OrderDetails = () => {
                   : "bg-white/80 border-gray-200/50 backdrop-blur-sm shadow-sm"
               }`}
             >
-              <h2
-                className={`text-xl font-semibold mb-4 flex items-center ${
-                  darkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                <Home className="mx-2" size={20} />
-                {t("selectedKitchen")}
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2
+                  className={`text-xl font-semibold flex items-center ${
+                    darkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  <Home className="mx-2" size={20} />
+                  {t("selectedKitchen")}
+                </h2>
+                <button
+                  onClick={() => navigate(`/gallery/${order.postId}`)}
+                  className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                    darkMode
+                      ? "bg-gray-700 hover:bg-gray-600 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                  }`}
+                >
+                  <span>{t("viewGallery")}</span>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
               <div className="flex items-center space-x-4">
                 <div className="w-24 h-24 rounded-xl overflow-hidden">
                   {kitchenData.images && (

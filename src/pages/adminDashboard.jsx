@@ -637,7 +637,7 @@ const AdminDashboard = () => {
                         }`}
                       >
                         {order.date
-                          ? new Date(order.date).toLocaleDateString()
+                          ? new Date(order.createdAt).toLocaleDateString()
                           : t("noDateProvided")}
                       </p>
                     </div>
@@ -830,9 +830,8 @@ const AdminDashboard = () => {
                       darkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {new Date(
-                      order.completionDetails?.completedAt || order.date
-                    ).toLocaleDateString()}
+                    
+                      {order.updatedAt.split("T")[0]}
                   </p>
                 </div>
               </div>
