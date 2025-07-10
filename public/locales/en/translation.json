@@ -302,6 +302,7 @@
   "requestNewLink": "Request a new link",
   "enterOrderTitle": "Enter your order title",
   "amount": "Amount",
-  "noTitleProvided": "Please provide a title for your order"
+  "noTitleProvided": "Please provide a title for your order",
+  "pendingApproval": "Pending approval"
 
 }
