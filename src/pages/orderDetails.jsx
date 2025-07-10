@@ -1704,9 +1704,9 @@ const OrderDetails = () => {
                 </div>
               </div>
               <div className="text-left sm:text-right">
-                <p className="font-medium">{t("furnitureCraft")}</p>
-                <p className="text-sm">123 Workshop St, Woodville</p>
-                <p className="text-sm">contact@furniturecraft.com</p>
+                <p className="font-medium">Dz Wood Kitchen</p>
+                <p className="text-sm">Ouled-Slama, Blida</p>
+                <p className="text-sm">support@dzwoodkitchen.com</p>
               </div>
             </div>
 
