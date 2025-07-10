@@ -638,7 +638,7 @@ const AdminDashboard = () => {
                       >
                         {order.createdAt
                           ? order.createdAt.split("T")[0]
-                          : t("noDateProvidedd")}
+                          : t("noDateProvided")}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -725,8 +725,8 @@ const AdminDashboard = () => {
                           darkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        {order.date
-                          ? new Date(order.date).toLocaleDateString()
+                        {order.createdAt
+                          ? order.createdAt.split("T")[0]
                           : t("noDateProvided")}
                       </p>
                     </div>
