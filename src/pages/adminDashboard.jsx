@@ -830,7 +830,6 @@ const AdminDashboard = () => {
                       darkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    
                       {order.updatedAt.split("T")[0]}
                   </p>
                 </div>
