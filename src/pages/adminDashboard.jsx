@@ -60,6 +60,7 @@ const AdminDashboard = () => {
   const [creatingPost, setCreatingPost] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  
 
   // Form states
   const [completionForm, setCompletionForm] = useState({
@@ -589,7 +590,6 @@ const AdminDashboard = () => {
                   }`}
                 >
                   <option value="all">{t("allStatuses")}</option>
-                  <option value="waiting">{t("waiting")}</option>
                   <option value="inProgress">{t("inProgress")}</option>
                   <option value="shipping">{t("shipping")}</option>
                 </select>

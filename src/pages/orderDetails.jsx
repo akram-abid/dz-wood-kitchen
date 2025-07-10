@@ -44,6 +44,21 @@ const OrderDetails = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [kitchenData, setKitchenData] = useState({});
+  const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const fullscreenStyles = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    zIndex: 1000,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
 
   const [completionForm, setCompletionForm] = useState({
     elements: [],
@@ -481,6 +496,63 @@ const OrderDetails = () => {
         showProfileButton={true}
       />
 
+      {isFullscreenPreview && order.mediaUrls && (
+        <div
+          style={fullscreenStyles}
+          onClick={() => setIsFullscreenPreview(false)}
+          className="cursor-zoom-out"
+        >
+          <div className="relative max-w-4xl w-full h-full flex items-center justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsFullscreenPreview(false);
+              }}
+              className="absolute top-4 right-4 bg-gray-800 text-white rounded-full p-2 z-10 hover:bg-gray-700"
+            >
+              <X size={24} />
+            </button>
+
+            <img
+              src={`${import.meta.env.VITE_REACT_APP_ORIGIN}/${
+                order.mediaUrls[currentImageIndex]
+              }`}
+              alt={`Order ${order.id} - ${currentImageIndex + 1}`}
+              className="max-w-full max-h-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            {order.mediaUrls.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex((prev) =>
+                      prev === 0 ? order.mediaUrls.length - 1 : prev - 1
+                    );
+                  }}
+                  className="absolute left-4 bg-gray-800 text-white rounded-full p-2 z-10 hover:bg-gray-700"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex((prev) =>
+                      prev === order.mediaUrls.length - 1 ? 0 : prev + 1
+                    );
+                  }}
+                  className="absolute right-4 bg-gray-800 text-white rounded-full p-2 z-10 hover:bg-gray-700"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div
@@ -619,7 +691,11 @@ const OrderDetails = () => {
                 {order.mediaUrls.map((img, index) => (
                   <div
                     key={index}
-                    className="relative h-36 sm:h-48 rounded-xl overflow-hidden"
+                    className="relative h-36 sm:h-48 rounded-xl overflow-hidden cursor-zoom-in"
+                    onClick={() => {
+                      setCurrentImageIndex(index);
+                      setIsFullscreenPreview(true);
+                    }}
                   >
                     <img
                       loading="lazy"
