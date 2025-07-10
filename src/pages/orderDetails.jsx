@@ -1797,7 +1797,6 @@ const OrderDetails = () => {
                   <p className="text-sm font-medium text-right">{t("date")}</p>
                 </div>
 
-                {/* Payment Rows */}
                 {order.installments?.map((payment, index) => (
                   <div
                     key={index}
