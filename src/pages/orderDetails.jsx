@@ -1805,7 +1805,6 @@ const OrderDetails = () => {
                       darkMode ? "bg-gray-800" : "bg-white"
                     }`}
                   >
-                    <h1>just do it</h1>
                     <p className="text-sm">
                       {t("payment")} {index + 1} ({payment.method})
                     </p>
