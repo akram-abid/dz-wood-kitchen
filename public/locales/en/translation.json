@@ -300,6 +300,8 @@
   "updating": "Updating...",
   "invalidTokenTitle": "Link not valid",
   "requestNewLink": "Request a new link",
-  "enterOrderTitle": "Enter your order title"
+  "enterOrderTitle": "Enter your order title",
+  "amount": "Amount",
+  "noTitleProvided": "Please provide a title for your order"
 
 }

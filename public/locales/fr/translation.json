@@ -289,5 +289,7 @@
   "updating": "Mise à jour...",
   "invalidTokenTitle": "Lien non valide",
   "requestNewLink": "Demander un nouveau lien",
-  "enterOrderTitle": "Entrez le titre de votre commande"
+  "enterOrderTitle": "Entrez le titre de votre commande",
+  "amount": "Montant",
+  "noTitleProvided": "Veuillez indiquer un titre pour votre commande"
 }

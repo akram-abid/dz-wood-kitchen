@@ -294,5 +294,7 @@
   "updating": "جاري التحديث...",
   "invalidTokenTitle": "الرابط غير صالح",
   "requestNewLink": "طلب رابط جديد",
-  "enterOrderTitle": "أدخل عنوان الطلب"
+  "enterOrderTitle": "أدخل عنوان الطلب",
+  "amount": "المبلغ",
+  "noTitleProvided": "يرجى إدخال عنوان للطلب"
 }
