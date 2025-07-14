@@ -278,7 +278,7 @@
   "driverAndWorkshopHelper": "سائق ومساعد في الورشة",
   "designerAnd3dEngineer": "مصمم ومهندس ثلاثي الأبعاد",
   "specializedIn3dAndInterior": "متخصص في النمذجة ثلاثية الأبعاد والديكور الداخلي",
-   "invalidOrExpiredToken": "هذا الرابط لم يعد صالحًا",
+  "invalidOrExpiredToken": "هذا الرابط لم يعد صالحًا",
   "noTokenProvided": "هذا الرابط غير مكتمل أو غير صالح",
   "fillAllFields": "يرجى ملء جميع الخانات",
   "passwordMinLength": "كلمة المرور يجب أن تكون على الأقل 6 أحرف",
@@ -297,5 +297,13 @@
   "enterOrderTitle": "أدخل عنوان الطلب",
   "amount": "المبلغ",
   "noTitleProvided": "يرجى إدخال عنوان للطلب",
-  "pendingApproval": "Pending approval"
+  "pendingApproval": "في انتظار الموافقة",
+  "payOnDelivery": "الدفع عند الاستلام",
+  "payOnDeliveryDescription": "ادفع عند استلام طلبك.",
+  "tenYearWarranty": "ضمان 10 سنوات",
+  "tenYearWarrantyDescription": "حماية شاملة مع ضماننا الرائد في الصناعة لمدة 10 سنوات على جميع المنتجات.",
+  "afterSalesService": "خدمة ما بعد البيع",
+  "afterSalesServiceDescription": "دعم فني متاح في حال ظهور أي مشاكل في تركيب المنتج أو عمله.",
+  "marketingSocialMediaManager": "مدير التسويق ووسائل التواصل الاجتماعي",
+  "experienceKitchenPassionate": "شغوف بالتواصل الرقمي وتعزيز العلامات التجارية"
 }

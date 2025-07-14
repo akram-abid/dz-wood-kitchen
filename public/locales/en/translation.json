@@ -303,6 +303,13 @@
   "enterOrderTitle": "Enter your order title",
   "amount": "Amount",
   "noTitleProvided": "Please provide a title for your order",
-  "pendingApproval": "Pending approval"
-
+  "pendingApproval": "Pending approval",
+  "payOnDelivery": "Pay on Delivery",
+  "payOnDeliveryDescription": "Pay when you receive your order.",
+  "tenYearWarranty": "10-Year Warranty",
+  "tenYearWarrantyDescription": "Comprehensive protection with our industry-leading 10-year warranty on all products.",
+  "afterSalesService": "After-Sales Service",
+  "afterSalesServiceDescription": "Technical support available if any issues arise with your product installation or functionality.",
+  "marketingSocialMediaManager": "Marketing and Social Media Manager",
+  "experienceKitchenPassionate": "Passionate about digital communication and brand engagement."
 }

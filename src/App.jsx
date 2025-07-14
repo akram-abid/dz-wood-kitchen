@@ -15,6 +15,10 @@ import img6 from "./assets/images/carousel/imgcarousel6.jpg";
 import img7 from "./assets/images/carousel/imgcarousel7.jpg";
 import img8 from "./assets/images/carousel/imgcarousel8.jpg";
 import img9 from "./assets/images/carousel/imgcarousel9.jpg";
+import amine from "./assets/images/amine.jpg";
+import warranty from "./assets/images/warranty.png";
+import costumerService from "./assets/images/costumer-service.png";
+import cod from "./assets/images/cod.png";
 import workshop from "./assets/images/workshop.webp";
 import designExcellenceImage from "./assets/images/designExcellenceImage.webp";
 import craftsmanshipImage from "./assets/images/craftsmanshipImage.webp";
@@ -28,6 +32,9 @@ import {
   ChevronDown,
   Sun,
   Moon,
+  Headset,
+  ShieldCheck,
+  CreditCard,
   Menu,
   X,
   ArrowDown,
@@ -195,6 +202,7 @@ function App() {
       name: "أمين",
       role: t("manager"),
       bio: t("experienceModernKitchenInteriorExpert"),
+      img: amine,
     },
     {
       id: 2,
@@ -246,6 +254,12 @@ function App() {
       name: "محمد",
       role: t("designerAnd3dEngineer"),
       bio: t("specializedIn3dAndInterior"),
+    },
+    {
+      id: 10,
+      name: "عبد الرحيم",
+      role: t("marketingSocialMediaManager"),
+      bio: t("experienceKitchenPassionate"),
     },
   ];
 
@@ -1042,19 +1056,22 @@ function App() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                 {[
                   {
-                    icon: Award,
-                    title: t("quality"),
-                    desc: t("qualityDescription"),
+                    icon: CreditCard, // or use an appropriate icon
+                    title: t("payOnDelivery"),
+                    desc: t("payOnDeliveryDescription"),
+                    image: cod,
                   },
                   {
-                    icon: Target,
-                    title: t("innovation"),
-                    desc: t("innovationDescription"),
+                    icon: ShieldCheck, // or use an appropriate icon
+                    title: t("tenYearWarranty"),
+                    desc: t("tenYearWarrantyDescription"),
+                    image: warranty,
                   },
                   {
-                    icon: Users,
-                    title: t("service"),
-                    desc: t("serviceDescription"),
+                    icon: Headset, // or use an appropriate icon
+                    title: t("afterSalesService"),
+                    desc: t("afterSalesServiceDescription"),
+                    image: costumerService,
                   },
                 ].map((value, index) => (
                   <div
@@ -1063,6 +1080,13 @@ function App() {
                       isDarkMode ? "bg-gray-800" : "bg-gray-50"
                     }`}
                   >
+                    <div className="w-full h-40 mb-4 rounded-lg overflow-hidden">
+                      <img
+                        src={value.image}
+                        alt={value.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
                       <value.icon size={18} className="text-black" />
                     </div>

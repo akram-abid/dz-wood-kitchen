@@ -292,5 +292,13 @@
   "enterOrderTitle": "Entrez le titre de votre commande",
   "amount": "Montant",
   "noTitleProvided": "Veuillez indiquer un titre pour votre commande",
-  "pendingApproval": "Pending approval"
+  "pendingApproval": "Pending approval",
+  "payOnDelivery": "Paiement à la livraison",
+  "payOnDeliveryDescription": "Payez lorsque vous recevez votre commande.",
+  "tenYearWarranty": "Garantie de 10 ans",
+  "tenYearWarrantyDescription": "Protection complète avec notre garantie de 10 ans, leader dans le secteur, sur tous les produits.",
+  "afterSalesService": "Service Après-Vente",
+  "afterSalesServiceDescription": "Assistance technique disponible en cas de problème avec l'installation ou le fonctionnement de votre produit.",
+  "marketingSocialMediaManager": "Responsable marketing et réseaux sociaux",
+  "experienceKitchenPassionate": "Passionné par la communication numérique et l’engagement de la marque"
 }
