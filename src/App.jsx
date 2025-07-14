@@ -1089,18 +1089,10 @@ function App() {
                         loading="lazy"
                       />
                     </div>
-
-                    {/* Icon */}
-                    <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <value.icon size={18} className="text-black" />
-                    </div>
-
-                    {/* Title */}
                     <h3 className="text-lg font-bold mb-1 text-center">
                       {value.title}
                     </h3>
 
-                    {/* Description */}
                     <p
                       className={`text-sm text-center ${
                         isDarkMode ? "text-gray-400" : "text-gray-600"
