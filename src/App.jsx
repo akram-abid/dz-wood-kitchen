@@ -1053,22 +1053,22 @@ function App() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mt-8">
                 {[
                   {
-                    icon: CreditCard, // or use an appropriate icon
+                    icon: CreditCard,
                     title: t("payOnDelivery"),
                     desc: t("payOnDeliveryDescription"),
                     image: cod,
                   },
                   {
-                    icon: ShieldCheck, // or use an appropriate icon
+                    icon: ShieldCheck,
                     title: t("tenYearWarranty"),
                     desc: t("tenYearWarrantyDescription"),
                     image: warranty,
                   },
                   {
-                    icon: Headset, // or use an appropriate icon
+                    icon: Headset,
                     title: t("afterSalesService"),
                     desc: t("afterSalesServiceDescription"),
                     image: costumerService,
@@ -1076,27 +1076,35 @@ function App() {
                 ].map((value, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow ${
+                    className={`p-3 sm:p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow ${
                       isDarkMode ? "bg-gray-800" : "bg-gray-50"
-                    }`}
+                    } flex flex-col`}
                   >
-                    <div className="w-full h-40 mb-4 rounded-lg overflow-hidden">
+                    {/* Image container with controlled height */}
+                    <div className="w-full h-40 sm:h-48 md:h-40 lg:h-48 mb-3 sm:mb-4 rounded-lg overflow-hidden">
                       <img
                         src={value.image}
                         alt={value.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
+                        loading="lazy"
                       />
                     </div>
+
+                    {/* Icon */}
                     <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-3">
                       <value.icon size={18} className="text-black" />
                     </div>
+
+                    {/* Title */}
                     <h3 className="text-lg font-bold mb-1 text-center">
                       {value.title}
                     </h3>
+
+                    {/* Description */}
                     <p
                       className={`text-sm text-center ${
                         isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      } px-1 sm:px-2`}
                     >
                       {value.desc}
                     </p>
