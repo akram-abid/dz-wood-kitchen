@@ -783,7 +783,10 @@ const OrderDetails = () => {
           </div>
 
           {/* Price Proposal Section */}
-          {order.status === "waiting" && (
+          {/* Price Proposal Section - Show for waiting, inProgress, and shipping statuses */}
+          {(order.status === "waiting" ||
+            order.status === "inProgress" ||
+            order.status === "shipping") && (
             <div
               className={`p-3 sm:p-4 rounded-lg mb-6 ${
                 darkMode ? "bg-gray-700" : "bg-gray-100"

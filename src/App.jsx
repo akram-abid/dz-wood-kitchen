@@ -15,6 +15,7 @@ import img6 from "./assets/images/carousel/imgcarousel6.jpg";
 import img7 from "./assets/images/carousel/imgcarousel7.jpg";
 import img8 from "./assets/images/carousel/imgcarousel8.jpg";
 import img9 from "./assets/images/carousel/imgcarousel9.jpg";
+import mohamed from "./assets/images/mohamed.jpg";
 import amine from "./assets/images/amine.jpg";
 import warranty from "./assets/images/warranty.png";
 import costumerService from "./assets/images/costumer-service.png";
@@ -209,6 +210,7 @@ function App() {
       name: "محمد الشلفي",
       role: t("workshopTeamLeader"),
       bio: t("experienceKitchenPassionate"),
+      img: mohamed
     },
     {
       id: 3,
