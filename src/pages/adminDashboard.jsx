@@ -87,7 +87,6 @@ const AdminDashboard = () => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
-  const [uploadStatus, setUploadStatus] = useState("");
 
   if (!isAuthenticated && !authLoading) navigate("/login");
 
@@ -337,88 +336,77 @@ const AdminDashboard = () => {
   };
 
   const handleCreatePost = async () => {
-    if (
-      !newPost.title ||
-      !newPost.description ||
-      !newPost.woodType ||
-      newPost.images.length === 0
-    ) {
-      alert("Please fill all required fields and upload at least one image");
-      return;
-    }
+  if (
+    !newPost.title ||
+    !newPost.description ||
+    !newPost.woodType ||
+    newPost.images.length === 0
+  ) {
+    alert("Please fill all required fields and upload at least one image");
+    return;
+  }
 
-    setCreatingPost(true);
+  setCreatingPost(true);
+  setApiUploadProgress(0); // Reset progress
+  
+  try {
+    const formData = new FormData();
+    formData.append("title", newPost.title);
+    formData.append("description", newPost.description);
+    formData.append("woodType", newPost.woodType);
+    formData.append("items", JSON.stringify(newPost.items));
+
+    if (newPost.location) formData.append("location", newPost.location);
+
+    // Append all images
+    newPost.images.forEach((image) => {
+      formData.append("media", image.file, image.name);
+    });
+
+    // Create axios config with progress tracking
+    const config = {
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round(
+          (progressEvent.loaded * 100) / progressEvent.total
+        );
+        setApiUploadProgress(percentCompleted);
+      },
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    const response = await apiFetch(
+      "/api/v1/services/posts",
+      formData,
+      config, // Pass the config with progress tracking
+      "POST"
+    );
+
+    if (response.success) {
+      alert("Post created successfully!");
+      setNewPost({
+        title: "",
+        description: "",
+        woodType: "",
+        location: "",
+        images: [],
+        items: [],
+        currentItem: "",
+      });
+      setShowCreatePostModal(false);
+    } else {
+      console.error("Failed to create post:", response.error);
+      alert("Failed to create post: " + response.error);
+    }
+  } catch (error) {
+    console.error("Error creating post:", error);
+    alert("An error occurred while creating the post");
+  } finally {
+    setCreatingPost(false);
     setApiUploadProgress(0);
-    setUploadStatus("preparing");
-
-    try {
-      const formData = new FormData();
-      formData.append("title", newPost.title);
-      formData.append("description", newPost.description);
-      formData.append("woodType", newPost.woodType);
-      formData.append("items", JSON.stringify(newPost.items));
-
-      if (newPost.location) formData.append("location", newPost.location);
-
-      // Append all images
-      newPost.images.forEach((image) => {
-        formData.append("media", image.file, image.name);
-      });
-
-      setUploadStatus("uploading");
-
-      // Example using fetch with progress tracking
-      const xhr = new XMLHttpRequest();
-      xhr.upload.addEventListener("progress", (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round(
-            (event.loaded / event.total) * 100
-          );
-          setApiUploadProgress(percentComplete);
-        }
-      });
-
-      const response = await new Promise((resolve, reject) => {
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              resolve(JSON.parse(xhr.responseText));
-            } else {
-              reject(new Error(xhr.statusText));
-            }
-          }
-        };
-
-        xhr.open("POST", "/api/v1/services/posts", true);
-        xhr.send(formData);
-      });
-
-      setUploadStatus("processing");
-
-      if (response.success) {
-        alert("Post created successfully!");
-        setNewPost({
-          title: "",
-          description: "",
-          woodType: "",
-          location: "",
-          images: [],
-          items: [],
-          currentItem: "",
-        });
-        setShowCreatePostModal(false);
-      } else {
-        throw new Error(response.error || "Failed to create post");
-      }
-    } catch (error) {
-      console.error("Error creating post:", error);
-      alert(`An error occurred: ${error.message}`);
-    } finally {
-      setCreatingPost(false);
-      setApiUploadProgress(0);
-      setUploadStatus("");
-    }
-  };
+  }
+};
 
   const handleAddPayment = async () => {
     if (!currentOrder || !paymentData.amount) return;
@@ -925,50 +913,16 @@ const AdminDashboard = () => {
                     {t("createNewPost")}
                   </h2>
                   <button
-                    onClick={() =>
-                      !creatingPost && setShowCreatePostModal(false)
-                    }
+                    onClick={() => setShowCreatePostModal(false)}
                     className={`p-2 rounded-full ${
                       darkMode
                         ? "hover:bg-gray-700 text-gray-400"
                         : "hover:bg-gray-100 text-gray-500"
-                    } ${creatingPost ? "cursor-not-allowed opacity-50" : ""}`}
+                    }`}
                   >
                     <X size={20} />
                   </button>
                 </div>
-
-                {/* API Upload Progress Bar */}
-                {creatingPost && (
-                  <div className="mb-4 px-6">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span
-                        className={darkMode ? "text-gray-300" : "text-gray-700"}
-                      >
-                        {t("uploadingToServer")}...
-                      </span>
-                      <span
-                        className={darkMode ? "text-gray-300" : "text-gray-700"}
-                      >
-                        {apiUploadProgress}%
-                      </span>
-                    </div>
-                    <div
-                      className={`w-full h-2 rounded-full ${
-                        darkMode ? "bg-gray-700" : "bg-gray-200"
-                      }`}
-                    >
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          apiUploadProgress === 100
-                            ? "bg-green-500"
-                            : "bg-yellow-500"
-                        }`}
-                        style={{ width: `${apiUploadProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
 
                 {/* Form Content */}
                 <div className="space-y-4">
@@ -1311,12 +1265,13 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="sticky bottom-0 p-6 pt-0 mt-6 flex justify-end space-x-3 dark:bg-gray-800">
+                <div className="sticky bottom-0 p-6 pt-0 mt-6 flex justify-end space-x-3">
                   <button
                     onClick={() => setShowCreatePostModal(false)}
-                    disabled={creatingPost}
                     className={`px-4 py-2 rounded-lg ${
-                      creatingPost ? "opacity-50 cursor-not-allowed" : ""
+                      darkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-white"
+                        : "bg-gray-200 hover:bg-gray-300 text-gray-900"
                     }`}
                   >
                     {t("cancel")}
