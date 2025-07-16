@@ -40,6 +40,7 @@ const AdminDashboard = () => {
   // State for orders and loading states
   const [orders, setOrders] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
+  const [apiUploadProgress, setApiUploadProgress] = useState(0);
   const [waitingOrders, setWaitingOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState({
     completed: false,
@@ -346,6 +347,8 @@ const AdminDashboard = () => {
     }
 
     setCreatingPost(true);
+    setApiUploadProgress(0); // Reset progress
+
     try {
       const formData = new FormData();
       formData.append("title", newPost.title);
@@ -355,15 +358,28 @@ const AdminDashboard = () => {
 
       if (newPost.location) formData.append("location", newPost.location);
 
-      // Append all images (already converted to WebP)
+      // Append all images
       newPost.images.forEach((image) => {
         formData.append("media", image.file, image.name);
       });
 
+      // Create axios config with progress tracking
+      const config = {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setApiUploadProgress(percentCompleted);
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
       const response = await apiFetch(
         "/api/v1/services/posts",
         formData,
-        false,
+        config, // Pass the config with progress tracking
         "POST"
       );
 
@@ -388,6 +404,7 @@ const AdminDashboard = () => {
       alert("An error occurred while creating the post");
     } finally {
       setCreatingPost(false);
+      setApiUploadProgress(0);
     }
   };
 
@@ -896,16 +913,50 @@ const AdminDashboard = () => {
                     {t("createNewPost")}
                   </h2>
                   <button
-                    onClick={() => setShowCreatePostModal(false)}
+                    onClick={() =>
+                      !creatingPost && setShowCreatePostModal(false)
+                    }
                     className={`p-2 rounded-full ${
                       darkMode
                         ? "hover:bg-gray-700 text-gray-400"
                         : "hover:bg-gray-100 text-gray-500"
-                    }`}
+                    } ${creatingPost ? "cursor-not-allowed opacity-50" : ""}`}
                   >
                     <X size={20} />
                   </button>
                 </div>
+
+                {/* API Upload Progress Bar */}
+                {creatingPost && (
+                  <div className="mb-4 px-6">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span
+                        className={darkMode ? "text-gray-300" : "text-gray-700"}
+                      >
+                        {t("uploadingToServer")}...
+                      </span>
+                      <span
+                        className={darkMode ? "text-gray-300" : "text-gray-700"}
+                      >
+                        {apiUploadProgress}%
+                      </span>
+                    </div>
+                    <div
+                      className={`w-full h-2 rounded-full ${
+                        darkMode ? "bg-gray-700" : "bg-gray-200"
+                      }`}
+                    >
+                      <div
+                        className={`h-full rounded-full transition-all duration-300 ${
+                          apiUploadProgress === 100
+                            ? "bg-green-500"
+                            : "bg-yellow-500"
+                        }`}
+                        style={{ width: `${apiUploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Form Content */}
                 <div className="space-y-4">
@@ -1248,14 +1299,15 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="sticky bottom-0 p-6 pt-0 mt-6 flex justify-end space-x-3">
+                <div className="sticky bottom-0 p-6 pt-0 mt-6 flex justify-end space-x-3 bg-white dark:bg-gray-800">
                   <button
                     onClick={() => setShowCreatePostModal(false)}
+                    disabled={creatingPost}
                     className={`px-4 py-2 rounded-lg ${
                       darkMode
                         ? "bg-gray-700 hover:bg-gray-600 text-white"
                         : "bg-gray-200 hover:bg-gray-300 text-gray-900"
-                    }`}
+                    } ${creatingPost ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     {t("cancel")}
                   </button>
