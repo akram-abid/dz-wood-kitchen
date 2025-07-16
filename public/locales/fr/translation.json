@@ -300,5 +300,8 @@
   "afterSalesService": "Service Après-Vente",
   "afterSalesServiceDescription": "Assistance technique disponible en cas de problème avec l'installation ou le fonctionnement de votre produit.",
   "marketingSocialMediaManager": "Responsable marketing et réseaux sociaux",
-  "experienceKitchenPassionate": "Passionné par la communication numérique et l’engagement de la marque"
+  "experienceKitchenPassionate": "Passionné par la communication numérique et l’engagement de la marque",
+  "clickToUpload": "Cliquez pour téléverser",
+  "supportsMultipleImages": "Prend en charge plusieurs images",
+  "uploadingToServer": "Téléversement sur le serveur..."
 }

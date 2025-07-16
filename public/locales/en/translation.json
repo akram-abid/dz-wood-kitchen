@@ -311,5 +311,8 @@
   "afterSalesService": "After-Sales Service",
   "afterSalesServiceDescription": "Technical support available if any issues arise with your product installation or functionality.",
   "marketingSocialMediaManager": "Marketing and Social Media Manager",
-  "experienceKitchenPassionate": "Passionate about digital communication and brand engagement."
+  "experienceKitchenPassionate": "Passionate about digital communication and brand engagement.",
+  "clickToUpload": "Click to upload",
+  "supportsMultipleImages": "Supports multiple images",
+  "uploadingToServer": "Uploading to server..."
 }

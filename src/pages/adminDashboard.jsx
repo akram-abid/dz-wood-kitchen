@@ -1303,11 +1303,7 @@ const AdminDashboard = () => {
                   <button
                     onClick={() => setShowCreatePostModal(false)}
                     disabled={creatingPost}
-                    className={`px-4 py-2 rounded-lg ${
-                      darkMode
-                        ? "bg-gray-700 hover:bg-gray-600 text-white"
-                        : "bg-gray-200 hover:bg-gray-300 text-gray-900"
-                    } ${creatingPost ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`px-4 py-2 rounded-lg ${creatingPost ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     {t("cancel")}
                   </button>

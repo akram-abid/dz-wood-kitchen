@@ -305,5 +305,8 @@
   "afterSalesService": "خدمة ما بعد البيع",
   "afterSalesServiceDescription": "دعم فني متاح في حال ظهور أي مشاكل في تركيب المنتج أو عمله.",
   "marketingSocialMediaManager": "مدير التسويق ووسائل التواصل الاجتماعي",
-  "experienceKitchenPassionate": "شغوف بالتواصل الرقمي وتعزيز العلامات التجارية"
+  "experienceKitchenPassionate": "شغوف بالتواصل الرقمي وتعزيز العلامات التجارية",
+  "clickToUpload": "انقر للتحميل",
+  "supportsMultipleImages": "يدعم صورًا متعددة",
+  "uploadingToServer": "جارٍ التحميل إلى الخادم..."
 }
