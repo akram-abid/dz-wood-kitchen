@@ -367,24 +367,46 @@ const AdminDashboard = () => {
 
       setUploadStatus("uploading");
 
-      // Create custom headers if needed
-      const headers = {
-        "Content-Type": "multipart/form-data",
-        // Add any other headers your apiFetch expects
-      };
+      // Get the access token from localStorage
+      const accessToken = localStorage.getItem("accessToken");
 
-      // Use apiFetch with progress tracking
-      const response = await apiFetch("/api/v1/services/posts", formData, {
-        method: "POST",
-        headers: headers,
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.lengthComputable) {
-            const percentComplete = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setApiUploadProgress(percentComplete);
+      // Create XMLHttpRequest with progress tracking
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round(
+            (event.loaded / event.total) * 100
+          );
+          setApiUploadProgress(percentComplete);
+        }
+      });
+
+      const response = await new Promise((resolve, reject) => {
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              try {
+                resolve(JSON.parse(xhr.responseText));
+              } catch (error) {
+                reject(new Error("Invalid JSON response"));
+              }
+            } else {
+              reject(new Error(xhr.statusText || "Request failed"));
+            }
           }
-        },
+        };
+
+        xhr.open("POST", "/api/v1/services/posts", true);
+
+        // Set authorization header
+        if (accessToken) {
+          xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
+        }
+
+        // Important: Don't set Content-Type header for FormData - let the browser set it automatically
+        // with the correct boundary parameter
+
+        xhr.send(formData);
       });
 
       setUploadStatus("processing");
@@ -407,12 +429,20 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error("Error creating post:", error);
       alert(`An error occurred: ${error.message}`);
+
+      // If it's an authorization error, you might want to redirect to login
+      if (
+        error.message.includes("401") ||
+        error.message.includes("Unauthorized")
+      ) {
+        // Handle unauthorized error (e.g., redirect to login)
+      }
     } finally {
       setCreatingPost(false);
       setApiUploadProgress(0);
       setUploadStatus("");
     }
-  };
+  };  
 
   const handleAddPayment = async () => {
     if (!currentOrder || !paymentData.amount) return;
