@@ -87,6 +87,7 @@ const AdminDashboard = () => {
   const [uploadProgress, setUploadProgress] = useState({});
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const [uploadStatus, setUploadStatus] = useState("");
 
   if (!isAuthenticated && !authLoading) navigate("/login");
 
@@ -347,7 +348,8 @@ const AdminDashboard = () => {
     }
 
     setCreatingPost(true);
-    setApiUploadProgress(0); // Reset progress
+    setApiUploadProgress(0);
+    setUploadStatus("preparing");
 
     try {
       const formData = new FormData();
@@ -363,25 +365,35 @@ const AdminDashboard = () => {
         formData.append("media", image.file, image.name);
       });
 
-      // Create axios config with progress tracking
-      const config = {
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setApiUploadProgress(percentCompleted);
-        },
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      };
+      setUploadStatus("uploading");
 
-      const response = await apiFetch(
-        "/api/v1/services/posts",
-        formData,
-        config, // Pass the config with progress tracking
-        "POST"
-      );
+      // Example using fetch with progress tracking
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round(
+            (event.loaded / event.total) * 100
+          );
+          setApiUploadProgress(percentComplete);
+        }
+      });
+
+      const response = await new Promise((resolve, reject) => {
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject(new Error(xhr.statusText));
+            }
+          }
+        };
+
+        xhr.open("POST", "/api/v1/services/posts", true);
+        xhr.send(formData);
+      });
+
+      setUploadStatus("processing");
 
       if (response.success) {
         alert("Post created successfully!");
@@ -396,15 +408,15 @@ const AdminDashboard = () => {
         });
         setShowCreatePostModal(false);
       } else {
-        console.error("Failed to create post:", response.error);
-        alert("Failed to create post: " + response.error);
+        throw new Error(response.error || "Failed to create post");
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("An error occurred while creating the post");
+      alert(`An error occurred: ${error.message}`);
     } finally {
       setCreatingPost(false);
       setApiUploadProgress(0);
+      setUploadStatus("");
     }
   };
 
@@ -1299,11 +1311,13 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Modal Footer */}
-                <div className="sticky bottom-0 p-6 pt-0 mt-6 flex justify-end space-x-3 bg-white dark:bg-gray-800">
+                <div className="sticky bottom-0 p-6 pt-0 mt-6 flex justify-end space-x-3 dark:bg-gray-800">
                   <button
                     onClick={() => setShowCreatePostModal(false)}
                     disabled={creatingPost}
-                    className={`px-4 py-2 rounded-lg ${creatingPost ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`px-4 py-2 rounded-lg ${
+                      creatingPost ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
                     {t("cancel")}
                   </button>
