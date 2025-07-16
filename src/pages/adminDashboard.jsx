@@ -6,6 +6,7 @@ import {
   Sun,
   Moon,
   ChevronDown,
+  UploadCloud,
   Home,
   Package,
   CheckCircle,
