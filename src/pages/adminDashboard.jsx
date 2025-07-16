@@ -877,192 +877,328 @@ const AdminDashboard = () => {
         )}
 
         {/* Create Post Modal */}
-        {/* Create Post Modal */}
         {showCreatePostModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div
-              className={`rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto ${
+              className={`rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl ${
                 darkMode ? "bg-gray-800" : "bg-white"
               }`}
             >
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2
-                    className={`text-xl font-bold ${
-                      darkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {t("createNewPost")}
-                  </h2>
-                  <button
-                    onClick={() => setShowCreatePostModal(false)}
-                    className={`p-2 rounded-full ${
-                      darkMode
-                        ? "hover:bg-gray-700 text-gray-400"
-                        : "hover:bg-gray-100 text-gray-500"
-                    }`}
-                  >
-                    <X size={20} />
-                  </button>
+              {/* Modal Header */}
+              <div className="sticky top-0 z-10 p-6 pb-0 flex justify-between items-center border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {t("createNewPost")}
+                </h2>
+                <button
+                  onClick={() => setShowCreatePostModal(false)}
+                  className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-6">
+                {/* Post Title */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t("title")} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newPost.title}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, title: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    placeholder={t("enterTitle")}
+                  />
                 </div>
 
-                <div className="space-y-4">
-                  {/* ... (other form fields remain the same) ... */}
+                {/* Description */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t("description")} <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={newPost.description}
+                    onChange={(e) =>
+                      setNewPost({ ...newPost, description: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                    placeholder={t("enterDescription")}
+                  />
+                </div>
 
-                  <div>
-                    <label
-                      className={`block text-sm font-medium mb-2 ${
-                        darkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      {t("images")}
+                {/* Wood Type and Location */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Wood Type */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t("woodType")} <span className="text-red-500">*</span>
                     </label>
-
-                    {/* Hidden file input */}
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageUpload}
-                      accept="image/*"
-                      multiple
-                      style={{ display: "none" }}
-                      disabled={isUploading}
-                    />
-
-                    {/* Upload area */}
-                    <div
-                      onClick={() =>
-                        !isUploading && fileInputRef.current?.click()
+                    <select
+                      value={newPost.woodType}
+                      onChange={(e) =>
+                        setNewPost({ ...newPost, woodType: e.target.value })
                       }
-                      className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-                        darkMode
-                          ? "border-gray-600 bg-gray-700/50 hover:bg-gray-700/70"
-                          : "border-gray-300 bg-gray-100 hover:bg-gray-200"
-                      } ${isUploading ? "opacity-70 cursor-not-allowed" : ""}`}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     >
-                      <div className="flex flex-col items-center">
-                        {isUploading ? (
-                          <>
-                            <Spinner size={24} />
-                            <p
-                              className={`mt-2 ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              {t("uploading")}...
-                            </p>
-                          </>
-                        ) : (
-                          <>
-                            <Plus
-                              size={24}
-                              className={`mb-2 ${
-                                darkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            />
-                            <p
-                              className={`${
-                                darkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              {t("clickToUpload")}
-                            </p>
-                            <p
-                              className={`text-xs mt-1 ${
-                                darkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
-                            >
-                              {t("supportsMultipleImages")}
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                      <option value="">{t("selectWoodType")}</option>
+                      <option value="Egger">Egger</option>
+                      <option value="High-Gloss">High Gloss</option>
+                      <option value="MDF">MDF</option>
+                    </select>
+                  </div>
 
-                    {/* Upload progress indicators */}
-                    {isUploading && Object.keys(uploadProgress).length > 0 && (
-                      <div className="mt-4 space-y-2">
-                        {Object.entries(uploadProgress).map(
-                          ([fileName, progress]) => (
-                            <div key={fileName} className="space-y-1">
-                              <div className="flex justify-between text-xs">
-                                <span
-                                  className={`truncate max-w-[180px] ${
-                                    darkMode ? "text-gray-400" : "text-gray-600"
-                                  }`}
-                                >
-                                  {fileName}
-                                </span>
-                                <span
-                                  className={`${
-                                    darkMode ? "text-gray-300" : "text-gray-700"
-                                  }`}
-                                >
-                                  {Math.round(progress)}%
-                                </span>
-                              </div>
-                              <div
-                                className={`w-full h-2 rounded-full ${
-                                  darkMode ? "bg-gray-700" : "bg-gray-200"
-                                }`}
-                              >
-                                <div
-                                  className={`h-full rounded-full ${
-                                    progress === 100
-                                      ? "bg-green-500"
-                                      : "bg-yellow-500"
-                                  }`}
-                                  style={{ width: `${progress}%` }}
-                                />
-                              </div>
-                            </div>
-                          )
-                        )}
-                      </div>
-                    )}
-
-                    {/* Image preview */}
-                    {newPost.images && newPost.images.length > 0 && (
-                      <div className="mt-4">
-                        <h3
-                          className={`text-sm font-medium mb-2 ${
-                            darkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          {t("uploadedImages")} ({newPost.images.length})
-                        </h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                          {newPost.images.map((image, index) => (
-                            <div key={index} className="relative group">
-                              <div className="aspect-square overflow-hidden rounded-lg">
-                                <img
-                                  loading="lazy"
-                                  src={image.preview}
-                                  alt={`Preview ${index + 1}`}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeImage(index);
-                                }}
-                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <X size={16} />
-                              </button>
-                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                                <p className="text-white text-xs truncate">
-                                  {image.originalName || image.name}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                  {/* Location */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t("location")}
+                    </label>
+                    <input
+                      type="text"
+                      value={newPost.location}
+                      onChange={(e) =>
+                        setNewPost({ ...newPost, location: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                      placeholder={t("enterLocation")}
+                    />
                   </div>
                 </div>
+
+                {/* Items */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t("items")} ({t("optional")})
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={newPost.currentItem}
+                      onChange={(e) =>
+                        setNewPost({ ...newPost, currentItem: e.target.value })
+                      }
+                      className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                      placeholder={t("Add item (e.g. table, chair)")}
+                      onKeyPress={(e) => e.key === "Enter" && handleAddItem()}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddItem}
+                      disabled={!newPost.currentItem.trim()}
+                      className="px-4 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {t("Add")}
+                    </button>
+                  </div>
+
+                  {/* Display added items */}
+                  {newPost.items.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {newPost.items.map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-1.5"
+                        >
+                          <span className="text-sm text-gray-800 dark:text-gray-200">
+                            {item}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(index)}
+                            className="ml-2 -mr-1 p-0.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Image Upload */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t("images")} <span className="text-red-500">*</span>
+                  </label>
+
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                    disabled={isUploading}
+                  />
+
+                  {/* Upload area */}
+                  <div
+                    onClick={() =>
+                      !isUploading && fileInputRef.current?.click()
+                    }
+                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                      darkMode
+                        ? "border-gray-600 bg-gray-700/30 hover:border-gray-500"
+                        : "border-gray-300 bg-gray-50 hover:border-gray-400"
+                    } ${isUploading ? "opacity-70 cursor-not-allowed" : ""}`}
+                  >
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      {isUploading ? (
+                        <>
+                          <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                          <p className="text-gray-600 dark:text-gray-400 font-medium">
+                            {t("uploading")}...
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30">
+                            <UploadCloud
+                              size={24}
+                              className="text-yellow-600 dark:text-yellow-400"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-gray-900 dark:text-white font-medium">
+                              {t("dragAndDrop")}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              {t("orClickToBrowse")}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                              {t("supportsMultipleImages")}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Upload progress indicators */}
+                  {isUploading && Object.keys(uploadProgress).length > 0 && (
+                    <div className="mt-4 space-y-3">
+                      {Object.entries(uploadProgress).map(
+                        ([fileName, progress]) => (
+                          <div key={fileName} className="space-y-1.5">
+                            <div className="flex justify-between text-sm">
+                              <span
+                                className={`truncate max-w-[70%] ${
+                                  darkMode ? "text-gray-300" : "text-gray-700"
+                                }`}
+                              >
+                                {fileName}
+                              </span>
+                              <span
+                                className={`font-medium ${
+                                  darkMode ? "text-gray-200" : "text-gray-800"
+                                }`}
+                              >
+                                {Math.round(progress)}%
+                              </span>
+                            </div>
+                            <div
+                              className={`w-full h-2 rounded-full ${
+                                darkMode ? "bg-gray-700" : "bg-gray-200"
+                              }`}
+                            >
+                              <div
+                                className={`h-full rounded-full transition-all duration-300 ${
+                                  progress === 100
+                                    ? "bg-green-500"
+                                    : "bg-yellow-500"
+                                }`}
+                                style={{ width: `${progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  {/* Image preview */}
+                  {newPost.images.length > 0 && (
+                    <div className="mt-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {t("preview")} ({newPost.images.length})
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="text-sm font-medium text-yellow-600 dark:text-yellow-400 hover:underline"
+                        >
+                          {t("addMoreImages")}
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {newPost.images.map((image, index) => (
+                          <div
+                            key={index}
+                            className="relative group aspect-square rounded-lg overflow-hidden"
+                          >
+                            <img
+                              src={image.preview}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute bottom-0 left-0 right-0 p-2 translate-y-2 group-hover:translate-y-0 transition-transform">
+                              <p className="text-xs text-white truncate">
+                                {image.originalName || image.name}
+                              </p>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeImage(index);
+                              }}
+                              className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 z-10 p-6 pt-0 flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <button
+                  onClick={() => setShowCreatePostModal(false)}
+                  className="px-5 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium"
+                >
+                  {t("cancel")}
+                </button>
+                <button
+                  onClick={handleCreatePost}
+                  disabled={
+                    creatingPost ||
+                    !newPost.title ||
+                    !newPost.description ||
+                    !newPost.woodType ||
+                    newPost.images.length === 0
+                  }
+                  className="px-5 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-medium disabled:opacity-70 disabled:cursor-not-allowed min-w-[120px] flex items-center justify-center"
+                >
+                  {creatingPost ? (
+                    <>
+                      <Spinner size={20} className="mr-2" />
+                      {t("creating")}...
+                    </>
+                  ) : (
+                    t("createPost")
+                  )}
+                </button>
               </div>
             </div>
           </div>
