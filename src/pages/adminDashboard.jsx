@@ -237,47 +237,80 @@ const AdminDashboard = () => {
   };
 
   const handleImageUpload = async (e) => {
-  const files = Array.from(e.target.files);
-  if (files.length === 0) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
-  setIsUploading(true);
-  setUploadProgress({}); // Reset progress
+    setIsUploading(true);
+    setUploadProgress({}); // Reset progress
 
-  // Process each file WITHOUT compression or conversion
-  const processedImages = await Promise.all(
-    files.map(async (file) => {
-      if (!file.type.startsWith("image/")) return null;
+    // Process each file with WebP conversion
+    const processedImages = await Promise.all(
+      files.map(async (file, index) => {
+        if (!file.type.startsWith("image/")) return null;
 
-      // Immediately set progress to 100% (no processing needed)
-      setUploadProgress((prev) => ({ ...prev, [file.name]: 100 }));
+        try {
+          // Update progress for this file
+          setUploadProgress((prev) => ({ ...prev, [file.name]: 0 }));
 
-      // Create preview (unchanged)
-      const preview = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target.result);
-        reader.readAsDataURL(file);
-      });
+          // Convert to WebP
+          const options = {
+            maxSizeMB: 5,
+            //maxWidthOrHeight: 1920,
+            useWebWorker: true,
+            fileType: "image/webp",
+            onProgress: (percentage) => {
+              setUploadProgress((prev) => ({
+                ...prev,
+                [file.name]: percentage,
+              }));
+            },
+          };
 
-      return {
-        file: file, // Keep original file (no compression)
-        preview: preview, // Preview for UI
-        name: file.name, // Original filename
-        originalName: file.name,
-      };
-    })
-  );
+          const compressedFile = await imageCompression(file, options);
 
-  // Filter out non-image files
-  const validImages = processedImages.filter((img) => img !== null);
+          // Create preview
+          const preview = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.readAsDataURL(compressedFile);
+          });
 
-  setNewPost((prev) => ({
-    ...prev,
-    images: [...prev.images, ...validImages],
-  }));
+          return {
+            file: compressedFile,
+            preview: preview,
+            name: `${file.name.split(".")[0]}.webp`,
+            originalName: file.name,
+          };
+        } catch (error) {
+          console.error("Error processing image:", error);
+          // Fallback to original if conversion fails
+          const preview = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.readAsDataURL(file);
+          });
 
-  setIsUploading(false);
-  e.target.value = ""; // Reset file input
-};
+          return {
+            file: file,
+            preview: preview,
+            name: file.name,
+            originalName: file.name,
+          };
+        }
+      })
+    );
+
+    // Filter out any null values (non-image files)
+    const validImages = processedImages.filter((img) => img !== null);
+
+    setNewPost((prev) => ({
+      ...prev,
+      images: [...prev.images, ...validImages],
+    }));
+
+    setIsUploading(false);
+    e.target.value = ""; // Reset file input
+  };
 
   const removeImage = (index) => {
     setNewPost((prev) => ({
