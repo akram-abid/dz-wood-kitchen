@@ -18,7 +18,7 @@ import img9 from "./assets/images/carousel/imgcarousel9.jpg";
 import mohamed from "./assets/images/mohamed.jpg";
 import amine from "./assets/images/amine.jpg";
 import warranty from "./assets/images/warranty.png";
-import costumerService from "./assets/images/costumer-service.jpg";
+import costumerService from "./assets/images/costumer-service.png";
 import cod from "./assets/images/cod.png";
 import workshop from "./assets/images/workshop.webp";
 import designExcellenceImage from "./assets/images/designExcellenceImage.webp";
